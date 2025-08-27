@@ -68,15 +68,6 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         </div>
 
-        {/* Tab Navigation */}
-        <Tabs value="settings" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sessions" asChild>
-              <Link href="/sessions">Sessions</Link>
-            </TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
       {/* Settings Content */}

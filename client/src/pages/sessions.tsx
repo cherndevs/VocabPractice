@@ -48,15 +48,6 @@ export default function Sessions() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <Tabs value="sessions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="settings" asChild>
-              <Link href="/settings">Settings</Link>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
 
       {/* Content */}
