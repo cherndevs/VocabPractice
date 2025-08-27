@@ -139,7 +139,7 @@ export default function PracticeSession() {
               if (!isPaused && currentWordIndex < session.words.length - 1) {
                 setCurrentWordIndex(prev => prev + 1);
                 setCurrentRepetition(1);
-                playWord();
+                // Don't auto-play next word - user must press play button
               }
             }, pauseDuration);
           }
@@ -166,11 +166,7 @@ export default function PracticeSession() {
     if (currentWordIndex < session.words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
       setCurrentRepetition(1);
-
-      // Auto-play in test mode
-      if (mode === "test") {
-        timeoutRef.current = setTimeout(playWord, 500);
-      }
+      // Don't auto-play - user must press play button
     }
   };
 
@@ -185,11 +181,7 @@ export default function PracticeSession() {
     setIsPaused(false);
     setCurrentWordIndex(0);
     setCurrentRepetition(1);
-
-    // Auto-play first word in test mode
-    if (mode === "test") {
-      timeoutRef.current = setTimeout(playWord, 500);
-    }
+    // Don't auto-play - user must press play button
   };
 
   const previousWord = () => {
@@ -252,11 +244,7 @@ export default function PracticeSession() {
     setIsPaused(false);
     setMode(newMode);
     setCurrentRepetition(1);
-
-    // Auto-play first word in test mode
-    if (newMode === "test") {
-      timeoutRef.current = setTimeout(playWord, 500);
-    }
+    // Don't auto-play when entering test mode - user must press play
   };
 
   const formatTime = (seconds: number) => {
