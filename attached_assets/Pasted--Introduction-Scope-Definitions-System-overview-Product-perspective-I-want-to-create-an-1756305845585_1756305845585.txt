@@ -1,0 +1,54 @@
+# Introduction
+## Scope
+## Definitions
+
+# System overview
+## Product perspective
+I want to create an PWA app mean to run on an iPhone. I'm envisioning a tab at the bottom of the screen that allows me to navigate between the main spelling session page, and maybe a settings page. The spelling session page should list the spelling sessions created prior in a list, and should have a 'create' button at the top of the page. 
+
+The 'create' button should initiate a create spelling session workflow, which is a stepped workflow that allows me to: 1. Data acquisition by launching the phone’s camera, then allowing the user to take a photo of the spelling worksheet, which can be optionally skipped straight to the word editing screen 2. Data preparation with the user selecting the area on the worksheet that the user wants processed into spelling words 3. Data processing of the area of the image captured to extract the text on the sheet into spelling words 4. Presenting the user with a preview of all the spelling words captured in an editable and enumerated list of words in the word editing screen, which optionally allows the user to add new words as well 5. Allowing the user to edit if needed, then press the ‘confirmation’ button to finalise the spelling words to be saved into the session 6. Tapping on the ‘confirmation’ button creating a new spelling practice session and populating it with the spelling words, then launches the spelling practice session. 7. The spelling practice session should now also be visible and can be launched from the main spelling practice session list
+
+The expected workflow to run a spelling practice session is
+1. User taps on a practice session from the practice session list
+2. The UI switches to the spelling practice session
+3. In the ‘practice’ mode, the spelling practice session UI presents the user with an option to autoplay all the practice words, or to tap on individual words to practice
+4. In the ‘test’ mode, the words are all concealed and the student has controls to start the session playback
+5. There should be an options button that allows the user to configure how many times the word should be read out aloud by the app, and the time gap in between the words being read.
+
+In ' test mode', the app selects the first word to dictate, and dictates the word out a set number of times before automatically changing to the next word. There should be a time gap between each repetition of the word being read. The time gap should be a configurable parameter in the settings page. There should also be an 'auto play' toggle on the Test Mode page that allows setting if all words should be autoplayed in sequence after being read out a set number of times. The number of times the word is read should also be a configuration that can be set in the settings page.
+
+
+
+## Product features
+1. Easy data acquisition: Scan a paper document using the iPhone’s onboard camera module to convert images into text to construct a spelling training session with 
+2. Smart entity extraction: Some entity extraction will be required when the photo is taken, to identity individual words or phrases that should go together, and which individual words on the page should be their own items without the user having to manually identify them himself
+3. Spelling session execution: Allow student to practicing writing words while looking at the words displayed while writing the words on paper, and then masking the words to be practiced when the student wants to test their memory while reading it out aloud
+4. Spelling session management: Controls for student to easily manage a session being played back
+5. Spelling session config: Ability for the user to configure spelling session settings to enable them to learn and write at their own pace automatically
+
+
+## Constraints
+1. Must be able to run on my iPhone, and make use of its camera to capture images and do OCR with it. 
+2. Should not cost me any money to run
+
+## Assumptions
+1. App will not capture the student’s handwriting, and this will be done on paper offline. 
+
+## Other Requirements
+
+A Spelling session should have configurations that allow the user to set playback speed, number of times the word is repeatedly read out
+Spelling session should have a features that allows the user to mark certain words as ‘OK’. Those words will be skipped during auto playback in a session
+Spelling session should have a feature that reveals how the words are actually spelt, so child can check and mark it themselves.
+
+
+Overall: 
+1. Spelling is expected to be multilingual, with some test having a combination of Chinese pinyin, simple Chinese characters, and other purely English words. 
+2. All words in spelling practice sessions are masked when the UI is launched
+
+
+# Architecture requirements
+
+Technical requirements:
+- The app should be a PWA, likely JS based framework
+- Will likely need to use tesseract for OCR capabilities and entity extraction
+    - ALL COMPUTATIONAL LOGIC THAT CAN BE IN THE BROWSER SHOULD RUN IN THE BROWSER and make use of browser capabilities such as text to speech, where possible. 
