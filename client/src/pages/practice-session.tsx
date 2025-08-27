@@ -18,7 +18,7 @@ export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  
+
   const [mode, setMode] = useState<PracticeMode>("practice");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
@@ -27,7 +27,7 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  
+
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
 
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -48,12 +48,41 @@ export default function PracticeSession() {
     },
   });
 
+  // Stop speech when navigating away or component unmounts
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Force stop all speech synthesis
+      window.speechSynthesis.cancel();
+      cancel();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Stop speech when tab becomes hidden/inactive
+        window.speechSynthesis.cancel();
+        cancel();
+      }
+    };
+
+    // Listen for page unload and visibility changes
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      // Cleanup: stop speech and remove listeners
+      window.speechSynthesis.cancel();
+      cancel();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [cancel]);
+
   // Update time spent every second
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeSpent(Math.floor((Date.now() - sessionStartTime) / 1000));
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
@@ -62,7 +91,7 @@ export default function PracticeSession() {
     if (session) {
       const progress = Math.floor((wordsCompleted.size / session.words.length) * 100);
       const status = progress === 100 ? "completed" : wordsCompleted.size > 0 ? "in-progress" : "new";
-      
+
       updateSessionMutation.mutate({
         progress: wordsCompleted.size,
         timeSpent,
@@ -73,17 +102,17 @@ export default function PracticeSession() {
 
   const playWord = async () => {
     if (!session || isMuted || isPaused) return;
-    
+
     const word = session.words[currentWordIndex];
     if (word) {
       try {
         await speak(word);
-        
+
         // In test mode, handle repetitions with pauses
         if (mode === "test" && settings) {
           const maxReps = settings.wordRepetitions || 2;
           const pauseDuration = settings.pauseBetweenWords || 1500;
-          
+
           if (currentRepetition < maxReps) {
             setTimeout(() => {
               if (!isPaused) { // Check if not paused before continuing
@@ -102,15 +131,16 @@ export default function PracticeSession() {
 
   const nextWord = () => {
     if (!session) return;
-    
-    // Cancel any ongoing speech
+
+    // Force stop all speech immediately
+    window.speechSynthesis.cancel();
     cancel();
     setIsPaused(false);
-    
+
     if (currentWordIndex < session.words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
       setCurrentRepetition(1);
-      
+
       // Auto-play in test mode
       if (mode === "test") {
         setTimeout(playWord, 500);
@@ -120,7 +150,8 @@ export default function PracticeSession() {
 
   const previousWord = () => {
     if (currentWordIndex > 0) {
-      // Cancel any ongoing speech
+      // Force stop all speech immediately
+      window.speechSynthesis.cancel();
       cancel();
       setIsPaused(false);
       setCurrentWordIndex(prev => prev - 1);
@@ -131,6 +162,8 @@ export default function PracticeSession() {
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (!isMuted) {
+      // Force stop all speech immediately
+      window.speechSynthesis.cancel();
       cancel();
     }
   };
@@ -146,9 +179,9 @@ export default function PracticeSession() {
       }
     } else {
       setIsPaused(true);
-      if (isSpeaking) {
-        pause();
-      }
+      // Force stop all speech immediately
+      window.speechSynthesis.cancel();
+      cancel();
     }
   };
 
@@ -157,12 +190,13 @@ export default function PracticeSession() {
   };
 
   const switchMode = (newMode: PracticeMode) => {
-    // Cancel any ongoing speech and reset state
+    // Force stop all speech immediately and reset state
+    window.speechSynthesis.cancel();
     cancel();
     setIsPaused(false);
     setMode(newMode);
     setCurrentRepetition(1);
-    
+
     // Auto-play first word in test mode
     if (newMode === "test") {
       setTimeout(playWord, 500);
@@ -246,7 +280,7 @@ export default function PracticeSession() {
             <div className="text-4xl font-bold text-foreground mb-6" data-testid="text-current-word">
               {currentWord}
             </div>
-            
+
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-8">
               <Button 
@@ -316,14 +350,14 @@ export default function PracticeSession() {
                   {wordsCompleted.size}/{session.words.length}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Time Spent:</span>
                 <span className="font-medium text-foreground" data-testid="text-time-spent">
                   {formatTime(timeSpent)}
                 </span>
               </div>
-              
+
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-muted-foreground">Progress:</span>
@@ -346,7 +380,7 @@ export default function PracticeSession() {
             <div className="text-4xl font-bold text-foreground mb-6" data-testid="text-hidden-word">
               ★ ★ ★
             </div>
-            
+
             {/* Repetition Info */}
             <div className="text-sm text-muted-foreground mb-4" data-testid="text-word-info">
               Word {currentWordIndex + 1} of {session.words.length}
@@ -367,7 +401,7 @@ export default function PracticeSession() {
               >
                 <Play className="w-8 h-8 text-primary" fill="currentColor" />
               </Button>
-              
+
               {settings?.enablePauseButton && (
                 <Button 
                   variant="outline" 
@@ -384,7 +418,7 @@ export default function PracticeSession() {
                   )}
                 </Button>
               )}
-              
+
               <Button 
                 size="lg" 
                 className="p-4 rounded-full"
