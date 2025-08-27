@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell } from "lucide-react";
@@ -27,6 +27,7 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
 
@@ -51,9 +52,13 @@ export default function PracticeSession() {
   // Stop speech when navigating away or component unmounts
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Force stop all speech synthesis
+      // Force stop all speech synthesis and clear timeouts
       window.speechSynthesis.cancel();
       cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     };
 
     const handleVisibilityChange = () => {
@@ -61,6 +66,10 @@ export default function PracticeSession() {
         // Stop speech when tab becomes hidden/inactive
         window.speechSynthesis.cancel();
         cancel();
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
       }
     };
 
@@ -72,6 +81,10 @@ export default function PracticeSession() {
       // Cleanup: stop speech and remove listeners
       window.speechSynthesis.cancel();
       cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -109,12 +122,12 @@ export default function PracticeSession() {
         await speak(word);
 
         // In test mode, handle repetitions with pauses
-        if (mode === "test" && settings) {
+        if (mode === "test" && settings && !isPaused) {
           const maxReps = settings.wordRepetitions || 2;
           const pauseDuration = settings.pauseBetweenWords || 1500;
 
           if (currentRepetition < maxReps) {
-            setTimeout(() => {
+            timeoutRef.current = setTimeout(() => {
               if (!isPaused) { // Check if not paused before continuing
                 setCurrentRepetition(prev => prev + 1);
                 playWord();
@@ -122,7 +135,7 @@ export default function PracticeSession() {
             }, pauseDuration);
           } else {
             // Move to next word after all repetitions are complete
-            setTimeout(() => {
+            timeoutRef.current = setTimeout(() => {
               if (!isPaused && currentWordIndex < session.words.length - 1) {
                 setCurrentWordIndex(prev => prev + 1);
                 setCurrentRepetition(1);
@@ -141,9 +154,13 @@ export default function PracticeSession() {
   const nextWord = () => {
     if (!session) return;
 
-    // Force stop all speech immediately
+    // Force stop all speech immediately and clear timeouts
     window.speechSynthesis.cancel();
     cancel();
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setIsPaused(false);
 
     if (currentWordIndex < session.words.length - 1) {
@@ -152,30 +169,38 @@ export default function PracticeSession() {
 
       // Auto-play in test mode
       if (mode === "test") {
-        setTimeout(playWord, 500);
+        timeoutRef.current = setTimeout(playWord, 500);
       }
     }
   };
 
   const startLoop = () => {
-    // Force stop all speech immediately
+    // Force stop all speech immediately and clear timeouts
     window.speechSynthesis.cancel();
     cancel();
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setIsPaused(false);
     setCurrentWordIndex(0);
     setCurrentRepetition(1);
 
     // Auto-play first word in test mode
     if (mode === "test") {
-      setTimeout(playWord, 500);
+      timeoutRef.current = setTimeout(playWord, 500);
     }
   };
 
   const previousWord = () => {
     if (currentWordIndex > 0) {
-      // Force stop all speech immediately
+      // Force stop all speech immediately and clear timeouts
       window.speechSynthesis.cancel();
       cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setIsPaused(false);
       setCurrentWordIndex(prev => prev - 1);
       setCurrentRepetition(1);
@@ -185,9 +210,13 @@ export default function PracticeSession() {
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (!isMuted) {
-      // Force stop all speech immediately
+      // Force stop all speech immediately and clear timeouts
       window.speechSynthesis.cancel();
       cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     }
   };
 
@@ -198,9 +227,13 @@ export default function PracticeSession() {
       playWord();
     } else {
       setIsPaused(true);
-      // Force stop all speech immediately
+      // Force stop all speech immediately and clear timeouts
       window.speechSynthesis.cancel();
       cancel();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
     }
   };
 
@@ -212,13 +245,17 @@ export default function PracticeSession() {
     // Force stop all speech immediately and reset state
     window.speechSynthesis.cancel();
     cancel();
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setIsPaused(false);
     setMode(newMode);
     setCurrentRepetition(1);
 
     // Auto-play first word in test mode
     if (newMode === "test") {
-      setTimeout(playWord, 500);
+      timeoutRef.current = setTimeout(playWord, 500);
     }
   };
 
