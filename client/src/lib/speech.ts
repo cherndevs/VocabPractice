@@ -40,7 +40,14 @@ export class SpeechService {
       }
 
       utterance.onend = () => resolve();
-      utterance.onerror = (event) => reject(new Error(`Speech error: ${event.error}`));
+      utterance.onerror = (event) => {
+        // Don't reject on cancellation - this is normal behavior
+        if (event.error === 'canceled' || event.error === 'interrupted') {
+          resolve();
+        } else {
+          reject(new Error(`Speech error: ${event.error}`));
+        }
+      };
 
       this.synth.speak(utterance);
     });

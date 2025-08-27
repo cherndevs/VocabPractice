@@ -75,19 +75,24 @@ export default function PracticeSession() {
     
     const word = session.words[currentWordIndex];
     if (word) {
-      await speak(word);
-      
-      // In test mode, handle repetitions with pauses
-      if (mode === "test" && settings) {
-        const maxReps = settings.wordRepetitions || 2;
-        const pauseDuration = settings.pauseBetweenWords || 1500;
+      try {
+        await speak(word);
         
-        if (currentRepetition < maxReps) {
-          setTimeout(() => {
-            setCurrentRepetition(prev => prev + 1);
-            playWord();
-          }, pauseDuration);
+        // In test mode, handle repetitions with pauses
+        if (mode === "test" && settings) {
+          const maxReps = settings.wordRepetitions || 2;
+          const pauseDuration = settings.pauseBetweenWords || 1500;
+          
+          if (currentRepetition < maxReps) {
+            setTimeout(() => {
+              setCurrentRepetition(prev => prev + 1);
+              playWord();
+            }, pauseDuration);
+          }
         }
+      } catch (error) {
+        // Silently handle speech errors (like cancellation)
+        console.debug('Speech playback interrupted:', error);
       }
     }
   };

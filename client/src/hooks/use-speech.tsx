@@ -33,7 +33,12 @@ export function useSpeech() {
 
         utterance.onerror = (event) => {
           setIsSpeaking(false);
-          reject(new Error(`Speech synthesis error: ${event.error}`));
+          // Don't reject on cancellation - this is normal behavior
+          if (event.error === 'canceled' || event.error === 'interrupted') {
+            resolve();
+          } else {
+            reject(new Error(`Speech synthesis error: ${event.error}`));
+          }
         };
 
         window.speechSynthesis.speak(utterance);
