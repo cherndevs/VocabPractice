@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,8 +26,9 @@ export default function PracticeSession() {
   const [timeSpent, setTimeSpent] = useState(0);
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   
-  const { speak, cancel } = useSpeech();
+  const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
 
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
     queryKey: ["/api/sessions", id],
@@ -71,7 +72,7 @@ export default function PracticeSession() {
   }, [wordsCompleted.size, timeSpent, session?.words.length]);
 
   const playWord = async () => {
-    if (!session || isMuted) return;
+    if (!session || isMuted || isPaused) return;
     
     const word = session.words[currentWordIndex];
     if (word) {
@@ -85,8 +86,10 @@ export default function PracticeSession() {
           
           if (currentRepetition < maxReps) {
             setTimeout(() => {
-              setCurrentRepetition(prev => prev + 1);
-              playWord();
+              if (!isPaused) { // Check if not paused before continuing
+                setCurrentRepetition(prev => prev + 1);
+                playWord();
+              }
             }, pauseDuration);
           }
         }
@@ -99,6 +102,10 @@ export default function PracticeSession() {
 
   const nextWord = () => {
     if (!session) return;
+    
+    // Cancel any ongoing speech
+    cancel();
+    setIsPaused(false);
     
     if (currentWordIndex < session.words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
@@ -113,6 +120,9 @@ export default function PracticeSession() {
 
   const previousWord = () => {
     if (currentWordIndex > 0) {
+      // Cancel any ongoing speech
+      cancel();
+      setIsPaused(false);
       setCurrentWordIndex(prev => prev - 1);
       setCurrentRepetition(1);
     }
@@ -125,11 +135,31 @@ export default function PracticeSession() {
     }
   };
 
+  const togglePause = () => {
+    if (isPaused) {
+      setIsPaused(false);
+      if (isSpeaking) {
+        resume();
+      } else {
+        // Resume from current word and repetition
+        playWord();
+      }
+    } else {
+      setIsPaused(true);
+      if (isSpeaking) {
+        pause();
+      }
+    }
+  };
+
   const markWordCompleted = () => {
     setWordsCompleted(prev => new Set([...prev, currentWordIndex]));
   };
 
   const switchMode = (newMode: PracticeMode) => {
+    // Cancel any ongoing speech and reset state
+    cancel();
+    setIsPaused(false);
     setMode(newMode);
     setCurrentRepetition(1);
     
@@ -326,17 +356,35 @@ export default function PracticeSession() {
             </div>
 
             {/* Audio Controls */}
-            <div className="flex items-center justify-center space-x-6 mb-6">
+            <div className="flex items-center justify-center space-x-4 mb-6">
               <Button 
                 variant="outline" 
                 size="lg" 
                 className="p-4 rounded-full"
                 onClick={playWord}
-                disabled={isMuted}
+                disabled={isMuted || isPaused}
                 data-testid="button-play-word"
               >
                 <Play className="w-8 h-8 text-primary" fill="currentColor" />
               </Button>
+              
+              {settings?.enablePauseButton && (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="p-4 rounded-full"
+                  onClick={togglePause}
+                  disabled={isMuted}
+                  data-testid="button-pause-resume"
+                >
+                  {isPaused ? (
+                    <Play className="w-8 h-8 text-primary" fill="currentColor" />
+                  ) : (
+                    <Pause className="w-8 h-8 text-primary" fill="currentColor" />
+                  )}
+                </Button>
+              )}
+              
               <Button 
                 size="lg" 
                 className="p-4 rounded-full"

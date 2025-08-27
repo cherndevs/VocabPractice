@@ -33,6 +33,7 @@ export class MemStorage implements IStorage {
       notifications: true,
       darkMode: false,
       dataSync: false,
+      enablePauseButton: true,
     };
   }
 

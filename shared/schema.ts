@@ -28,6 +28,7 @@ export const settings = pgTable("settings", {
   notifications: boolean("notifications").default(true),
   darkMode: boolean("dark_mode").default(false),
   dataSync: boolean("data_sync").default(false),
+  enablePauseButton: boolean("enable_pause_button").default(true),
 });
 
 export const insertSessionSchema = createInsertSchema(sessions).omit({

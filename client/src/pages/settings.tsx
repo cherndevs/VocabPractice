@@ -173,7 +173,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Data Synchronization */}
-            <div className="flex items-center justify-between py-3">
+            <div className="flex items-center justify-between py-3 border-b border-border">
               <div>
                 <Label className="font-medium">Data Synchronization</Label>
                 <p className="text-sm text-muted-foreground">
@@ -184,6 +184,21 @@ export default function SettingsPage() {
                 checked={currentSettings.dataSync ?? false}
                 onCheckedChange={(checked) => handleSettingChange('dataSync', checked)}
                 data-testid="switch-data-sync"
+              />
+            </div>
+
+            {/* Pause Button */}
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <Label className="font-medium">Show Pause Button</Label>
+                <p className="text-sm text-muted-foreground">
+                  Display pause/resume button during test mode dictation.
+                </p>
+              </div>
+              <Switch
+                checked={currentSettings.enablePauseButton ?? true}
+                onCheckedChange={(checked) => handleSettingChange('enablePauseButton', checked)}
+                data-testid="switch-pause-button"
               />
             </div>
           </CardContent>
