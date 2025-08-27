@@ -120,6 +120,15 @@ export default function PracticeSession() {
                 playWord();
               }
             }, pauseDuration);
+          } else {
+            // Move to next word after all repetitions are complete
+            setTimeout(() => {
+              if (!isPaused && currentWordIndex < session.words.length - 1) {
+                setCurrentWordIndex(prev => prev + 1);
+                setCurrentRepetition(1);
+                playWord();
+              }
+            }, pauseDuration);
           }
         }
       } catch (error) {
@@ -148,6 +157,20 @@ export default function PracticeSession() {
     }
   };
 
+  const startLoop = () => {
+    // Force stop all speech immediately
+    window.speechSynthesis.cancel();
+    cancel();
+    setIsPaused(false);
+    setCurrentWordIndex(0);
+    setCurrentRepetition(1);
+
+    // Auto-play first word in test mode
+    if (mode === "test") {
+      setTimeout(playWord, 500);
+    }
+  };
+
   const previousWord = () => {
     if (currentWordIndex > 0) {
       // Force stop all speech immediately
@@ -171,12 +194,8 @@ export default function PracticeSession() {
   const togglePause = () => {
     if (isPaused) {
       setIsPaused(false);
-      if (isSpeaking) {
-        resume();
-      } else {
-        // Resume from current word and repetition
-        playWord();
-      }
+      // Resume from current word and repetition
+      playWord();
     } else {
       setIsPaused(true);
       // Force stop all speech immediately
@@ -429,6 +448,21 @@ export default function PracticeSession() {
                 <ChevronRight className="w-8 h-8" />
               </Button>
             </div>
+
+            {/* Loop Button - Show when at last word */}
+            {currentWordIndex === session.words.length - 1 && (
+              <div className="flex items-center justify-center mt-8">
+                <Button 
+                  variant="default"
+                  size="lg"
+                  onClick={startLoop}
+                  data-testid="button-start-loop"
+                  className="px-8 py-3"
+                >
+                  Start Loop
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
