@@ -49,7 +49,9 @@ export class SpeechService {
         }
       };
 
-      this.synth.speak(utterance);
+      if (this.synth) {
+        this.synth.speak(utterance);
+      }
     });
   }
 
@@ -63,7 +65,7 @@ export class SpeechService {
       await this.speak(text, options);
       
       if (i < repetitions - 1) {
-        await this.pause(pauseDuration);
+        await this.delay(pauseDuration);
       }
     }
   }
@@ -74,13 +76,13 @@ export class SpeechService {
     }
   }
 
-  pause(): void {
+  pauseSpeech(): void {
     if (this.synth) {
       this.synth.pause();
     }
   }
 
-  resume(): void {
+  resumeSpeech(): void {
     if (this.synth) {
       this.synth.resume();
     }
@@ -90,7 +92,7 @@ export class SpeechService {
     return this.synth?.getVoices() || [];
   }
 
-  private pause(ms: number): Promise<void> {
+  private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
@@ -99,7 +101,7 @@ export class SpeechService {
   }
 
   get speaking(): boolean {
-    return this.synth?.speaking || false;
+    return this.synth ? this.synth.speaking : false;
   }
 }
 

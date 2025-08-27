@@ -153,7 +153,7 @@ export default function PracticeSession() {
   };
 
   const markWordCompleted = () => {
-    setWordsCompleted(prev => new Set([...prev, currentWordIndex]));
+    setWordsCompleted(prev => new Set(Array.from(prev).concat(currentWordIndex)));
   };
 
   const switchMode = (newMode: PracticeMode) => {

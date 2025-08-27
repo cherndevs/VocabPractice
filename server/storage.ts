@@ -68,8 +68,13 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const session: Session = {
-      ...insertSession,
       id,
+      title: insertSession.title,
+      words: insertSession.words as string[],
+      status: insertSession.status || "new",
+      wordCount: insertSession.wordCount,
+      progress: insertSession.progress || 0,
+      timeSpent: insertSession.timeSpent || 0,
       createdAt: now,
       updatedAt: now,
     };

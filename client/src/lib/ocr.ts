@@ -43,7 +43,7 @@ export class OCRService {
       .filter(word => /^[a-zA-Z]+$/.test(word)); // Only alphabetic words
 
     // Remove duplicates
-    return [...new Set(words)];
+    return Array.from(new Set(words));
   }
 
   async terminate(): Promise<void> {
