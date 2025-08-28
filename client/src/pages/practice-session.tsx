@@ -114,18 +114,39 @@ export default function PracticeSession() {
   }, [wordsCompleted.size, timeSpent, session?.words.length]);
 
   const playWord = async () => {
-    if (!session) return;
+    if (!session) {
+      console.log('No session available');
+      return;
+    }
 
     // Reset pause state when user explicitly presses play
     setIsPaused(false);
 
     const word = session.words[currentWordIndex];
-    console.log('Attempting to play word:', word, 'isMuted:', isMuted, 'isPaused:', isPaused);
+    console.log('=== PLAYWORD DEBUG ===');
+    console.log('Word to play:', word);
+    console.log('isMuted:', isMuted);
+    console.log('isPaused:', isPaused);
+    console.log('currentWordIndex:', currentWordIndex);
+    console.log('speechSynthesis available:', 'speechSynthesis' in window);
+    console.log('speechSynthesis.speaking:', window.speechSynthesis?.speaking);
+    console.log('speechSynthesis.pending:', window.speechSynthesis?.pending);
+    console.log('speechSynthesis.paused:', window.speechSynthesis?.paused);
     
     if (word && !isMuted) {
       try {
-        console.log('Calling speak function...');
+        console.log('About to call speak function with word:', word);
+        
+        // Cancel any existing speech first
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
+        
+        // Small delay to ensure cancellation is processed
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         await speak(word);
+        console.log('Speak function completed successfully');
 
         // In test mode, handle repetitions with pauses
         if (mode === "test" && settings && !isPaused) {
@@ -145,9 +166,15 @@ export default function PracticeSession() {
           }
         }
       } catch (error) {
-        // Silently handle speech errors (like cancellation)
-        console.debug('Speech playback interrupted:', error);
+        console.error('Speech playback error:', error);
+        toast({
+          title: "Speech Error",
+          description: "Unable to play audio. Please check your browser settings.",
+          variant: "destructive",
+        });
       }
+    } else {
+      console.log('Skipping speech - word:', word, 'isMuted:', isMuted);
     }
   };
 
