@@ -114,11 +114,17 @@ export default function PracticeSession() {
   }, [wordsCompleted.size, timeSpent, session?.words.length]);
 
   const playWord = async () => {
-    if (!session || isMuted || isPaused) return;
+    if (!session) return;
+
+    // Reset pause state when user explicitly presses play
+    setIsPaused(false);
 
     const word = session.words[currentWordIndex];
-    if (word) {
+    console.log('Attempting to play word:', word, 'isMuted:', isMuted, 'isPaused:', isPaused);
+    
+    if (word && !isMuted) {
       try {
+        console.log('Calling speak function...');
         await speak(word);
 
         // In test mode, handle repetitions with pauses
@@ -174,7 +180,11 @@ export default function PracticeSession() {
     setIsPaused(false);
     setCurrentWordIndex(0);
     setCurrentRepetition(1);
-    // Don't auto-play - user must press play button
+    
+    // Auto-play the first word when starting loop
+    setTimeout(() => {
+      playWord();
+    }, 100);
   };
 
   const previousWord = () => {
