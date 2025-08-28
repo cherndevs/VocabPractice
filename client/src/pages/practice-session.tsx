@@ -501,17 +501,17 @@ export default function PracticeSession() {
               </Button>
             </div>
 
-            {/* Loop Button - Show when at last word */}
+            {/* Done Button - Show when at last word */}
             {currentWordIndex === session.words.length - 1 && (
               <div className="flex items-center justify-center mt-8">
                 <Button 
                   variant="default"
                   size="lg"
-                  onClick={startLoop}
-                  data-testid="button-start-loop"
+                  onClick={() => navigate("/sessions")}
+                  data-testid="button-done"
                   className="px-8 py-3"
                 >
-                  Start Loop
+                  Done
                 </Button>
               </div>
             )}
