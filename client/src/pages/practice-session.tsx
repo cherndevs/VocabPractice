@@ -120,8 +120,8 @@ export default function PracticeSession() {
     const word = session.words[currentWordIndex];
     if (!word) return;
 
-    setIsPaused(false);
     if (mode === "test") {
+      setIsPaused(false);
       setIsLooping(true);
     }
 
@@ -133,12 +133,13 @@ export default function PracticeSession() {
       console.log('✅ PLAYED SUCCESSFULLY');
 
       // Handle repetitions in test mode - continuous loop until manually stopped
-      if (mode === "test" && settings && !isPaused && isLooping) {
+      if (mode === "test" && settings) {
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
         timeoutRef.current = setTimeout(() => {
-          // Check again if we should continue looping
-          if (!isPaused && isLooping) {
+          // Continue looping if still in test mode and not manually stopped
+          if (mode === "test" && !isPaused && isLooping && !isMuted) {
+            console.log('🔄 LOOPING NEXT PLAY');
             playWord();
           }
         }, pauseDuration);
