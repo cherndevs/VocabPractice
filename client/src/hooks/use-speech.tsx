@@ -5,6 +5,26 @@ export function useSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSupported] = useState(() => 'speechSynthesis' in window);
 
+  // Function to detect language based on text content
+  const detectLanguage = useCallback((text: string): string => {
+    const trimmedText = text.trim();
+    
+    // Check for Chinese characters (both simplified and traditional)
+    const chineseRegex = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
+    if (chineseRegex.test(trimmedText)) {
+      return 'zh-CN'; // Chinese Simplified
+    }
+    
+    // Check for pinyin (contains tone marks or is all lowercase letters with spaces)
+    const pinyinRegex = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s]+$/i;
+    if (pinyinRegex.test(trimmedText) && trimmedText.includes(' ') && !/[A-Z]/.test(trimmedText)) {
+      return 'zh-CN'; // Use Chinese voice for pinyin too
+    }
+    
+    // Default to English
+    return 'en-US';
+  }, []);
+
   const speak = useCallback(async (text: string): Promise<void> => {
     if (!isSupported || !text?.trim()) {
       throw new Error('Speech not supported or no text');
@@ -21,7 +41,7 @@ export function useSpeech() {
         const utterance = new SpeechSynthesisUtterance(text.trim());
         utterance.rate = 0.8;
         utterance.volume = 1.0;
-        utterance.lang = 'en-US';
+        utterance.lang = detectLanguage(text);
 
         let completed = false;
 
@@ -53,7 +73,7 @@ export function useSpeech() {
         reject(error);
       }
     });
-  }, [isSupported]);
+  }, [isSupported, detectLanguage]);
 
   const cancel = useCallback(() => {
     window.speechSynthesis.cancel();
