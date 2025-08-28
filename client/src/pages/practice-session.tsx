@@ -27,6 +27,7 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isLooping, setIsLooping] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
@@ -120,6 +121,9 @@ export default function PracticeSession() {
     if (!word) return;
 
     setIsPaused(false);
+    if (mode === "test") {
+      setIsLooping(true);
+    }
 
     try {
       console.log('🎵 PLAYING:', word);
@@ -142,10 +146,12 @@ export default function PracticeSession() {
           }, pauseDuration);
         } else {
           setCurrentRepetition(1);
+          setIsLooping(false);
         }
       }
     } catch (error) {
       console.error('❌ SPEECH FAILED:', error);
+      setIsLooping(false);
       toast({
         title: "Try Again",
         description: "Click play to hear the word. Check your volume is up!",
@@ -165,6 +171,7 @@ export default function PracticeSession() {
       timeoutRef.current = null;
     }
     setIsPaused(false);
+    setIsLooping(false);
 
     if (currentWordIndex < session.words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
@@ -200,6 +207,7 @@ export default function PracticeSession() {
         timeoutRef.current = null;
       }
       setIsPaused(false);
+      setIsLooping(false);
       setCurrentWordIndex(prev => prev - 1);
       setCurrentRepetition(1);
     }
@@ -221,10 +229,12 @@ export default function PracticeSession() {
   const togglePause = () => {
     if (isPaused) {
       setIsPaused(false);
+      setIsLooping(true);
       // Resume from current word and repetition
       playWord();
     } else {
       setIsPaused(true);
+      setIsLooping(false);
       // Force stop all speech immediately and clear timeouts
       window.speechSynthesis.cancel();
       cancel();
@@ -248,6 +258,7 @@ export default function PracticeSession() {
       timeoutRef.current = null;
     }
     setIsPaused(false);
+    setIsLooping(false);
     setMode(newMode);
     setCurrentRepetition(1);
     // Don't auto-play when entering test mode - user must press play
@@ -449,7 +460,7 @@ export default function PracticeSession() {
 
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-6">
-              {!isSpeaking && (
+              {!isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
@@ -462,7 +473,7 @@ export default function PracticeSession() {
                 </Button>
               )}
 
-              {settings?.enablePauseButton && isSpeaking && (
+              {settings?.enablePauseButton && isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
