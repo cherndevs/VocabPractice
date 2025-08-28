@@ -128,20 +128,14 @@ export default function PracticeSession() {
 
           if (currentRepetition < maxReps) {
             timeoutRef.current = setTimeout(() => {
-              if (!isPaused) { // Check if not paused before continuing
+              if (!isPaused) {
                 setCurrentRepetition(prev => prev + 1);
                 playWord();
               }
             }, pauseDuration);
           } else {
-            // Move to next word after all repetitions are complete
-            timeoutRef.current = setTimeout(() => {
-              if (!isPaused && currentWordIndex < session.words.length - 1) {
-                setCurrentWordIndex(prev => prev + 1);
-                setCurrentRepetition(1);
-                // Don't auto-play next word - user must press play button
-              }
-            }, pauseDuration);
+            // After all repetitions are complete, reset for next word but don't auto-advance
+            setCurrentRepetition(1);
           }
         }
       } catch (error) {
@@ -166,7 +160,6 @@ export default function PracticeSession() {
     if (currentWordIndex < session.words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
       setCurrentRepetition(1);
-      // Don't auto-play - user must press play button
     }
   };
 
@@ -435,18 +428,20 @@ export default function PracticeSession() {
 
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-6">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="p-4 rounded-full"
-                onClick={playWord}
-                disabled={isMuted || isPaused}
-                data-testid="button-play-word"
-              >
-                <Play className="w-8 h-8 text-primary" fill="currentColor" />
-              </Button>
+              {!isSpeaking && (
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="p-4 rounded-full"
+                  onClick={playWord}
+                  disabled={isMuted}
+                  data-testid="button-play-word"
+                >
+                  <Play className="w-8 h-8 text-primary" fill="currentColor" />
+                </Button>
+              )}
 
-              {settings?.enablePauseButton && (
+              {settings?.enablePauseButton && isSpeaking && (
                 <Button 
                   variant="outline" 
                   size="lg" 
