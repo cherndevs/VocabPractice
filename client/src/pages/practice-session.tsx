@@ -123,9 +123,9 @@ export default function PracticeSession() {
 
     try {
       console.log('🎵 PLAYING:', word);
-      
+
       await speak(word);
-      
+
       console.log('✅ PLAYED SUCCESSFULLY');
 
       // Handle repetitions in test mode
@@ -183,7 +183,7 @@ export default function PracticeSession() {
     setIsPaused(false);
     setCurrentWordIndex(0);
     setCurrentRepetition(1);
-    
+
     // Auto-play the first word when starting loop
     setTimeout(() => {
       playWord();

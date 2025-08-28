@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 
 export function useSpeech() {
@@ -5,82 +6,70 @@ export function useSpeech() {
   const [isSupported] = useState(() => 'speechSynthesis' in window);
 
   const speak = async (text: string): Promise<void> => {
-    console.log('🎤 SIMPLE SPEECH - Starting');
+    console.log('🎤 ULTRA SIMPLE SPEECH - Starting with:', text);
 
-    if (!isSupported || !text?.trim()) {
-      console.log('❌ Speech not supported or no text');
+    if (!isSupported) {
+      console.log('❌ Speech not supported');
       throw new Error('Speech not supported');
     }
 
-    // Cancel any existing speech first
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-      console.log('🛑 Cancelling existing speech');
-      window.speechSynthesis.cancel();
-      await new Promise(resolve => setTimeout(resolve, 100));
+    if (!text?.trim()) {
+      console.log('❌ No text provided');
+      throw new Error('No text provided');
     }
 
-    return new Promise((resolve, reject) => {
-      const utterance = new SpeechSynthesisUtterance(text.trim());
+    // Force stop everything first
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    
+    // Small delay to ensure clean state
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-      // Basic settings
+    return new Promise((resolve) => {
+      const utterance = new SpeechSynthesisUtterance(text.trim());
+      
+      // Simple settings
       utterance.rate = 0.8;
-      utterance.pitch = 1.0;
       utterance.volume = 1.0;
       utterance.lang = 'en-US';
 
-      let resolved = false;
+      let finished = false;
 
-      const cleanup = () => {
-        if (!resolved) {
-          resolved = true;
+      const finish = () => {
+        if (!finished) {
+          finished = true;
           setIsSpeaking(false);
+          console.log('✅ Speech finished');
           resolve();
         }
       };
 
       utterance.onstart = () => {
-        console.log('✅ Speech started');
+        console.log('🗣️ Speech started');
         setIsSpeaking(true);
       };
 
-      utterance.onend = () => {
-        console.log('✅ Speech ended');
-        cleanup();
+      utterance.onend = finish;
+      utterance.onerror = (e) => {
+        console.log('⚠️ Speech error (but continuing):', e.error);
+        finish();
       };
 
-      utterance.onerror = (event) => {
-        console.log('⚠️ Speech error:', event.error);
-        cleanup();
-      };
-
-      // Safety timeout
-      const timeout = setTimeout(() => {
-        console.log('⏰ Speech timeout');
-        window.speechSynthesis.cancel();
-        cleanup();
-      }, 5000);
-
+      // Start speech
       try {
-        console.log('🗣️ Speaking:', text);
         window.speechSynthesis.speak(utterance);
-
-        // Clear timeout when done
-        utterance.onend = () => {
-          clearTimeout(timeout);
-          cleanup();
-        };
-
+        console.log('📢 Speech command sent');
+        
+        // Backup timeout
+        setTimeout(finish, 3000);
       } catch (error) {
-        clearTimeout(timeout);
-        console.error('❌ Speech error:', error);
-        setIsSpeaking(false);
-        reject(error);
+        console.error('❌ Failed to start speech:', error);
+        finish();
       }
     });
   };
 
   const cancel = useCallback(() => {
-    console.log('🛑 Cancelling speech');
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
   }, []);
