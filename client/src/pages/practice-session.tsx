@@ -450,12 +450,9 @@ export default function PracticeSession() {
               ★ ★ ★
             </div>
 
-            {/* Repetition Info */}
-            <div className="text-sm text-muted-foreground mb-4" data-testid="text-word-info">
+            {/* Word Info */}
+            <div className="text-sm text-muted-foreground mb-8" data-testid="text-word-info">
               Word {currentWordIndex + 1} of {session.words.length}
-            </div>
-            <div className="text-lg font-medium text-foreground mb-8" data-testid="text-repetition-info">
-              Repetition {currentRepetition} of {settings?.wordRepetitions || 2}
             </div>
 
             {/* Audio Controls */}
