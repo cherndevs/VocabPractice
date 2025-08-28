@@ -16,8 +16,11 @@ export function useSpeech() {
     }
     
     // Check for pinyin (contains tone marks or is all lowercase letters with spaces)
-    const pinyinRegex = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s]+$/i;
-    if (pinyinRegex.test(trimmedText) && trimmedText.includes(' ') && !/[A-Z]/.test(trimmedText)) {
+    const pinyinRegex = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s]+$/;
+    const hasToneMarks = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(trimmedText);
+    const isLowerCaseWords = /^[a-z\s]+$/.test(trimmedText) && trimmedText.includes(' ');
+    
+    if (hasToneMarks || (isLowerCaseWords && trimmedText.split(' ').length <= 3)) {
       return 'zh-CN'; // Use Chinese voice for pinyin too
     }
     
@@ -39,9 +42,41 @@ export function useSpeech() {
     return new Promise((resolve, reject) => {
       try {
         const utterance = new SpeechSynthesisUtterance(text.trim());
+        const detectedLang = detectLanguage(text);
+        
         utterance.rate = 0.8;
         utterance.volume = 1.0;
-        utterance.lang = detectLanguage(text);
+        utterance.lang = detectedLang;
+
+        // Try to find and use a Chinese voice if speaking Chinese content
+        if (detectedLang === 'zh-CN') {
+          // Get available voices - try multiple times if needed
+          let voices = window.speechSynthesis.getVoices();
+          
+          // If no voices loaded yet, trigger loading and wait briefly
+          if (voices.length === 0) {
+            window.speechSynthesis.getVoices(); // Trigger loading
+            await new Promise(resolve => setTimeout(resolve, 300)); // Brief wait
+            voices = window.speechSynthesis.getVoices();
+          }
+          
+          const chineseVoice = voices.find(voice => 
+            voice.lang.startsWith('zh') || 
+            voice.lang.includes('CN') ||
+            voice.name.toLowerCase().includes('chinese') ||
+            voice.name.toLowerCase().includes('mandarin') ||
+            voice.name.toLowerCase().includes('cantonese')
+          );
+          
+          if (chineseVoice) {
+            utterance.voice = chineseVoice;
+            console.log('🎌 Using Chinese voice:', chineseVoice.name, chineseVoice.lang);
+          } else {
+            console.log('⚠️ No Chinese voice found. Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+            // Try alternative Chinese language codes
+            utterance.lang = 'zh';
+          }
+        }
 
         let completed = false;
 
@@ -55,7 +90,7 @@ export function useSpeech() {
 
         utterance.onstart = () => {
           setIsSpeaking(true);
-          console.log('🗣️ Speaking:', text);
+          console.log('🗣️ Speaking:', text, 'Language:', detectedLang);
         };
 
         utterance.onend = cleanup;
