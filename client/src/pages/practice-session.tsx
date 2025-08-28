@@ -99,11 +99,11 @@ export default function PracticeSession() {
     return () => clearInterval(interval);
   }, [sessionStartTime]);
 
-  // Auto-save progress
+  // Auto-save progress (only when wordsCompleted changes, not every second)
   useEffect(() => {
-    if (session) {
+    if (session && wordsCompleted.size > 0) {
       const progress = Math.floor((wordsCompleted.size / session.words.length) * 100);
-      const status = progress === 100 ? "completed" : wordsCompleted.size > 0 ? "in-progress" : "new";
+      const status = progress === 100 ? "completed" : "in-progress";
 
       updateSessionMutation.mutate({
         progress: wordsCompleted.size,
@@ -111,7 +111,7 @@ export default function PracticeSession() {
         status,
       });
     }
-  }, [wordsCompleted.size, timeSpent, session?.words.length]);
+  }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
   const playWord = async () => {
     if (!session || isMuted) return;
