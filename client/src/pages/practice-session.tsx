@@ -175,7 +175,7 @@ export default function PracticeSession() {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    setIsPaused(false);
+    setIsPaused(true);
     setIsLooping(false);
 
     if (currentWordIndex < session.words.length - 1) {
@@ -211,7 +211,7 @@ export default function PracticeSession() {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      setIsPaused(false);
+      setIsPaused(true);
       setIsLooping(false);
       setCurrentWordIndex(prev => prev - 1);
       setCurrentRepetition(1);
@@ -228,6 +228,8 @@ export default function PracticeSession() {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      setIsPaused(true);
+      setIsLooping(false);
     }
   };
 
@@ -262,7 +264,7 @@ export default function PracticeSession() {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    setIsPaused(false);
+    setIsPaused(true);
     setIsLooping(false);
     setMode(newMode);
     setCurrentRepetition(1);
