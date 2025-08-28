@@ -123,58 +123,65 @@ export default function PracticeSession() {
     setIsPaused(false);
 
     const word = session.words[currentWordIndex];
-    console.log('=== PLAYWORD DEBUG ===');
-    console.log('Word to play:', word);
-    console.log('isMuted:', isMuted);
-    console.log('isPaused:', isPaused);
-    console.log('currentWordIndex:', currentWordIndex);
-    console.log('speechSynthesis available:', 'speechSynthesis' in window);
-    console.log('speechSynthesis.speaking:', window.speechSynthesis?.speaking);
-    console.log('speechSynthesis.pending:', window.speechSynthesis?.pending);
-    console.log('speechSynthesis.paused:', window.speechSynthesis?.paused);
     
-    if (word && !isMuted) {
-      try {
-        console.log('About to call speak function with word:', word);
-        
-        // Cancel any existing speech first
-        if (window.speechSynthesis) {
-          window.speechSynthesis.cancel();
-        }
-        
-        // Small delay to ensure cancellation is processed
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        await speak(word);
-        console.log('Speak function completed successfully');
+    if (!word) {
+      console.log('No word to play');
+      return;
+    }
 
-        // In test mode, handle repetitions with pauses
-        if (mode === "test" && settings && !isPaused) {
-          const maxReps = settings.wordRepetitions || 2;
-          const pauseDuration = settings.pauseBetweenWords || 1500;
+    if (isMuted) {
+      console.log('Skipping speech - muted');
+      return;
+    }
 
-          if (currentRepetition < maxReps) {
-            timeoutRef.current = setTimeout(() => {
-              if (!isPaused) {
-                setCurrentRepetition(prev => prev + 1);
-                playWord();
-              }
-            }, pauseDuration);
-          } else {
-            // After all repetitions are complete, reset for next word but don't auto-advance
-            setCurrentRepetition(1);
-          }
+    // Check if speech synthesis is available
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: "Speech Not Supported",
+        description: "Your browser doesn't support text-to-speech.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      console.log('🎵 Playing word:', word);
+      
+      // Show a quick toast to let user know speech is starting
+      toast({
+        title: "Playing...",
+        description: `Speaking: "${word}"`,
+        duration: 1000,
+      });
+      
+      await speak(word);
+      console.log('✅ Speech completed successfully');
+
+      // In test mode, handle repetitions with pauses
+      if (mode === "test" && settings && !isPaused) {
+        const maxReps = settings.wordRepetitions || 2;
+        const pauseDuration = settings.pauseBetweenWords || 1500;
+
+        if (currentRepetition < maxReps) {
+          timeoutRef.current = setTimeout(() => {
+            if (!isPaused) {
+              setCurrentRepetition(prev => prev + 1);
+              playWord();
+            }
+          }, pauseDuration);
+        } else {
+          // After all repetitions are complete, reset for next word but don't auto-advance
+          setCurrentRepetition(1);
         }
-      } catch (error) {
-        console.error('Speech playback error:', error);
-        toast({
-          title: "Speech Error",
-          description: "Unable to play audio. Please check your browser settings.",
-          variant: "destructive",
-        });
       }
-    } else {
-      console.log('Skipping speech - word:', word, 'isMuted:', isMuted);
+    } catch (error) {
+      console.error('❌ Speech error:', error);
+      toast({
+        title: "Speech Error",
+        description: "Click the play button to try again. Make sure your device volume is up!",
+        variant: "destructive",
+        duration: 5000,
+      });
     }
   };
 
