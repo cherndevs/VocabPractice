@@ -67,7 +67,7 @@ export default function Sessions() {
                 </div>
                 <div className="text-left">
                   <div className="font-medium">Create New Session</div>
-                  <div className="text-sm text-muted-foreground">Start a new spelling list from a photo or scratch</div>
+                  <div className="text-sm text-muted-foreground">Create from photo or from scratch</div>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground" />

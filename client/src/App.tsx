@@ -10,12 +10,10 @@ import CreateSession from "@/pages/create-session";
 import PracticeSession from "@/pages/practice-session";
 import NotFound from "@/pages/not-found";
 import BottomNavigation from "@/components/bottom-navigation";
-import StatusBar from "@/components/status-bar";
 
 function Router() {
   return (
     <div className="mobile-container max-w-sm mx-auto min-h-screen bg-background">
-      <StatusBar />
       <div className="pb-20">
         <Switch>
           <Route path="/" component={Sessions} />
