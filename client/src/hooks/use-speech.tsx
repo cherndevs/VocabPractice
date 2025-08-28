@@ -56,6 +56,14 @@ export function useSpeech() {
       
       console.log('🎵 Available voices:', voices.map(v => `${v.name} (${v.lang})`));
       
+      // Also log Chinese voices specifically
+      const chineseVoices = voices.filter(v => 
+        v.lang.toLowerCase().includes('zh') || 
+        v.name.toLowerCase().includes('chinese') ||
+        v.name.toLowerCase().includes('mandarin')
+      );
+      console.log('🇨🇳 Chinese voices found:', chineseVoices.map(v => `${v.name} (${v.lang})`));
+      
       // More comprehensive Chinese voice search
       selectedVoice = voices.find(voice => {
         const name = voice.name.toLowerCase();
@@ -95,9 +103,18 @@ export function useSpeech() {
       try {
         const utterance = new SpeechSynthesisUtterance(text.trim());
         
-        utterance.rate = 0.8;
+        utterance.rate = 0.7;
         utterance.volume = 1.0;
+        utterance.pitch = 1.0;
         utterance.lang = detectedLang;
+        
+        console.log('🎛️ Speech settings:', {
+          text: text,
+          lang: utterance.lang,
+          rate: utterance.rate,
+          volume: utterance.volume,
+          voice: selectedVoice?.name || 'default'
+        });
         
         // Use selected voice if found
         if (selectedVoice) {
@@ -122,19 +139,45 @@ export function useSpeech() {
 
         utterance.onstart = () => {
           setIsSpeaking(true);
-          console.log('🗣️ Speaking:', text, 'Language:', detectedLang);
+          console.log('🗣️ Speech started:', text, 'Language:', detectedLang, 'Voice:', utterance.voice?.name || 'default');
         };
 
-        utterance.onend = cleanup;
+        utterance.onend = () => {
+          console.log('✅ Speech completed');
+          cleanup();
+        };
+        
         utterance.onerror = (e) => {
-          console.error('Speech error:', e.error);
+          console.error('❌ Speech error:', e.error, 'Text:', text);
           cleanup();
         };
 
-        // Safety timeout
-        setTimeout(cleanup, 5000);
+        utterance.onpause = () => console.log('⏸️ Speech paused');
+        utterance.onresume = () => console.log('▶️ Speech resumed');
 
-        window.speechSynthesis.speak(utterance);
+        // Check if speech synthesis is working
+        if (!window.speechSynthesis) {
+          console.error('❌ Speech synthesis not supported');
+          reject(new Error('Speech synthesis not supported'));
+          return;
+        }
+
+        if (window.speechSynthesis.speaking) {
+          console.log('🔄 Already speaking, canceling...');
+          window.speechSynthesis.cancel();
+          setTimeout(() => window.speechSynthesis.speak(utterance), 100);
+        } else {
+          console.log('🎤 Starting speech synthesis...');
+          window.speechSynthesis.speak(utterance);
+        }
+
+        // Safety timeout
+        setTimeout(() => {
+          if (!completed) {
+            console.log('⏰ Speech timeout - forcing cleanup');
+            cleanup();
+          }
+        }, 8000);
       } catch (error) {
         setIsSpeaking(false);
         reject(error);
