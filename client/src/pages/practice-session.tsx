@@ -446,10 +446,6 @@ export default function PracticeSession() {
         <div className="px-4 py-8">
           {/* Word Display Hidden */}
           <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-foreground mb-6" data-testid="text-hidden-word">
-              ★ ★ ★
-            </div>
-
             {/* Word Info */}
             <div className="text-sm text-muted-foreground mb-8" data-testid="text-word-info">
               Word {currentWordIndex + 1} of {session.words.length}
