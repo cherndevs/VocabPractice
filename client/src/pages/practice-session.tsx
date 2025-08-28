@@ -114,50 +114,21 @@ export default function PracticeSession() {
   }, [wordsCompleted.size, timeSpent, session?.words.length]);
 
   const playWord = async () => {
-    if (!session) {
-      console.log('No session available');
-      return;
-    }
-
-    // Reset pause state when user explicitly presses play
-    setIsPaused(false);
+    if (!session || isMuted) return;
 
     const word = session.words[currentWordIndex];
-    
-    if (!word) {
-      console.log('No word to play');
-      return;
-    }
+    if (!word) return;
 
-    if (isMuted) {
-      console.log('Skipping speech - muted');
-      return;
-    }
-
-    // Check if speech synthesis is available
-    if (!('speechSynthesis' in window)) {
-      toast({
-        title: "Speech Not Supported",
-        description: "Your browser doesn't support text-to-speech.",
-        variant: "destructive",
-      });
-      return;
-    }
+    setIsPaused(false);
 
     try {
-      console.log('🎵 Playing word:', word);
-      
-      // Show a quick toast to let user know speech is starting
-      toast({
-        title: "Playing...",
-        description: `Speaking: "${word}"`,
-        duration: 1000,
-      });
+      console.log('🎵 PLAYING:', word);
       
       await speak(word);
-      console.log('✅ Speech completed successfully');
+      
+      console.log('✅ PLAYED SUCCESSFULLY');
 
-      // In test mode, handle repetitions with pauses
+      // Handle repetitions in test mode
       if (mode === "test" && settings && !isPaused) {
         const maxReps = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
@@ -170,17 +141,15 @@ export default function PracticeSession() {
             }
           }, pauseDuration);
         } else {
-          // After all repetitions are complete, reset for next word but don't auto-advance
           setCurrentRepetition(1);
         }
       }
     } catch (error) {
-      console.error('❌ Speech error:', error);
+      console.error('❌ SPEECH FAILED:', error);
       toast({
-        title: "Speech Error",
-        description: "Click the play button to try again. Make sure your device volume is up!",
+        title: "Try Again",
+        description: "Click play to hear the word. Check your volume is up!",
         variant: "destructive",
-        duration: 5000,
       });
     }
   };
@@ -382,6 +351,14 @@ export default function PracticeSession() {
                 data-testid="button-toggle-mute"
               >
                 {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => speak("test")}
+                className="px-4 py-2"
+              >
+                Test
               </Button>
             </div>
 
