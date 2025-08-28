@@ -115,7 +115,7 @@ export default function PracticeSession() {
   }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
   const playWord = async () => {
-    if (!session || isMuted || isPaused) return;
+    if (!session || isMuted) return;
 
     const word = session.words[currentWordIndex];
     if (!word) return;
@@ -132,20 +132,14 @@ export default function PracticeSession() {
 
       console.log('✅ PLAYED SUCCESSFULLY');
 
-      // Check again after speaking completes - user might have paused during speech
-      if (isPaused || !isLooping) {
-        console.log('🛑 STOPPING - User paused during speech');
-        return;
-      }
-
       // Handle repetitions in test mode
-      if (mode === "test" && settings && !isPaused && isLooping) {
+      if (mode === "test" && settings && !isPaused) {
         const maxReps = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
         if (currentRepetition < maxReps) {
           timeoutRef.current = setTimeout(() => {
-            if (!isPaused && isLooping) {
+            if (!isPaused) {
               setCurrentRepetition(prev => prev + 1);
               playWord();
             }
@@ -154,7 +148,7 @@ export default function PracticeSession() {
           // Reset repetition and continue looping until manually paused
           setCurrentRepetition(1);
           timeoutRef.current = setTimeout(() => {
-            if (!isPaused && isLooping) {
+            if (!isPaused) {
               playWord();
             }
           }, pauseDuration);
