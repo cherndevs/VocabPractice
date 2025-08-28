@@ -145,8 +145,13 @@ export default function PracticeSession() {
             }
           }, pauseDuration);
         } else {
+          // Reset repetition and continue looping until manually paused
           setCurrentRepetition(1);
-          setIsLooping(false);
+          timeoutRef.current = setTimeout(() => {
+            if (!isPaused) {
+              playWord();
+            }
+          }, pauseDuration);
         }
       }
     } catch (error) {
