@@ -132,27 +132,16 @@ export default function PracticeSession() {
 
       console.log('✅ PLAYED SUCCESSFULLY');
 
-      // Handle repetitions in test mode
-      if (mode === "test" && settings && !isPaused) {
-        const maxReps = settings.wordRepetitions || 2;
+      // Handle repetitions in test mode - continuous loop until manually stopped
+      if (mode === "test" && settings && !isPaused && isLooping) {
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
-        if (currentRepetition < maxReps) {
-          timeoutRef.current = setTimeout(() => {
-            if (!isPaused) {
-              setCurrentRepetition(prev => prev + 1);
-              playWord();
-            }
-          }, pauseDuration);
-        } else {
-          // Reset repetition and continue looping until manually paused
-          setCurrentRepetition(1);
-          timeoutRef.current = setTimeout(() => {
-            if (!isPaused) {
-              playWord();
-            }
-          }, pauseDuration);
-        }
+        timeoutRef.current = setTimeout(() => {
+          // Check again if we should continue looping
+          if (!isPaused && isLooping) {
+            playWord();
+          }
+        }, pauseDuration);
       }
     } catch (error) {
       console.error('❌ SPEECH FAILED:', error);
