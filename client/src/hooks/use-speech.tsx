@@ -39,43 +39,75 @@ export function useSpeech() {
     // Wait a bit for cleanup
     await new Promise(resolve => setTimeout(resolve, 100));
 
+    // Handle voice setup first for Chinese content
+    const detectedLang = detectLanguage(text);
+    let selectedVoice = null;
+    
+    if (detectedLang === 'zh-CN') {
+      // Get available voices
+      let voices = window.speechSynthesis.getVoices();
+      
+      // If no voices loaded yet, wait for them
+      if (voices.length === 0) {
+        console.log('🔄 Loading voices...');
+        await new Promise(resolve => setTimeout(resolve, 200));
+        voices = window.speechSynthesis.getVoices();
+      }
+      
+      console.log('🎵 Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+      
+      // More comprehensive Chinese voice search
+      selectedVoice = voices.find(voice => {
+        const name = voice.name.toLowerCase();
+        const lang = voice.lang.toLowerCase();
+        
+        return (
+          // Language code patterns
+          lang.startsWith('zh') ||
+          lang.includes('cn') ||
+          lang.includes('chinese') ||
+          // Name patterns
+          name.includes('chinese') ||
+          name.includes('mandarin') ||
+          name.includes('cantonese') ||
+          name.includes('taiwan') ||
+          name.includes('hong kong') ||
+          name.includes('simplified') ||
+          name.includes('traditional') ||
+          // Common Chinese voice names
+          name.includes('ting-ting') ||
+          name.includes('sin-ji') ||
+          name.includes('mei-jia') ||
+          name.includes('yaoyao') ||
+          name.includes('huihui') ||
+          name.includes('kangkang')
+        );
+      });
+      
+      if (selectedVoice) {
+        console.log('🎌 Found Chinese voice:', selectedVoice.name, '(' + selectedVoice.lang + ')');
+      } else {
+        console.log('⚠️ No Chinese voice found among', voices.length, 'available voices');
+      }
+    }
+
     return new Promise((resolve, reject) => {
       try {
         const utterance = new SpeechSynthesisUtterance(text.trim());
-        const detectedLang = detectLanguage(text);
         
         utterance.rate = 0.8;
         utterance.volume = 1.0;
         utterance.lang = detectedLang;
-
-        // Try to find and use a Chinese voice if speaking Chinese content
-        if (detectedLang === 'zh-CN') {
-          // Get available voices - try multiple times if needed
-          let voices = window.speechSynthesis.getVoices();
-          
-          // If no voices loaded yet, trigger loading and wait briefly
-          if (voices.length === 0) {
-            window.speechSynthesis.getVoices(); // Trigger loading
-            await new Promise(resolve => setTimeout(resolve, 300)); // Brief wait
-            voices = window.speechSynthesis.getVoices();
-          }
-          
-          const chineseVoice = voices.find(voice => 
-            voice.lang.startsWith('zh') || 
-            voice.lang.includes('CN') ||
-            voice.name.toLowerCase().includes('chinese') ||
-            voice.name.toLowerCase().includes('mandarin') ||
-            voice.name.toLowerCase().includes('cantonese')
-          );
-          
-          if (chineseVoice) {
-            utterance.voice = chineseVoice;
-            console.log('🎌 Using Chinese voice:', chineseVoice.name, chineseVoice.lang);
-          } else {
-            console.log('⚠️ No Chinese voice found. Available voices:', voices.map(v => `${v.name} (${v.lang})`));
-            // Try alternative Chinese language codes
-            utterance.lang = 'zh';
-          }
+        
+        // Use selected voice if found
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+          console.log('🗣️ Using voice:', selectedVoice.name);
+        } else if (detectedLang === 'zh-CN') {
+          // Try fallback language codes
+          const chineseLangCodes = ['zh-CN', 'zh-TW', 'zh-HK', 'zh', 'cmn'];
+          utterance.lang = chineseLangCodes[0];
+          console.log('🔄 Fallback to language code:', utterance.lang);
         }
 
         let completed = false;
