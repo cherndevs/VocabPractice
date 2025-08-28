@@ -5,29 +5,6 @@ export function useSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSupported] = useState(() => 'speechSynthesis' in window);
 
-  // Function to detect language based on text content
-  const detectLanguage = useCallback((text: string): string => {
-    const trimmedText = text.trim();
-    
-    // Check for Chinese characters (both simplified and traditional)
-    const chineseRegex = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
-    if (chineseRegex.test(trimmedText)) {
-      return 'zh-CN'; // Chinese Simplified
-    }
-    
-    // Check for pinyin (contains tone marks or is all lowercase letters with spaces)
-    const pinyinRegex = /^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ\s]+$/;
-    const hasToneMarks = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/.test(trimmedText);
-    const isLowerCaseWords = /^[a-z\s]+$/.test(trimmedText) && trimmedText.includes(' ');
-    
-    if (hasToneMarks || (isLowerCaseWords && trimmedText.split(' ').length <= 3)) {
-      return 'zh-CN'; // Use Chinese voice for pinyin too
-    }
-    
-    // Default to English
-    return 'en-US';
-  }, []);
-
   const speak = useCallback(async (text: string): Promise<void> => {
     if (!isSupported || !text?.trim()) {
       throw new Error('Speech not supported or no text');
@@ -42,26 +19,9 @@ export function useSpeech() {
     return new Promise((resolve, reject) => {
       try {
         const utterance = new SpeechSynthesisUtterance(text.trim());
-        const detectedLang = detectLanguage(text);
-        
         utterance.rate = 0.8;
         utterance.volume = 1.0;
-        utterance.lang = detectedLang;
-
-        // Try to find Chinese voice only if needed
-        if (detectedLang === 'zh-CN') {
-          const voices = window.speechSynthesis.getVoices();
-          const chineseVoice = voices.find(voice => 
-            voice.lang.startsWith('zh') || 
-            voice.name.toLowerCase().includes('chinese') ||
-            voice.name.toLowerCase().includes('mandarin')
-          );
-          
-          if (chineseVoice) {
-            utterance.voice = chineseVoice;
-            console.log('Using Chinese voice:', chineseVoice.name);
-          }
-        }
+        utterance.lang = 'en-US';
 
         let completed = false;
 
@@ -75,7 +35,7 @@ export function useSpeech() {
 
         utterance.onstart = () => {
           setIsSpeaking(true);
-          console.log('Speaking:', text);
+          console.log('🗣️ Speaking:', text);
         };
 
         utterance.onend = cleanup;
@@ -93,7 +53,7 @@ export function useSpeech() {
         reject(error);
       }
     });
-  }, [isSupported, detectLanguage]);
+  }, [isSupported]);
 
   const cancel = useCallback(() => {
     window.speechSynthesis.cancel();
