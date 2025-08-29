@@ -120,12 +120,6 @@ export default function PracticeSession() {
     const word = session.words[currentWordIndex];
     if (!word) return;
 
-    // Set looping state immediately when starting
-    if (mode === "test" && repetitionCount === 1) {
-      setIsPaused(false);
-      setIsLooping(true);
-    }
-
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
 
@@ -134,14 +128,15 @@ export default function PracticeSession() {
       console.log('✅ PLAYED SUCCESSFULLY');
 
       // Handle repetitions in test mode
-      if (mode === "test" && settings && isLooping && !isPaused && !isMuted) {
+      if (mode === "test" && settings) {
         const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
         if (repetitionCount < maxRepetitions) {
           // Continue with next repetition after pause
           timeoutRef.current = setTimeout(() => {
-            if (mode === "test" && !isPaused && isLooping && !isMuted) {
+            // Check current state at time of execution, not capture time
+            if (mode === "test" && !isMuted) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             }
@@ -149,7 +144,8 @@ export default function PracticeSession() {
         } else {
           // All repetitions complete, start over after pause
           timeoutRef.current = setTimeout(() => {
-            if (mode === "test" && !isPaused && isLooping && !isMuted) {
+            // Check current state at time of execution, not capture time
+            if (mode === "test" && !isMuted) {
               console.log('🔄 LOOPING FROM START');
               playWord(1);
             }
@@ -468,7 +464,11 @@ export default function PracticeSession() {
                   variant="outline" 
                   size="lg" 
                   className="p-4 rounded-full"
-                  onClick={() => playWord(1)}
+                  onClick={() => {
+                    setIsPaused(false);
+                    setIsLooping(true);
+                    playWord(1);
+                  }}
                   disabled={isMuted}
                   data-testid="button-play-word"
                 >
