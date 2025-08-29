@@ -135,19 +135,23 @@ export default function PracticeSession() {
         if (repetitionCount < maxRepetitions) {
           // Continue with next repetition after pause
           timeoutRef.current = setTimeout(() => {
-            // Check current state at time of execution, not capture time
-            if (mode === "test" && !isMuted) {
+            // Check current state at time of execution - must not be paused or muted
+            if (mode === "test" && !isMuted && !isPaused && isLooping) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
+            } else {
+              console.log('❌ REPETITION CANCELLED - paused, muted, or not looping');
             }
           }, pauseDuration);
         } else {
           // All repetitions complete, start over after pause
           timeoutRef.current = setTimeout(() => {
-            // Check current state at time of execution, not capture time
-            if (mode === "test" && !isMuted) {
+            // Check current state at time of execution - must not be paused or muted
+            if (mode === "test" && !isMuted && !isPaused && isLooping) {
               console.log('🔄 LOOPING FROM START');
               playWord(1);
+            } else {
+              console.log('❌ LOOP CANCELLED - paused, muted, or not looping');
             }
           }, pauseDuration);
         }
