@@ -120,7 +120,8 @@ export default function PracticeSession() {
     const word = session.words[currentWordIndex];
     if (!word) return;
 
-    if (mode === "test") {
+    // Set looping state immediately when starting
+    if (mode === "test" && repetitionCount === 1) {
       setIsPaused(false);
       setIsLooping(true);
     }
@@ -133,7 +134,7 @@ export default function PracticeSession() {
       console.log('✅ PLAYED SUCCESSFULLY');
 
       // Handle repetitions in test mode
-      if (mode === "test" && settings) {
+      if (mode === "test" && settings && isLooping && !isPaused && !isMuted) {
         const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
@@ -141,7 +142,7 @@ export default function PracticeSession() {
           // Continue with next repetition after pause
           timeoutRef.current = setTimeout(() => {
             if (mode === "test" && !isPaused && isLooping && !isMuted) {
-              console.log('🔄 NEXT REPETITION');
+              console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             }
           }, pauseDuration);
@@ -158,6 +159,7 @@ export default function PracticeSession() {
     } catch (error) {
       console.error('❌ SPEECH FAILED:', error);
       setIsLooping(false);
+      setIsPaused(true);
       toast({
         title: "Try Again",
         description: "Click play to hear the word. Check your volume is up!",
@@ -461,7 +463,7 @@ export default function PracticeSession() {
 
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-6">
-              {!isLooping && (
+              {(!isLooping || isPaused) && (
                 <Button 
                   variant="outline" 
                   size="lg" 
@@ -474,7 +476,7 @@ export default function PracticeSession() {
                 </Button>
               )}
 
-              {settings?.enablePauseButton && isLooping && (
+              {settings?.enablePauseButton && isLooping && !isPaused && (
                 <Button 
                   variant="outline" 
                   size="lg" 
@@ -483,11 +485,7 @@ export default function PracticeSession() {
                   disabled={isMuted}
                   data-testid="button-pause-resume"
                 >
-                  {isPaused ? (
-                    <Play className="w-8 h-8 text-primary" fill="currentColor" />
-                  ) : (
-                    <Pause className="w-8 h-8 text-primary" fill="currentColor" />
-                  )}
+                  <Pause className="w-8 h-8 text-primary" fill="currentColor" />
                 </Button>
               )}
 
