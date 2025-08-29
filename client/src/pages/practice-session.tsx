@@ -234,11 +234,20 @@ export default function PracticeSession() {
 
   const togglePause = () => {
     if (isPaused) {
+      // PLAY: Clean up any existing timeouts first to prevent conflicts
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      window.speechSynthesis.cancel();
+      cancel();
+
       setIsPaused(false);
       setIsLooping(true);
       // Resume from current word and repetition
       playWord(1);
     } else {
+      // PAUSE: Stop everything immediately
       setIsPaused(true);
       setIsLooping(false);
       // Force stop all speech immediately and clear timeouts
