@@ -114,7 +114,7 @@ export default function PracticeSession() {
     }
   }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
-  const playWord = async () => {
+  const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
 
     const word = session.words[currentWordIndex];
@@ -126,23 +126,34 @@ export default function PracticeSession() {
     }
 
     try {
-      console.log('🎵 PLAYING:', word);
+      console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
 
       await speak(word);
 
       console.log('✅ PLAYED SUCCESSFULLY');
 
-      // Handle repetitions in test mode - continuous loop until manually stopped
+      // Handle repetitions in test mode
       if (mode === "test" && settings) {
+        const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
-        timeoutRef.current = setTimeout(() => {
-          // Continue looping if still in test mode and not manually stopped
-          if (mode === "test" && !isPaused && isLooping && !isMuted) {
-            console.log('🔄 LOOPING NEXT PLAY');
-            playWord();
-          }
-        }, pauseDuration);
+        if (repetitionCount < maxRepetitions) {
+          // Continue with next repetition after pause
+          timeoutRef.current = setTimeout(() => {
+            if (mode === "test" && !isPaused && isLooping && !isMuted) {
+              console.log('🔄 NEXT REPETITION');
+              playWord(repetitionCount + 1);
+            }
+          }, pauseDuration);
+        } else {
+          // All repetitions complete, start over after pause
+          timeoutRef.current = setTimeout(() => {
+            if (mode === "test" && !isPaused && isLooping && !isMuted) {
+              console.log('🔄 LOOPING FROM START');
+              playWord(1);
+            }
+          }, pauseDuration);
+        }
       }
     } catch (error) {
       console.error('❌ SPEECH FAILED:', error);
@@ -188,7 +199,7 @@ export default function PracticeSession() {
 
     // Auto-play the first word when starting loop
     setTimeout(() => {
-      playWord();
+      playWord(1);
     }, 100);
   };
 
@@ -228,7 +239,7 @@ export default function PracticeSession() {
       setIsPaused(false);
       setIsLooping(true);
       // Resume from current word and repetition
-      playWord();
+      playWord(1);
     } else {
       setIsPaused(true);
       setIsLooping(false);
@@ -345,7 +356,7 @@ export default function PracticeSession() {
                 variant="outline" 
                 size="lg" 
                 className="p-3 rounded-full"
-                onClick={playWord}
+                onClick={() => playWord(1)}
                 disabled={isMuted}
                 data-testid="button-play-audio"
               >
@@ -455,7 +466,7 @@ export default function PracticeSession() {
                   variant="outline" 
                   size="lg" 
                   className="p-4 rounded-full"
-                  onClick={playWord}
+                  onClick={() => playWord(1)}
                   disabled={isMuted}
                   data-testid="button-play-word"
                 >
