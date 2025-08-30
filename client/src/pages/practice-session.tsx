@@ -114,6 +114,16 @@ export default function PracticeSession() {
     }
   }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
+
+  // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
+  useEffect(() => {
+    console.log('🔄 STATE CHANGE:', {
+      isPaused,
+      isLooping,
+      stack: new Error().stack?.split('\n').slice(1, 4).join('\n') // Show call stack
+    });
+  }, [isPaused, isLooping]);
+
   
   // REPLACE your playWord function with this debugging version:
   const playWord = async (repetitionCount: number = 1) => {
@@ -122,6 +132,10 @@ export default function PracticeSession() {
     const word = session.words[currentWordIndex];
     if (!word) return;
 
+    //
+    setIsPaused(false);
+
+    
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
       console.log('📊 STATE BEFORE SPEAKING:', {
@@ -131,8 +145,7 @@ export default function PracticeSession() {
         isLooping
       });
 
-      await speak(word);
-
+      await speak(word);      
       console.log('✅ PLAYED SUCCESSFULLY');
       console.log('📊 STATE AFTER SPEAKING:', {
         mode,
@@ -167,7 +180,7 @@ export default function PracticeSession() {
             });
 
             // Check state is still valid for continuing
-            if (mode === "test" && !isMuted && !isPaused && isLooping) {
+            if (mode === "test" && !isMuted && !isPaused) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             } else {
@@ -186,7 +199,8 @@ export default function PracticeSession() {
         } else {
           // All repetitions complete - STOP
           console.log('✅ ALL REPETITIONS COMPLETE - STOPPING');
-          setIsPaused(true);
+          //taking out possibly unnecessary setIsPaused(true);
+          // setIsPaused(true);
           setIsLooping(false);
         }
       }
