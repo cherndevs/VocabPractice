@@ -18,7 +18,6 @@ export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-
   const [mode, setMode] = useState<PracticeMode>("practice");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
@@ -226,6 +225,8 @@ export default function PracticeSession() {
       timeoutRef.current = null;
     }
     setIsPaused(true);
+    // Reinitialize so it's not automatically set to pause upon first play
+    setIsPaused(false);
     setIsLooping(false);
 
     if (currentWordIndex < session.words.length - 1) {
@@ -318,7 +319,8 @@ export default function PracticeSession() {
     setIsLooping(false);
     setMode(newMode);
     setCurrentRepetition(1);
-    // Don't auto-play when entering test mode - user must press play
+    // Reinitialize so it's not automatically set to pause upon first play
+    setIsPaused(false);
   };
 
   const formatTime = (seconds: number) => {
