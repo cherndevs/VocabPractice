@@ -524,7 +524,7 @@ export default function PracticeSession() {
                 </Button>
               )}
 
-              {settings?.isLooping && (
+              {settings?.enablePauseButton && isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
