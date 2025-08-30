@@ -28,9 +28,7 @@ export default function PracticeSession() {
   const [isPaused, setIsPaused] = useState(false);
   const [isLooping, setIsLooping] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
-
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
     queryKey: ["/api/sessions", id],
   });
@@ -49,27 +47,30 @@ export default function PracticeSession() {
     },
   });
 
+
+  // Function to stop all playback
+  const stopAllPlayback = () => {
+    window.speechSynthesis.cancel(); // kill browser speech
+    cancel(); // kill custom hook speech
+    setIsPaused(true)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
+
+
   // Stop speech when navigating away or component unmounts
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Force stop all speech synthesis and clear timeouts
-      window.speechSynthesis.cancel();
-      cancel();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      stopAllPlayback(); // Force stop all speech synthesis and clear timeouts
     };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Stop speech when tab becomes hidden/inactive
-        window.speechSynthesis.cancel();
-        cancel();
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
+        stopAllPlayback();
       }
     };
 
@@ -79,12 +80,7 @@ export default function PracticeSession() {
 
     return () => {
       // Cleanup: stop speech and remove listeners
-      window.speechSynthesis.cancel();
-      cancel();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      stopAllPlayback();
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -124,15 +120,14 @@ export default function PracticeSession() {
   }, [isPaused, isLooping]);
 
   
-  // REPLACE your playWord function with this debugging version:
+  // This is the main playWord function
+  // It handles the logic for playing a word, including repetitions in test mode
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
     const word = session.words[currentWordIndex];
     if (!word) return;
 
     setIsLooping(true)
-    
-    //
     setIsPaused(false);
     
     try {
@@ -198,8 +193,6 @@ export default function PracticeSession() {
         } else {
           // All repetitions complete - STOP
           console.log('✅ ALL REPETITIONS COMPLETE - STOPPING');
-          //taking out possibly unnecessary setIsPaused(true);
-          // setIsPaused(true);
           setIsLooping(false);
         }
       }
@@ -216,17 +209,9 @@ export default function PracticeSession() {
   };
   const nextWord = () => {
     if (!session) return;
-
-    // Force stop all speech immediately and clear timeouts
-    window.speechSynthesis.cancel();
-    cancel();
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    stopAllPlayback();
     setIsPaused(true);
-    // Reinitialize so it's not automatically set to pause upon first play
-    setIsPaused(false);
+    setIsPaused(false);  // Reinitialize so it's not automatically set to pause upon first play
     setIsLooping(false);
 
     if (currentWordIndex < session.words.length - 1) {
@@ -237,12 +222,7 @@ export default function PracticeSession() {
 
   const startLoop = () => {
     // Force stop all speech immediately and clear timeouts
-    window.speechSynthesis.cancel();
-    cancel();
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    stopAllPlayback();
     setIsPaused(false);
     setCurrentWordIndex(0);
     setCurrentRepetition(1);
@@ -256,12 +236,7 @@ export default function PracticeSession() {
   const previousWord = () => {
     if (currentWordIndex > 0) {
       // Force stop all speech immediately and clear timeouts
-      window.speechSynthesis.cancel();
-      cancel();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+     stopAllPlayback();
       setIsPaused(true);
       setIsLooping(false);
       setCurrentWordIndex(prev => prev - 1);
@@ -273,12 +248,7 @@ export default function PracticeSession() {
     setIsMuted(!isMuted);
     if (!isMuted) {
       // Force stop all speech immediately and clear timeouts
-      window.speechSynthesis.cancel();
-      cancel();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      stopAllPlayback();
       setIsPaused(true);
       setIsLooping(false);
     }
@@ -293,12 +263,7 @@ export default function PracticeSession() {
       setIsPaused(true); // Calls function to pause playback
       setIsLooping(false);
       // Force stop all speech immediately and clear timeouts
-      window.speechSynthesis.cancel();
-      cancel();
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      stopAllPlayback();
     }
   };
 
@@ -308,12 +273,7 @@ export default function PracticeSession() {
 
   const switchMode = (newMode: PracticeMode) => {
     // Force stop all speech immediately and reset state
-    window.speechSynthesis.cancel();
-    cancel();
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
+    stopAllPlayback();
     setIsPaused(true);
     setIsLooping(false);
     setMode(newMode);
