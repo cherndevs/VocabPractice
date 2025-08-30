@@ -11,7 +11,7 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import type { Session, Settings } from "@shared/schema";
-
+import React, { useCallback } from "react";
 type PracticeMode = "practice" | "test";
 
 export default function PracticeSession() {
@@ -29,7 +29,8 @@ export default function PracticeSession() {
   const [isPaused, setIsPaused] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  const playbackSessionRef = useRef(0);
+  const isStoppingRef = useRef(false);
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
 
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -40,6 +41,31 @@ export default function PracticeSession() {
     queryKey: ["/api/settings"],
   });
 
+  const stopPlayback = useCallback(() => {
+    console.log('🛑 STOPPING PLAYBACK');
+
+    isStoppingRef.current = true;
+    playbackSessionRef.current++;
+
+    window.speechSynthesis.cancel();
+    cancel();
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    setIsPaused(true);
+    setIsLooping(false);
+
+    setTimeout(() => {
+      isStoppingRef.current = false;
+    }, 100);
+
+    console.log('✅ PLAYBACK STOPPED');
+  }, [cancel]);
+
+  
   const updateSessionMutation = useMutation({
     mutationFn: async (updates: Partial<Session>) => {
       const response = await apiRequest("PUT", `/api/sessions/${id}`, updates);
