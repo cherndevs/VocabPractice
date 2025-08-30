@@ -127,13 +127,13 @@ export default function PracticeSession() {
   // REPLACE your playWord function with this debugging version:
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
-
     const word = session.words[currentWordIndex];
     if (!word) return;
 
+    setIsLooping(true)
+    
     //
     setIsPaused(false);
-
     
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
@@ -288,10 +288,9 @@ export default function PracticeSession() {
     if (isPaused) {
       setIsPaused(false);
       setIsLooping(true);
-      // Resume from current word and repetition
-      playWord(1);
+      playWord(1);  // start playback
     } else {
-      setIsPaused(true);
+      setIsPaused(true); // Calls function to pause playback
       setIsLooping(false);
       // Force stop all speech immediately and clear timeouts
       window.speechSynthesis.cancel();
@@ -525,7 +524,7 @@ export default function PracticeSession() {
                 </Button>
               )}
 
-              {settings?.enablePauseButton && isLooping && (
+              {settings?.isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
