@@ -27,7 +27,7 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
+  const [isLooping, setIsLooping] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
@@ -114,49 +114,100 @@ export default function PracticeSession() {
     }
   }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
-  const playWord = async () => {
+
+  // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
+  useEffect(() => {
+    console.log('🔄 STATE CHANGE:', {
+      isPaused,
+      isLooping,
+      stack: new Error().stack?.split('\n').slice(1, 4).join('\n') // Show call stack
+    });
+  }, [isPaused, isLooping]);
+
+  
+  // REPLACE your playWord function with this debugging version:
+  const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
 
     const word = session.words[currentWordIndex];
     if (!word) return;
 
+    //
     setIsPaused(false);
-    if (mode === "test") {
-      setIsLooping(true);
-    }
 
+    
     try {
-      console.log('🎵 PLAYING:', word);
+      console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
+      console.log('📊 STATE BEFORE SPEAKING:', {
+        mode,
+        isMuted,
+        isPaused,
+        isLooping
+      });
 
-      await speak(word);
-
+      await speak(word);      
       console.log('✅ PLAYED SUCCESSFULLY');
+      console.log('📊 STATE AFTER SPEAKING:', {
+        mode,
+        isMuted,
+        isPaused,
+        isLooping
+      });
 
       // Handle repetitions in test mode
-      if (mode === "test" && settings && !isPaused) {
-        const maxReps = settings.wordRepetitions || 2;
+      if (mode === "test" && settings) {
+        const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
-        if (currentRepetition < maxReps) {
+        console.log('🔧 REPETITION INFO:', {
+          currentRepetition: repetitionCount,
+          maxRepetitions,
+          willScheduleNext: repetitionCount < maxRepetitions
+        });
+
+        if (repetitionCount < maxRepetitions) {
+          // Schedule next repetition
+          console.log(`⏰ SCHEDULING NEXT REPETITION IN ${pauseDuration}ms`);
+
           timeoutRef.current = setTimeout(() => {
-            if (!isPaused) {
-              setCurrentRepetition(prev => prev + 1);
-              playWord();
+            console.log('⚡ TIMEOUT FIRED - CHECKING STATE');
+            console.log('📊 STATE AT TIMEOUT:', {
+              mode,
+              isMuted,
+              isPaused,
+              isLooping,
+              conditionCheck: mode === "test" && !isMuted && !isPaused && isLooping
+            });
+
+            // Check state is still valid for continuing
+            if (mode === "test" && !isMuted && !isPaused) {
+              console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
+              playWord(repetitionCount + 1);
+            } else {
+              console.log('❌ REPETITION CANCELLED - state changed:', {
+                mode: mode,
+                modeOK: mode === "test",
+                isMuted: isMuted,
+                mutedOK: !isMuted,
+                isPaused: isPaused,
+                pausedOK: !isPaused,
+                isLooping: isLooping,
+                loopingOK: isLooping
+              });
             }
           }, pauseDuration);
         } else {
-          // Reset repetition and continue looping until manually paused
-          setCurrentRepetition(1);
-          timeoutRef.current = setTimeout(() => {
-            if (!isPaused) {
-              playWord();
-            }
-          }, pauseDuration);
+          // All repetitions complete - STOP
+          console.log('✅ ALL REPETITIONS COMPLETE - STOPPING');
+          //taking out possibly unnecessary setIsPaused(true);
+          // setIsPaused(true);
+          setIsLooping(false);
         }
       }
     } catch (error) {
       console.error('❌ SPEECH FAILED:', error);
       setIsLooping(false);
+      setIsPaused(true);
       toast({
         title: "Try Again",
         description: "Click play to hear the word. Check your volume is up!",
@@ -164,7 +215,6 @@ export default function PracticeSession() {
       });
     }
   };
-
   const nextWord = () => {
     if (!session) return;
 
@@ -198,7 +248,7 @@ export default function PracticeSession() {
 
     // Auto-play the first word when starting loop
     setTimeout(() => {
-      playWord();
+      playWord(1);
     }, 100);
   };
 
@@ -238,7 +288,7 @@ export default function PracticeSession() {
       setIsPaused(false);
       setIsLooping(true);
       // Resume from current word and repetition
-      playWord();
+      playWord(1);
     } else {
       setIsPaused(true);
       setIsLooping(false);
@@ -355,7 +405,7 @@ export default function PracticeSession() {
                 variant="outline" 
                 size="lg" 
                 className="p-3 rounded-full"
-                onClick={playWord}
+                onClick={() => playWord(1)}
                 disabled={isMuted}
                 data-testid="button-play-audio"
               >
@@ -465,7 +515,7 @@ export default function PracticeSession() {
                   variant="outline" 
                   size="lg" 
                   className="p-4 rounded-full"
-                  onClick={playWord}
+                  onClick={() => playWord(1)}
                   disabled={isMuted}
                   data-testid="button-play-word"
                 >
