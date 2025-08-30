@@ -11,7 +11,7 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import type { Session, Settings } from "@shared/schema";
-import React, { useCallback } from "react";
+
 type PracticeMode = "practice" | "test";
 
 export default function PracticeSession() {
@@ -27,10 +27,9 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
+  const [isLooping, setIsLooping] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const playbackSessionRef = useRef(0);
-  const isStoppingRef = useRef(false);
+
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
 
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -41,31 +40,6 @@ export default function PracticeSession() {
     queryKey: ["/api/settings"],
   });
 
-  const stopPlayback = useCallback(() => {
-    console.log('🛑 STOPPING PLAYBACK');
-
-    isStoppingRef.current = true;
-    playbackSessionRef.current++;
-
-    window.speechSynthesis.cancel();
-    cancel();
-
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-
-    setIsPaused(true);
-    setIsLooping(false);
-
-    setTimeout(() => {
-      isStoppingRef.current = false;
-    }, 100);
-
-    console.log('✅ PLAYBACK STOPPED');
-  }, [cancel]);
-
-  
   const updateSessionMutation = useMutation({
     mutationFn: async (updates: Partial<Session>) => {
       const response = await apiRequest("PUT", `/api/sessions/${id}`, updates);
@@ -140,6 +114,8 @@ export default function PracticeSession() {
     }
   }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
 
+  
+  // REPLACE your playWord function with this debugging version:
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
 
@@ -148,38 +124,70 @@ export default function PracticeSession() {
 
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
+      console.log('📊 STATE BEFORE SPEAKING:', {
+        mode,
+        isMuted,
+        isPaused,
+        isLooping
+      });
 
       await speak(word);
 
       console.log('✅ PLAYED SUCCESSFULLY');
+      console.log('📊 STATE AFTER SPEAKING:', {
+        mode,
+        isMuted,
+        isPaused,
+        isLooping
+      });
 
       // Handle repetitions in test mode
       if (mode === "test" && settings) {
         const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
+        console.log('🔧 REPETITION INFO:', {
+          currentRepetition: repetitionCount,
+          maxRepetitions,
+          willScheduleNext: repetitionCount < maxRepetitions
+        });
+
         if (repetitionCount < maxRepetitions) {
-          // Continue with next repetition after pause
+          // Schedule next repetition
+          console.log(`⏰ SCHEDULING NEXT REPETITION IN ${pauseDuration}ms`);
+
           timeoutRef.current = setTimeout(() => {
-            // Check current state at time of execution - must not be paused or muted
+            console.log('⚡ TIMEOUT FIRED - CHECKING STATE');
+            console.log('📊 STATE AT TIMEOUT:', {
+              mode,
+              isMuted,
+              isPaused,
+              isLooping,
+              conditionCheck: mode === "test" && !isMuted && !isPaused && isLooping
+            });
+
+            // Check state is still valid for continuing
             if (mode === "test" && !isMuted && !isPaused && isLooping) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             } else {
-              console.log('❌ REPETITION CANCELLED - paused, muted, or not looping');
+              console.log('❌ REPETITION CANCELLED - state changed:', {
+                mode: mode,
+                modeOK: mode === "test",
+                isMuted: isMuted,
+                mutedOK: !isMuted,
+                isPaused: isPaused,
+                pausedOK: !isPaused,
+                isLooping: isLooping,
+                loopingOK: isLooping
+              });
             }
           }, pauseDuration);
         } else {
-          // All repetitions complete, start over after pause
-          timeoutRef.current = setTimeout(() => {
-            // Check current state at time of execution - must not be paused or muted
-            if (mode === "test" && !isMuted && !isPaused && isLooping) {
-              console.log('🔄 LOOPING FROM START');
-              playWord(1);
-            } else {
-              console.log('❌ LOOP CANCELLED - paused, muted, or not looping');
-            }
-          }, pauseDuration);
+          // All repetitions complete - STOP
+          console.log('✅ ALL REPETITIONS COMPLETE - STOPPING');
+          setIsPaused(true);
+          setIsLooping(false);
         }
       }
     } catch (error) {
@@ -193,7 +201,6 @@ export default function PracticeSession() {
       });
     }
   };
-
   const nextWord = () => {
     if (!session) return;
 
@@ -264,20 +271,11 @@ export default function PracticeSession() {
 
   const togglePause = () => {
     if (isPaused) {
-      // PLAY: Clean up any existing timeouts first to prevent conflicts
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-      window.speechSynthesis.cancel();
-      cancel();
-
       setIsPaused(false);
       setIsLooping(true);
       // Resume from current word and repetition
       playWord(1);
     } else {
-      // PAUSE: Stop everything immediately
       setIsPaused(true);
       setIsLooping(false);
       // Force stop all speech immediately and clear timeouts
@@ -498,16 +496,12 @@ export default function PracticeSession() {
 
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-6">
-              {(!isLooping || isPaused) && (
+              {!isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
                   className="p-4 rounded-full"
-                  onClick={() => {
-                    setIsPaused(false);
-                    setIsLooping(true);
-                    playWord(1);
-                  }}
+                  onClick={() => playWord(1)}
                   disabled={isMuted}
                   data-testid="button-play-word"
                 >
@@ -515,7 +509,7 @@ export default function PracticeSession() {
                 </Button>
               )}
 
-              {settings?.enablePauseButton && isLooping && !isPaused && (
+              {settings?.enablePauseButton && isLooping && (
                 <Button 
                   variant="outline" 
                   size="lg" 
@@ -524,7 +518,11 @@ export default function PracticeSession() {
                   disabled={isMuted}
                   data-testid="button-pause-resume"
                 >
-                  <Pause className="w-8 h-8 text-primary" fill="currentColor" />
+                  {isPaused ? (
+                    <Play className="w-8 h-8 text-primary" fill="currentColor" />
+                  ) : (
+                    <Pause className="w-8 h-8 text-primary" fill="currentColor" />
+                  )}
                 </Button>
               )}
 
