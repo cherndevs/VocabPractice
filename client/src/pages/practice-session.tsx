@@ -170,9 +170,11 @@ export default function PracticeSession() {
               isMuted,
               isPaused,
               isLooping,
-              conditionCheck: mode === "test" && !isMuted && !isPaused && isLooping
+              conditionCheck: mode === "test" && !isMuted && !isPaused
             });
 
+
+            
             // Check state is still valid for continuing
             if (mode === "test" && !isMuted && !isPaused) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
