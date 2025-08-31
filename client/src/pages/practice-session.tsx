@@ -32,11 +32,9 @@ export default function PracticeSession() {
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
     queryKey: ["/api/sessions", id],
   });
-
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
-
   const updateSessionMutation = useMutation({
     mutationFn: async (updates: Partial<Session>) => {
       const response = await apiRequest("PUT", `/api/sessions/${id}`, updates);
@@ -47,12 +45,19 @@ export default function PracticeSession() {
     },
   });
 
-
-  // Function to stop all playback
+  // Make sure stopAllPlayback logs what it's doing
+  // Update stopAllPlayback to set the ref immediately
   const stopAllPlayback = () => {
-    window.speechSynthesis.cancel(); // kill browser speech
-    cancel(); // kill custom hook speech
-    setIsPaused(true)
+    console.log('🛑 STOPPING ALL PLAYBACK AND SETTING PAUSE');
+
+    // Only set pause ref when actually pausing
+    isPausedRef.current = true;
+    console.log('🚨 SET PAUSE REF TO TRUE');
+
+    window.speechSynthesis.cancel();
+    cancel();
+    setIsPaused(true);
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -60,7 +65,10 @@ export default function PracticeSession() {
   };
 
 
+  // Add this ref at the top with your other refs
+  const isPausedRef = useRef(false);
 
+  
   // Stop speech when navigating away or component unmounts
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -86,6 +94,7 @@ export default function PracticeSession() {
     };
   }, [cancel]);
 
+  
   // Update time spent every second
   useEffect(() => {
     const interval = setInterval(() => {
@@ -122,6 +131,7 @@ export default function PracticeSession() {
   
   // This is the main playWord function
   // It handles the logic for playing a word, including repetitions in test mode
+
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
     const word = session.words[currentWordIndex];
@@ -129,72 +139,69 @@ export default function PracticeSession() {
 
     setIsLooping(true)
     setIsPaused(false);
-    
+
+
+    isPausedRef.current = false;
+    console.log('🚨 RESET PAUSE REF TO FALSE in playWord');
+
+
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
-      console.log('📊 STATE BEFORE SPEAKING:', {
-        mode,
-        isMuted,
-        isPaused,
-        isLooping
-      });
 
       await speak(word);      
       console.log('✅ PLAYED SUCCESSFULLY');
-      console.log('📊 STATE AFTER SPEAKING:', {
-        mode,
+
+      // ✨ KEY FIX: Check the REF value instead of state (refs update immediately)
+      console.log('🔍 CHECKING STATE AFTER SPEECH:', {
+        isPausedState: isPaused,
+        isPausedRef: isPausedRef.current,  // This is the real current value
         isMuted,
-        isPaused,
-        isLooping
+        mode
       });
+
+      // Use the ref value which updates immediately, not the state which is stale
+      if (isPausedRef.current || isMuted || mode !== "test") {
+        console.log('❌ NOT SCHEDULING - state changed during speech (using ref)');
+        setIsLooping(false);
+        return; // Exit early, don't schedule timeout
+      }
 
       // Handle repetitions in test mode
       if (mode === "test" && settings) {
         const maxRepetitions = settings.wordRepetitions || 2;
         const pauseDuration = settings.pauseBetweenWords || 1500;
 
-        console.log('🔧 REPETITION INFO:', {
-          currentRepetition: repetitionCount,
-          maxRepetitions,
-          willScheduleNext: repetitionCount < maxRepetitions
-        });
-
         if (repetitionCount < maxRepetitions) {
-          // Schedule next repetition
           console.log(`⏰ SCHEDULING NEXT REPETITION IN ${pauseDuration}ms`);
 
-          timeoutRef.current = setTimeout(() => {
-            console.log('⚡ TIMEOUT FIRED - CHECKING STATE');
+          // Clear any existing timeout first
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+
+          const timeoutId = setTimeout(() => {
+            console.log('⚡ TIMEOUT FIRED - CHECKING REF');
             console.log('📊 STATE AT TIMEOUT:', {
               mode,
               isMuted,
-              isPaused,
-              isLooping,
-              conditionCheck: mode === "test" && !isMuted && !isPaused
+              isPausedState: isPaused,
+              isPausedRef: isPausedRef.current  // Check ref in timeout too
             });
 
-
-            
-            // Check state is still valid for continuing
-            if (mode === "test" && !isMuted && !isPaused) {
+            // Check ref value in timeout as well
+            if (mode === "test" && !isMuted && !isPausedRef.current) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             } else {
-              console.log('❌ REPETITION CANCELLED - state changed:', {
-                mode: mode,
-                modeOK: mode === "test",
-                isMuted: isMuted,
-                mutedOK: !isMuted,
-                isPaused: isPaused,
-                pausedOK: !isPaused,
-                isLooping: isLooping,
-                loopingOK: isLooping
-              });
-              stopAllPlayback();
+              console.log('❌ REPETITION CANCELLED AT TIMEOUT (ref check)');
+              setIsLooping(false);
             }
           }, pauseDuration);
+
+          timeoutRef.current = timeoutId;
+          console.log('📝 STORED TIMEOUT ID:', timeoutId);
+
         } else {
-          // All repetitions complete - STOP
           console.log('✅ ALL REPETITIONS COMPLETE - STOPPING');
           setIsLooping(false);
         }
@@ -203,13 +210,11 @@ export default function PracticeSession() {
       console.error('❌ SPEECH FAILED:', error);
       setIsLooping(false);
       setIsPaused(true);
-      toast({
-        title: "Try Again",
-        description: "Click play to hear the word. Check your volume is up!",
-        variant: "destructive",
-      });
     }
   };
+  
+  /////
+  
   const nextWord = () => {
     if (!session) return;
     stopAllPlayback();
