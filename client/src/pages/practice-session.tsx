@@ -54,10 +54,11 @@ export default function PracticeSession() {
     isPausedRef.current = true;
     console.log('🚨 SET PAUSE REF TO TRUE');
 
-    window.speechSynthesis.cancel();
-    cancel();
-    setIsPaused(true);
-
+    window.speechSynthesis.cancel(); // cancel browser speech
+    cancel(); // cancel hook
+    setIsPaused(true); // may need to clean this up
+    //clean up timeout
+    
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
