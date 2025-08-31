@@ -190,6 +190,7 @@ export default function PracticeSession() {
                 isLooping: isLooping,
                 loopingOK: isLooping
               });
+              stopAllPlayback();
             }
           }, pauseDuration);
         } else {
