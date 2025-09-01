@@ -141,8 +141,7 @@ export default function PracticeSession() {
     setIsLooping(true)
     setIsPaused(false);
 
-
-    isPausedRef.current = false;
+    isPausedRef.current = false; // Reset ref to false
     console.log('🚨 RESET PAUSE REF TO FALSE in playWord');
 
 
