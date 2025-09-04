@@ -1,30 +1,47 @@
-
 import { useState, useCallback } from "react";
 
 export function useSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSupported] = useState(() => 'speechSynthesis' in window);
 
-  const speak = useCallback(async (text: string): Promise<void> => {
+  // Auto-detect language based on text content
+  const detectLanguage = useCallback((text: string): string => {
+    if (/[\u4e00-\u9fff]/.test(text)) {
+      return 'zh-CN'; // Chinese characters detected
+    }
+    return 'en-US'; // Default to English
+  }, []);
+
+  const speak = useCallback(async (text: string, options?: {
+    lang?: string;
+    rate?: number;
+    pitch?: number;
+    volume?: number;
+  }): Promise<void> => {
     if (!isSupported || !text?.trim()) {
       throw new Error('Speech not supported or no text');
     }
 
     // Stop any existing speech
     window.speechSynthesis.cancel();
-    
+
     // Wait a bit for cleanup
     await new Promise(resolve => setTimeout(resolve, 100));
 
     return new Promise((resolve, reject) => {
       try {
         const utterance = new SpeechSynthesisUtterance(text.trim());
-        utterance.rate = 0.8;
-        utterance.volume = 1.0;
-        utterance.lang = 'en-US';
+
+        // Auto-detect language if not provided
+        const language = options?.lang || detectLanguage(text);
+        utterance.lang = language;
+
+        // Set speech parameters with defaults
+        utterance.rate = options?.rate || 0.8;
+        utterance.pitch = options?.pitch || 1.0;
+        utterance.volume = options?.volume || 1.0;
 
         let completed = false;
-
         const cleanup = () => {
           if (!completed) {
             completed = true;
@@ -35,10 +52,11 @@ export function useSpeech() {
 
         utterance.onstart = () => {
           setIsSpeaking(true);
-          console.log('🗣️ Speaking:', text);
+          console.log('🗣️ Speaking:', text, `(${language})`);
         };
 
         utterance.onend = cleanup;
+
         utterance.onerror = (e) => {
           console.error('Speech error:', e.error);
           cleanup();
@@ -53,7 +71,24 @@ export function useSpeech() {
         reject(error);
       }
     });
-  }, [isSupported]);
+  }, [isSupported, detectLanguage]);
+
+  // Convenience methods for specific languages
+  const speakEnglish = useCallback(async (text: string, options?: {
+    rate?: number;
+    pitch?: number;
+    volume?: number;
+  }): Promise<void> => {
+    return speak(text, { ...options, lang: 'en-US' });
+  }, [speak]);
+
+  const speakChinese = useCallback(async (text: string, options?: {
+    rate?: number;
+    pitch?: number;
+    volume?: number;
+  }): Promise<void> => {
+    return speak(text, { ...options, lang: 'zh-CN' });
+  }, [speak]);
 
   const cancel = useCallback(() => {
     window.speechSynthesis.cancel();
@@ -71,6 +106,8 @@ export function useSpeech() {
 
   return {
     speak,
+    speakEnglish,
+    speakChinese,
     cancel,
     pause,
     resume,
