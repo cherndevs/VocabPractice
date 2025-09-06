@@ -20,7 +20,7 @@ export default function CreateSession() {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<CreateSessionStep>("camera");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [words, setWords] = useState<string[]>([]);
+  const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
@@ -105,6 +105,32 @@ export default function CreateSession() {
     const newWords = [...words];
     newWords[index] = value;
     setWords(newWords);
+  };
+
+  // NEW: Handle Enter key press in word inputs
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      
+      // If this is the last input and has content, add a new word
+      if (index === words.length - 1 && words[index].trim().length > 0) {
+        handleAddWord();
+        
+        // Focus the new input field after it's created
+        setTimeout(() => {
+          const newInput = document.querySelector(`[data-testid="input-word-${words.length}"]`) as HTMLInputElement;
+          if (newInput) {
+            newInput.focus();
+          }
+        }, 50);
+      } else if (index < words.length - 1) {
+        // Move to next input field if not the last one
+        const nextInput = document.querySelector(`[data-testid="input-word-${index + 1}"]`) as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }
+    }
   };
 
   const handleConfirmWordList = () => {
@@ -220,8 +246,10 @@ export default function CreateSession() {
                 <Input
                   value={word}
                   onChange={(e) => handleWordChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)} /* NEW: Added onKeyDown handler */
                   className="flex-1 bg-transparent border-none outline-none"
                   data-testid={`input-word-${index}`}
+                  placeholder="Enter word..." /* NEW: Added placeholder */
                 />
                 <Button
                   variant="ghost"
