@@ -1,17 +1,39 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Plus, ChevronRight, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SwipeableCard } from "@/components/swipeable-card";
 import type { Session } from "@shared/schema";
 import { format } from "date-fns";
 
 export default function Sessions() {
+  const queryClient = useQueryClient();
   const { data: sessions = [], isLoading } = useQuery<Session[]>({
     queryKey: ["/api/sessions"],
   });
+
+  const deleteSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const response = await fetch(`/api/sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete session');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch sessions
+      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+    },
+  });
+
+  const handleDeleteSession = (sessionId: string) => {
+    deleteSessionMutation.mutate(sessionId);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -40,7 +62,7 @@ export default function Sessions() {
       {/* Header */}
       <div className="px-4 py-6 bg-card">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Spelling Pro</h1>
+          <h1 className="text-2xl font-bold text-foreground">Mber Spelling Pro</h1>
           <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
             <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -103,10 +125,11 @@ export default function Sessions() {
               </Card>
             ) : (
               sessions.map((session) => (
-                <Card 
-                  key={session.id} 
+                <SwipeableCard
+                  key={session.id}
                   className="word-card hover:shadow-md transition-shadow cursor-pointer"
                   data-testid={`card-session-${session.id}`}
+                  onDelete={() => handleDeleteSession(session.id)}
                 >
                   <Link href={`/practice/${session.id}`}>
                     <CardContent className="p-4">
@@ -134,7 +157,7 @@ export default function Sessions() {
                       </div>
                     </CardContent>
                   </Link>
-                </Card>
+                </SwipeableCard>
               ))
             )}
           </div>
