@@ -18,7 +18,7 @@ export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [mode, setMode] = useState<PracticeMode>("practice");
+  const [mode, setMode] = useState<PracticeMode>("test");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   const [wordsCompleted, setWordsCompleted] = useState<Set<number>>(new Set());
@@ -26,7 +26,7 @@ export default function PracticeSession() {
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLooping, setIsLooping] = useState(true);
+  const [isLooping, setIsLooping] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -353,8 +353,8 @@ export default function PracticeSession() {
         {/* Mode Toggle */}
         <Tabs value={mode} onValueChange={(value) => switchMode(value as PracticeMode)} className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="practice" data-testid="tab-practice">Practice</TabsTrigger>
             <TabsTrigger value="test" data-testid="tab-test">Test</TabsTrigger>
+            <TabsTrigger value="practice" data-testid="tab-practice">Practice</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
