@@ -186,7 +186,14 @@ class PgStorage implements IStorage {
 
   async getSettings(): Promise<Settings | undefined> {
     const result = await this.db.select().from(settings).limit(1);
-    return result[0];
+    if (result[0]) return result[0];
+
+    // Create a default settings row if none exists (mirrors defaults in schema)
+    const inserted = await this.db
+      .insert(settings)
+      .values({})
+      .returning();
+    return inserted[0];
   }
 
   async updateSettings(updates: Partial<Settings>): Promise<Settings> {

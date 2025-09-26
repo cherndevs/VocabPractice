@@ -35,6 +35,12 @@ export default function PracticeSession() {
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
+  // Fallback settings ensure UI and repetition logic work even if settings are undefined
+  const effectiveSettings = {
+    wordRepetitions: settings?.wordRepetitions ?? 2,
+    pauseBetweenWords: settings?.pauseBetweenWords ?? 1500,
+    enablePauseButton: settings?.enablePauseButton ?? true,
+  };
   const updateSessionMutation = useMutation({
     mutationFn: async (updates: Partial<Session>) => {
       const response = await apiRequest("PUT", `/api/sessions/${id}`, updates);
@@ -166,10 +172,10 @@ export default function PracticeSession() {
         return; // Exit early, don't schedule timeout
       }
 
-      // Handle repetitions in test mode
-      if (mode === "test" && settings) {
-        const maxRepetitions = settings.wordRepetitions || 2;
-        const pauseDuration = settings.pauseBetweenWords || 1500;
+      // Handle repetitions in test mode (use effective settings fallback)
+      if (mode === "test") {
+        const maxRepetitions = effectiveSettings.wordRepetitions;
+        const pauseDuration = effectiveSettings.pauseBetweenWords;
 
         if (repetitionCount < maxRepetitions) {
           console.log(`⏰ SCHEDULING NEXT REPETITION IN ${pauseDuration}ms`);
