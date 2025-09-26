@@ -32,7 +32,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createSession(sessionData);
       res.json(session);
     } catch (error) {
-      res.status(400).json({ message: "Invalid session data" });
+      console.error("Session creation error:", error);
+      console.error("Request body:", req.body);
+      res.status(400).json({ message: "Invalid session data", error: error instanceof Error ? error.message : String(error) });
     }
   });
 

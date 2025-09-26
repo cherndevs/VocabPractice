@@ -112,4 +112,39 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+import { TursoStorage } from "./turso-storage";
+
+// Environment-based storage selection
+function createStorage(): IStorage {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const hasDatabaseUrl = !!process.env.DATABASE_URL;
+  const useTurso = process.env.USE_TURSO === 'true';
+  
+  console.log('Storage selection debug:', {
+    NODE_ENV: process.env.NODE_ENV,
+    isDevelopment,
+    DATABASE_URL: process.env.DATABASE_URL,
+    hasDatabaseUrl,
+    useTurso
+  });
+  
+  // Priority:
+  // 1. If USE_TURSO=true is explicitly set, use Turso
+  // 2. If DATABASE_URL is set, use Turso (cloud database)
+  // 3. Default: use Turso with local SQLite file
+  // 4. Only use MemStorage if explicitly disabled with USE_TURSO=false
+  
+  const disableTurso = process.env.USE_TURSO === 'false';
+  
+  if (!disableTurso) {
+    console.log(`Using Turso storage with ${hasDatabaseUrl ? 'cloud database' : 'local SQLite'}`);
+    const tursoStorage = new TursoStorage();
+    console.log('TursoStorage instance created');
+    return tursoStorage;
+  }
+  
+  console.log('Using in-memory storage (data will not persist) - explicitly disabled Turso');
+  return new MemStorage();
+}
+
+export const storage = createStorage();

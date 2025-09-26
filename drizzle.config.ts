@@ -1,14 +1,15 @@
 import { defineConfig } from "drizzle-kit";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL, ensure the database is provisioned");
-}
+// For local development, use local SQLite file
+// For production, use Turso cloud database
+const databaseUrl = process.env.DATABASE_URL || "file:local.db";
 
 export default defineConfig({
   out: "./migrations",
   schema: "./shared/schema.ts",
-  dialect: "postgresql",
+  dialect: "sqlite",
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: databaseUrl,
+    authToken: process.env.TURSO_AUTH_TOKEN,
   },
 });
