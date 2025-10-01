@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Plus, ChevronRight, Calendar, FileText } from "lucide-react";
+import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,41 @@ export default function Sessions() {
   const handleDeleteSession = (sessionId: string) => {
     deleteSessionMutation.mutate(sessionId);
   };
+
+  const pinMutation = useMutation({
+    mutationFn: async ({ id, pinnedAt }: { id: string; pinnedAt: string | null }) => {
+      const response = await fetch(`/api/sessions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinnedAt }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update pin state');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+    },
+  });
+
+  const handleTogglePin = (e: React.MouseEvent, session: Session) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const nextPinnedAt = session.pinnedAt ? null : new Date().toISOString();
+    pinMutation.mutate({ id: session.id, pinnedAt: nextPinnedAt });
+  };
+
+  // Ensure pinned items render first on the client as well (safety against 304/caching)
+  const sortedSessions = [...sessions].sort((a, b) => {
+    const aPinned = a.pinnedAt ? new Date(a.pinnedAt as unknown as string).getTime() : -Infinity;
+    const bPinned = b.pinnedAt ? new Date(b.pinnedAt as unknown as string).getTime() : -Infinity;
+    if (aPinned !== bPinned) return bPinned - aPinned; // pinned first, latest pinned first
+
+    const aCreated = a.createdAt ? new Date(a.createdAt as unknown as string).getTime() : 0;
+    const bCreated = b.createdAt ? new Date(b.createdAt as unknown as string).getTime() : 0;
+    return bCreated - aCreated; // newest created first
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -124,7 +159,7 @@ export default function Sessions() {
                 </CardContent>
               </Card>
             ) : (
-              sessions.map((session) => (
+              sortedSessions.map((session) => (
                 <SwipeableCard
                   key={session.id}
                   className="word-card hover:shadow-md transition-shadow cursor-pointer"
@@ -137,9 +172,21 @@ export default function Sessions() {
                         <h3 className="font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
                           {session.title}
                         </h3>
-                        <Badge className={getStatusColor(session.status)} data-testid={`badge-status-${session.id}`}>
-                          {getStatusText(session.status)}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={session.pinnedAt ? 'text-primary' : 'text-muted-foreground'}
+                            aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}
+                            onClick={(e) => handleTogglePin(e, session)}
+                            data-testid={`button-pin-${session.id}`}
+                          >
+                            <Pin className="w-4 h-4" />
+                          </Button>
+                          <Badge className={getStatusColor(session.status)} data-testid={`badge-status-${session.id}`}>
+                            {getStatusText(session.status)}
+                          </Badge>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div className="flex items-center space-x-3">

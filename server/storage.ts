@@ -58,9 +58,18 @@ export class MemStorage implements IStorage {
   }
 
   async getSessions(): Promise<Session[]> {
-    return Array.from(this.sessions.values()).sort((a, b) => 
-      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-    );
+    return Array.from(this.sessions.values()).sort((a, b) => {
+      const aPinnedTime = a.pinnedAt ? new Date(a.pinnedAt).getTime() : -Infinity;
+      const bPinnedTime = b.pinnedAt ? new Date(b.pinnedAt).getTime() : -Infinity;
+
+      if (aPinnedTime !== bPinnedTime) {
+        return bPinnedTime - aPinnedTime; // pinned first, newest pinned first
+      }
+
+      const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bCreated - aCreated; // newest created first
+    });
   }
 
   async getSession(id: string): Promise<Session | undefined> {
@@ -78,6 +87,7 @@ export class MemStorage implements IStorage {
       wordCount: insertSession.wordCount,
       progress: insertSession.progress || 0,
       timeSpent: insertSession.timeSpent || 0,
+      pinnedAt: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -140,7 +150,10 @@ class PgStorage implements IStorage {
   }
 
   async getSessions(): Promise<Session[]> {
-    const result = await this.db.select().from(sessions).orderBy(desc(sessions.createdAt));
+    const result = await this.db
+      .select()
+      .from(sessions)
+      .orderBy(desc(sessions.pinnedAt), desc(sessions.createdAt));
     return result;
   }
 

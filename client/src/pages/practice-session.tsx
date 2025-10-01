@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -50,6 +50,14 @@ export default function PracticeSession() {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
     },
   });
+
+  const togglePin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!session) return;
+    const nextPinnedAt = session.pinnedAt ? null : new Date().toISOString();
+    await updateSessionMutation.mutateAsync({ pinnedAt: nextPinnedAt as unknown as any });
+  };
 
   // Make sure stopAllPlayback logs what it's doing
   // Update stopAllPlayback to set the ref immediately
@@ -351,9 +359,14 @@ export default function PracticeSession() {
               {session.title}
             </h1>
           </div>
-          <Button variant="ghost" size="sm" className="p-2">
-            <Bell className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
+              <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2">
+              <Bell className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Mode Toggle */}
