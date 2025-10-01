@@ -17,6 +17,7 @@ export const sessions = pgTable("sessions", {
   wordCount: integer("word_count").notNull(),
   progress: integer("progress").default(0), // number of words completed
   timeSpent: integer("time_spent").default(0), // in seconds
+  pinnedAt: timestamp("pinned_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
