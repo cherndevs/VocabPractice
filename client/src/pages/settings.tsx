@@ -1,6 +1,11 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useVoices } from "@/hooks/use-voices";
+import { useSpeech } from "@/hooks/use-speech";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
@@ -18,6 +23,11 @@ export default function SettingsPage() {
   const { data: settings, isLoading } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
+
+  // Frontend-only voice preferences (local storage)
+  const [selectedVoices, setSelectedVoices] = useLocalStorage<{ en?: string; zh?: string }>("selectedVoices", {});
+  const voices = useVoices();
+  const { speakEnglish, speakChinese, isSupported } = useSpeech();
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (updates: Partial<Settings>) => {
@@ -72,6 +82,76 @@ export default function SettingsPage() {
 
       {/* Settings Content */}
       <div className="px-4 py-4 space-y-6">
+        {/* Text-to-Speech Voices */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Text-to-Speech Voices</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!isSupported && (
+              <div className="text-sm text-muted-foreground">Speech Synthesis is not supported on this device/browser.</div>
+            )}
+
+            <div className="grid grid-cols-1 gap-4">
+              {/* English Voice */}
+              <div className="space-y-2">
+                <Label className="font-medium">English voice</Label>
+                <Select
+                  value={selectedVoices.en || ""}
+                  onValueChange={(value) => setSelectedVoices({ ...selectedVoices, en: value || undefined })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={voices.en.length ? "Choose English voice" : "No voices found"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {voices.en.map((v) => (
+                      <SelectItem key={v.voiceURI} value={v.voiceURI}>
+                        {v.name} · {v.lang} {v.localService ? "· local" : ""} {v.default ? "· default" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={() => speakEnglish("Hello world")}>Test English</Button>
+                  <Button variant="outline" onClick={() => voices.refresh()}>Refresh voices</Button>
+                </div>
+              </div>
+
+              {/* Chinese Voice */}
+              <div className="space-y-2">
+                <Label className="font-medium">Chinese voice</Label>
+                <Select
+                  value={selectedVoices.zh || ""}
+                  onValueChange={(value) => setSelectedVoices({ ...selectedVoices, zh: value || undefined })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={voices.zh.length ? "Choose Chinese voice" : "No voices found"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {voices.zh.map((v) => (
+                      <SelectItem key={v.voiceURI} value={v.voiceURI}>
+                        {v.name} · {v.lang} {v.localService ? "· local" : ""} {v.default ? "· default" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2">
+                  <Button variant="secondary" onClick={() => speakChinese("你好")}>测试中文</Button>
+                  <Button variant="outline" onClick={() => voices.refresh()}>Refresh voices</Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Diagnostics */}
+            <div className="text-xs text-muted-foreground">
+              <div>Available voices: en={voices.en.length} · zh={voices.zh.length} · total={voices.all.length}</div>
+              {voices.zh.length === 0 && (
+                <div className="text-amber-600">No Chinese voices detected. On iOS, install additional Chinese Siri voices in Settings &gt; Accessibility &gt; Spoken Content &gt; Voices. On Android, install a Chinese TTS engine or voice in device settings.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Playback Settings */}
         <Card>
           <CardHeader>
