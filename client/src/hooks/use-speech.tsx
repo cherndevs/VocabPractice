@@ -1,8 +1,30 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export function useSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSupported] = useState(() => 'speechSynthesis' in window);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  // Load available voices; on mobile they may appear asynchronously
+  useEffect(() => {
+    if (!isSupported) return;
+
+    const loadVoices = () => {
+      const loaded = window.speechSynthesis.getVoices();
+      if (loaded && loaded.length) {
+        setVoices(loaded);
+      }
+    };
+
+    loadVoices();
+    const handler = () => loadVoices();
+    (window.speechSynthesis as any).onvoiceschanged = handler;
+    return () => {
+      if ((window.speechSynthesis as any).onvoiceschanged === handler) {
+        (window.speechSynthesis as any).onvoiceschanged = null;
+      }
+    };
+  }, [isSupported]);
 
   // Auto-detect language based on text content
   const detectLanguage = useCallback((text: string): string => {
@@ -11,6 +33,50 @@ export function useSpeech() {
     }
     return 'en-US'; // Default to English
   }, []);
+
+  // Pick a best-fit, high-quality voice for the language
+  const pickVoice = useCallback((lang: string): SpeechSynthesisVoice | null => {
+    if (!voices.length) return null;
+    const lc = lang.toLowerCase();
+
+    // Heuristics for higher-quality voices across platforms
+    const QUALITY_HINTS = [
+      'siri', 'enhanced', 'premium', 'high', 'natural', 'hq', 'neural'
+    ];
+
+    const qualityScore = (v: SpeechSynthesisVoice): number => {
+      const name = (v.name || '').toLowerCase();
+      let score = 0;
+      // Prefer localService voices (downloaded on device)
+      if (v.localService) score += 2;
+      // Prefer default
+      if (v.default) score += 1;
+      // Prefer known high-quality hints
+      if (QUALITY_HINTS.some(h => name.includes(h))) score += 3;
+      // Deprioritize compact voices
+      if (name.includes('compact')) score -= 2;
+      return score;
+    };
+
+    const byScoreDesc = (a: SpeechSynthesisVoice, b: SpeechSynthesisVoice) => qualityScore(b) - qualityScore(a);
+
+    // 1) Exact lang-region match
+    const exact = voices.filter(v => v.lang?.toLowerCase() === lc).sort(byScoreDesc);
+    if (exact.length) return exact[0];
+
+    // 2) If Chinese requested, accept any zh-* voice (sorted by quality)
+    if (lc.startsWith('zh')) {
+      const zh = voices.filter(v => v.lang?.toLowerCase().startsWith('zh')).sort(byScoreDesc);
+      if (zh.length) return zh[0];
+    }
+
+    // 3) Same base language (e.g., en-* for en-US)
+    const base = lc.split('-')[0];
+    const sameBase = voices.filter(v => v.lang?.toLowerCase().startsWith(base)).sort(byScoreDesc);
+    if (sameBase.length) return sameBase[0];
+
+    return null;
+  }, [voices]);
 
   const speak = useCallback(async (text: string, options?: {
     lang?: string;
@@ -35,6 +101,12 @@ export function useSpeech() {
         // Auto-detect language if not provided
         const language = options?.lang || detectLanguage(text);
         utterance.lang = language;
+
+        // Select a matching voice if available (important on mobile)
+        const voice = pickVoice(language);
+        if (voice) {
+          utterance.voice = voice;
+        }
 
         // Set speech parameters with defaults
         utterance.rate = options?.rate || 0.8;
@@ -63,7 +135,7 @@ export function useSpeech() {
         };
 
         // Safety timeout
-        setTimeout(cleanup, 5000);
+        setTimeout(cleanup, 8000);
 
         window.speechSynthesis.speak(utterance);
       } catch (error) {
@@ -71,7 +143,7 @@ export function useSpeech() {
         reject(error);
       }
     });
-  }, [isSupported, detectLanguage]);
+  }, [isSupported, detectLanguage, pickVoice]);
 
   // Convenience methods for specific languages
   const speakEnglish = useCallback(async (text: string, options?: {
