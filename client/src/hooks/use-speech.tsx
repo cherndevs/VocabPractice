@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export function useSpeech() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSupported] = useState(() => 'speechSynthesis' in window);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const { toast } = useToast();
 
   // Load available voices; on mobile they may appear asynchronously
   useEffect(() => {
@@ -102,8 +104,29 @@ export function useSpeech() {
         const language = options?.lang || detectLanguage(text);
         utterance.lang = language;
 
+        // If user selected a preferred voice (stored in localStorage), try to use it first
+        let selectedByUser: SpeechSynthesisVoice | null = null;
+        try {
+          const raw = window.localStorage.getItem('selectedVoices');
+          if (raw) {
+            const sel = JSON.parse(raw) as { en?: string; zh?: string };
+            const key = language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+            const uri = sel[key];
+            if (uri) {
+              selectedByUser = voices.find(v => v.voiceURI === uri) || null;
+              if (!selectedByUser && (voices?.length ?? 0) > 0) {
+                // Optional toast to inform fallback
+                toast({
+                  title: 'Selected voice unavailable',
+                  description: 'Using an automatic fallback voice for this language.',
+                });
+              }
+            }
+          }
+        } catch {}
+
         // Select a matching voice if available (important on mobile)
-        const voice = pickVoice(language);
+        const voice = selectedByUser || pickVoice(language);
         if (voice) {
           utterance.voice = voice;
         }
