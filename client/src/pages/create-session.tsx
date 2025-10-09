@@ -47,7 +47,7 @@ export default function CreateSession() {
       });
     },
   });
-
+// camera still not launching
   const handleImageCapture = async (imageData: string) => {
     setCapturedImage(imageData);
     setCurrentStep("processing");
