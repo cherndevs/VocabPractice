@@ -1,19 +1,37 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useVoices, VoiceInfo } from "@/hooks/use-voices";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import type { Settings } from "@shared/schema";
 
+const SELECTED_VOICES_KEY = 'selectedVoices';
+
+function getSelectedVoices(): { en?: string; zh?: string } {
+  try {
+    return JSON.parse(localStorage.getItem(SELECTED_VOICES_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function setSelectedVoices(sel: { en?: string; zh?: string }) {
+  localStorage.setItem(SELECTED_VOICES_KEY, JSON.stringify(sel));
+}
+
 export default function SettingsPage() {
   const { toast } = useToast();
   const [localSettings, setLocalSettings] = useState<Partial<Settings>>({});
+  const voices = useVoices();
+  const [selectedVoices, setSelectedVoicesState] = useState<{ en?: string; zh?: string }>(getSelectedVoices());
+  const [testingVoice, setTestingVoice] = useState<string | null>(null);
 
   const { data: settings, isLoading } = useQuery<Settings>({
     queryKey: ["/api/settings"],
@@ -48,6 +66,35 @@ export default function SettingsPage() {
 
   const currentSettings = { ...settings, ...localSettings };
 
+  // Persist selected voices
+  useEffect(() => {
+    setSelectedVoices(selectedVoices);
+  }, [selectedVoices]);
+
+  // Test voice playback
+  function testVoice(lang: 'en' | 'zh') {
+    const voiceId = selectedVoices[lang];
+    const phrase = lang === 'en' ? 'Hello world' : '你好';
+    if (!('speechSynthesis' in window)) {
+      toast({ title: 'SpeechSynthesis not available', variant: 'destructive' });
+      return;
+    }
+    const synth = window.speechSynthesis;
+    const voice = voices[lang].find(v => v.voiceURI === voiceId) || voices[lang][0];
+    if (!voice) {
+      toast({ title: `No ${lang === 'en' ? 'English' : 'Chinese'} voice available`, variant: 'destructive' });
+      return;
+    }
+    const utter = new SpeechSynthesisUtterance(phrase);
+    const actualVoice = synth.getVoices().find(v => v.voiceURI === voice.voiceURI) || null;
+    utter.voice = actualVoice;
+    utter.lang = voice.lang;
+    utter.onend = () => setTestingVoice(null);
+    setTestingVoice(voice.voiceURI);
+    console.log('[TTS DEBUG] testVoice: utter.voice object:', actualVoice);
+    synth.speak(utter);
+  }
+
   if (isLoading) {
     return (
       <div className="px-4 py-6">
@@ -72,7 +119,86 @@ export default function SettingsPage() {
 
       {/* Settings Content */}
       <div className="px-4 py-4 space-y-6">
-        {/* Playback Settings */}
+        {/* TTS Voices Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Text-to-Speech Voices</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* English Voice */}
+              <div>
+                <Label className="font-medium">English Voice</Label>
+                <select
+                  className="w-full mt-2 border rounded px-2 py-1"
+                  value={selectedVoices.en || ''}
+                  onChange={e => setSelectedVoicesState(v => ({ ...v, en: e.target.value }))}
+                  disabled={!voices.ready || voices.en.length === 0}
+                  data-testid="select-voice-en"
+                >
+                  <option value="">(Auto)</option>
+                  {voices.en.map(v => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} ({v.lang}){v.localService ? ' [local]' : ''}{v.default ? ' [default]' : ''}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="mt-2 px-3 py-1 bg-primary text-white rounded"
+                  onClick={() => testVoice('en')}
+                  disabled={!voices.ready || voices.en.length === 0 || !selectedVoices.en}
+                  data-testid="test-voice-en"
+                >Test voice</button>
+                {selectedVoices.en && voices.ready && !voices.en.some(v => v.voiceURI === selectedVoices.en) && (
+                  <div className="text-xs text-red-500 mt-2">Selected English voice is not available on this device. The closest available voice will be used.</div>
+                )}
+              </div>
+              {/* Chinese Voice */}
+              <div>
+                <Label className="font-medium">Chinese Voice</Label>
+                <select
+                  className="w-full mt-2 border rounded px-2 py-1"
+                  value={selectedVoices.zh || ''}
+                  onChange={e => setSelectedVoicesState(v => ({ ...v, zh: e.target.value }))}
+                  disabled={!voices.ready || voices.zh.length === 0}
+                  data-testid="select-voice-zh"
+                >
+                  <option value="">(Auto)</option>
+                  {voices.zh.map(v => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} ({v.lang}){v.localService ? ' [local]' : ''}{v.default ? ' [default]' : ''}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="mt-2 px-3 py-1 bg-primary text-white rounded"
+                  onClick={() => testVoice('zh')}
+                  disabled={!voices.ready || voices.zh.length === 0 || !selectedVoices.zh}
+                  data-testid="test-voice-zh"
+                >Test voice</button>
+                {selectedVoices.zh && voices.ready && !voices.zh.some(v => v.voiceURI === selectedVoices.zh) && (
+                  <div className="text-xs text-red-500 mt-2">Selected Chinese voice is not available on this device. The closest available voice will be used.</div>
+                )}
+              </div>
+            </div>
+            {/* Refresh & Diagnostics */}
+            <div className="flex items-center gap-4 mt-4">
+              <button
+                className="px-3 py-1 bg-secondary text-foreground rounded"
+                onClick={() => voices.refresh()}
+                disabled={!voices.ready}
+                data-testid="refresh-voices"
+              >Refresh voices</button>
+              <span className="text-xs text-muted-foreground">
+                {voices.ready ? `${voices.en.length} English, ${voices.zh.length} Chinese voices found.` : 'Loading voices...'}
+              </span>
+              {voices.ready && voices.zh.length === 0 && (
+                <span className="text-xs text-red-500">No Chinese voices found. Install system voices for more options.</span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+  {/* Playback Settings */}
         <Card>
           <CardHeader>
             <CardTitle>Playback Settings</CardTitle>
@@ -136,7 +262,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* General Settings */}
+  {/* General Settings */}
         <Card>
           <CardHeader>
             <CardTitle>General</CardTitle>
@@ -204,7 +330,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* About */}
+  {/* About */}
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">

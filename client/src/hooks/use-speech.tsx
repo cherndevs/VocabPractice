@@ -83,6 +83,7 @@ export function useSpeech() {
     rate?: number;
     pitch?: number;
     volume?: number;
+    voice?: SpeechSynthesisVoice;
   }): Promise<void> => {
     if (!isSupported || !text?.trim()) {
       throw new Error('Speech not supported or no text');
@@ -102,10 +103,34 @@ export function useSpeech() {
         const language = options?.lang || detectLanguage(text);
         utterance.lang = language;
 
-        // Select a matching voice if available (important on mobile)
-        const voice = pickVoice(language);
-        if (voice) {
-          utterance.voice = voice;
+        // Log what voice options we received
+        if (options?.voice) {
+          console.log('[TTS DEBUG] useSpeech.speak: Received voice option:', {
+            name: options.voice.name,
+            voiceURI: options.voice.voiceURI,
+            lang: options.voice.lang,
+            default: options.voice.default,
+            localService: options.voice.localService
+          });
+        } else {
+          console.log('[TTS DEBUG] useSpeech.speak: No voice provided in options');
+        }
+
+        // Use provided voice if available, otherwise pick best match
+        let voiceToUse = options?.voice || pickVoice(language);
+        
+        if (voiceToUse) {
+          utterance.voice = voiceToUse;
+          console.log('[TTS DEBUG] useSpeech.speak: Using voice:', {
+            name: voiceToUse.name,
+            voiceURI: voiceToUse.voiceURI,
+            lang: voiceToUse.lang,
+            default: voiceToUse.default,
+            localService: voiceToUse.localService,
+            source: options?.voice ? 'provided' : 'picked'
+          });
+        } else {
+          console.log('[TTS DEBUG] useSpeech.speak: No voice available, using default for lang:', language);
         }
 
         // Set speech parameters with defaults

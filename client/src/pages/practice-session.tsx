@@ -158,11 +158,44 @@ export default function PracticeSession() {
     isPausedRef.current = false; // Reset ref to false
     console.log('🚨 RESET PAUSE REF TO FALSE in playWord');
 
+    // Infer language: Chinese if contains CJK, else English
+    let lang = /[\u4e00-\u9fff]/.test(word) ? 'zh-CN' : 'en-US';
+    
+    // Get selected voice from localStorage and available voices
+    const selectedVoicesRaw = localStorage.getItem('selectedVoices');
+    const selectedVoices = selectedVoicesRaw ? JSON.parse(selectedVoicesRaw) : {};
+    const langKey = lang.startsWith('zh') ? 'zh' : 'en';
+    
+    // Debug logging
+    console.log('[TTS DEBUG] Selected voices from localStorage:', selectedVoicesRaw);
+    
+    const voicesList = window.speechSynthesis.getVoices();
+    console.log('[TTS DEBUG] Voices available at playback:', voicesList.map(v => ({ 
+      name: v.name, 
+      lang: v.lang, 
+      voiceURI: v.voiceURI 
+    })));
+
+    // Find the voice object for the selected voice URI
+    let selectedVoiceObj: SpeechSynthesisVoice | undefined;
+    const selectedVoiceURI = selectedVoices[langKey];
+    if (selectedVoiceURI) {
+      selectedVoiceObj = voicesList.find(v => v.voiceURI === selectedVoiceURI);
+      console.log('[TTS DEBUG] Playback: using selected voice:', 
+        selectedVoiceObj?.name, 
+        selectedVoiceObj?.voiceURI, 
+        selectedVoiceObj?.lang
+      );
+    } else {
+      console.log('[TTS DEBUG] Playback: No voice selected for', langKey, ', using default for:', lang);
+    }
 
     try {
       console.log('🎵 PLAYING:', word, `(repetition ${repetitionCount})`);
 
-      await speak(word);      
+  await speak(word, { lang, voice: selectedVoiceObj });
+  // Debug: confirm playback finished
+  console.log('[TTS DEBUG] Finished speak() for word:', word, 'lang:', lang);
       console.log('✅ PLAYED SUCCESSFULLY');
 
       // ✨ KEY FIX: Check the REF value instead of state (refs update immediately)

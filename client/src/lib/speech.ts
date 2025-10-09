@@ -17,6 +17,7 @@ export class SpeechService {
       volume?: number;
       lang?: string;
       voice?: SpeechSynthesisVoice;
+      showToast?: (msg: string) => void;
     } = {}
   ): Promise<void> {
     if (!this.isSupported || !this.synth || !text) {
@@ -26,22 +27,51 @@ export class SpeechService {
     // Cancel any ongoing speech
     this.synth.cancel();
 
+    // Voice selection logic
+    let utterLang = options.lang || "en-US";
+    let utterVoice: SpeechSynthesisVoice | null = null;
+    const voices = this.getVoices();
+    try {
+      const selRaw = localStorage.getItem('selectedVoices');
+      const selected = selRaw ? JSON.parse(selRaw) : {};
+      let langKey = utterLang.startsWith('zh') ? 'zh' : utterLang.startsWith('en') ? 'en' : undefined;
+      console.log('[TTS DEBUG] SpeechService: utterLang:', utterLang, 'langKey:', langKey, 'selected:', selected);
+      if (langKey && selected[langKey]) {
+        utterVoice = voices.find(v => v.voiceURI === selected[langKey]) || null;
+        console.log('[TTS DEBUG] SpeechService: matched utterVoice:', utterVoice);
+        if (!utterVoice && options.showToast) {
+          options.showToast(`Selected ${langKey === 'en' ? 'English' : 'Chinese'} voice not found. Using default.`);
+        }
+      }
+    } catch (err) {
+      console.log('[TTS DEBUG] SpeechService: error parsing selectedVoices', err);
+    }
+    // Fallback to provided voice or best match
+    if (!utterVoice && options.voice) {
+      utterVoice = options.voice;
+    }
+    if (!utterVoice) {
+      // Try best match for lang
+      utterVoice = voices.find(v => v.lang.startsWith(utterLang.slice(0,2))) || null;
+    }
+
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(text);
-
-      // Set speech properties
       utterance.rate = options.rate || 0.8;
       utterance.pitch = options.pitch || 1;
       utterance.volume = options.volume || 1;
-      utterance.lang = options.lang || "en-US";
-
-      if (options.voice) {
-        utterance.voice = options.voice;
-      }
+      utterance.lang = utterLang;
+  utterance.voice = utterVoice;
+  console.log('[TTS DEBUG] SpeechService.speak: utter.voice object:', utterVoice);
+          // Log the actual voice object used for utterance
+          if (utterVoice) {
+            console.log('[TTS DEBUG] SpeechService.speak: utter.voice.name:', utterVoice.name, 'voiceURI:', utterVoice.voiceURI, 'lang:', utterVoice.lang);
+          } else {
+            console.log('[TTS DEBUG] SpeechService.speak: utter.voice is null, using default for lang:', utterLang);
+          }
 
       utterance.onend = () => resolve();
       utterance.onerror = (event) => {
-        // Don't reject on cancellation - this is normal behavior
         if (event.error === 'canceled' || event.error === 'interrupted') {
           resolve();
         } else {
