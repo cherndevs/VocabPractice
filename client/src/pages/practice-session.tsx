@@ -35,7 +35,7 @@ export default function PracticeSession() {
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
-  // Fallback settings ensure UI and repetition logic work even if settings are undefined
+  // Fallback settings ensure UI and repetition logic work even if settings are undefined. 
   const effectiveSettings = {
     wordRepetitions: settings?.wordRepetitions ?? 2,
     pauseBetweenWords: settings?.pauseBetweenWords ?? 1500,
