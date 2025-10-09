@@ -60,7 +60,7 @@ export default function PracticeSession() {
   };
 
   // Make sure stopAllPlayback logs what it's doing
-  // Update stopAllPlayback to set the ref immediately
+  // Update stopAllPlayback to set the ref immediately 
   const stopAllPlayback = () => {
     console.log('🛑 STOPPING ALL PLAYBACK AND SETTING PAUSE');
 
