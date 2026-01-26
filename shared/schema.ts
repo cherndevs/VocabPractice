@@ -24,6 +24,7 @@ export const sessions = pgTable("sessions", {
 
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  pin: varchar("pin").default("111111"), // 6-digit PIN
   wordRepetitions: integer("word_repetitions").default(2),
   pauseBetweenWords: integer("pause_between_words").default(1500), // milliseconds
   notifications: boolean("notifications").default(true),

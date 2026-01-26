@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useVoices, VoiceInfo } from "@/hooks/use-voices";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import PinModal from "@/components/pin-modal";
 import type { Settings } from "@shared/schema";
 
 const SELECTED_VOICES_KEY = 'selectedVoices';
@@ -28,6 +29,10 @@ function setSelectedVoices(sel: { en?: string; zh?: string }) {
 
 export default function SettingsPage() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
+  const [pinVerified, setPinVerified] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(true);
+  const [isPinLoading, setIsPinLoading] = useState(false);
   const [localSettings, setLocalSettings] = useState<Partial<Settings>>({});
   const voices = useVoices();
   const [selectedVoices, setSelectedVoicesState] = useState<{ en?: string; zh?: string }>(getSelectedVoices());
@@ -36,6 +41,25 @@ export default function SettingsPage() {
   const { data: settings, isLoading } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
+
+  const handlePinVerify = async (pin: string): Promise<boolean> => {
+    setIsPinLoading(true);
+    try {
+      const response = await apiRequest("POST", "/api/verify-pin", { pin });
+      const data = await response.json();
+      if (data.success) {
+        setPinVerified(true);
+        setShowPinModal(false);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("PIN verification error:", error);
+      return false;
+    } finally {
+      setIsPinLoading(false);
+    }
+  };
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (updates: Partial<Settings>) => {
@@ -105,6 +129,11 @@ export default function SettingsPage() {
         </div>
       </div>
     );
+  }
+
+  // Show PIN modal if not verified
+  if (!pinVerified) {
+    return <PinModal open={showPinModal} onVerify={handlePinVerify} onClose={() => navigate("/sessions")} isLoading={isPinLoading} />;
   }
 
   return (

@@ -87,6 +87,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify PIN endpoint
+  app.post("/api/verify-pin", async (req, res) => {
+    try {
+      const { pin } = req.body;
+      if (!pin || typeof pin !== "string") {
+        return res.status(400).json({ success: false, message: "PIN required" });
+      }
+      const settings = await storage.getSettings();
+      if (settings && settings.pin === pin) {
+        return res.json({ success: true });
+      }
+      res.status(401).json({ success: false, message: "Invalid PIN" });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "PIN verification failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

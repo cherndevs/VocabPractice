@@ -31,6 +31,7 @@ export class MemStorage implements IStorage {
     this.sessions = new Map();
     this.settings = {
       id: randomUUID(),
+      pin: "111111",
       wordRepetitions: 2,
       pauseBetweenWords: 1500,
       notifications: true,
