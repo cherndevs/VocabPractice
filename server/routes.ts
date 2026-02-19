@@ -100,6 +100,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(401).json({ success: false, message: "Invalid PIN" });
     } catch (error) {
+      // Log the error server-side to aid debugging (do not expose details to clients)
+      console.error('[PIN VERIFY] error while verifying PIN:', error);
       res.status(500).json({ success: false, message: "PIN verification failed" });
     }
   });

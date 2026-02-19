@@ -29,9 +29,10 @@ function setSelectedVoices(sel: { en?: string; zh?: string }) {
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [pinVerified, setPinVerified] = useState(false);
-  const [showPinModal, setShowPinModal] = useState(true);
+  // Don't show the PIN modal by default — only when the settings route is active
+  const [showPinModal, setShowPinModal] = useState(false);
   const [isPinLoading, setIsPinLoading] = useState(false);
   const [localSettings, setLocalSettings] = useState<Partial<Settings>>({});
   const voices = useVoices();
@@ -94,6 +95,13 @@ export default function SettingsPage() {
   useEffect(() => {
     setSelectedVoices(selectedVoices);
   }, [selectedVoices]);
+
+  // Open the PIN modal when this page is actually active (navigated to /settings)
+  useEffect(() => {
+    if (location === "/settings" && !pinVerified) {
+      setShowPinModal(true);
+    }
+  }, [location, pinVerified]);
 
   // Test voice playback
   function testVoice(lang: 'en' | 'zh') {
