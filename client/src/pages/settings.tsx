@@ -6,6 +6,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useVoices, VoiceInfo } from "@/hooks/use-voices";
 import { apiRequest } from "@/lib/queryClient";
@@ -37,6 +39,7 @@ export default function SettingsPage() {
   const voices = useVoices();
   const [selectedVoices, setSelectedVoicesState] = useState<{ en?: string; zh?: string }>(getSelectedVoices());
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
+  const [newPin, setNewPin] = useState("");
 
   const { data: settings, isLoading } = useQuery<Settings>({
     queryKey: ["/api/settings"],
@@ -131,15 +134,19 @@ export default function SettingsPage() {
     );
   }
 
-  // Show PIN modal if not verified
-  if (!pinVerified) {
-    return <PinModal open={showPinModal} onVerify={handlePinVerify} onClose={() => navigate("/sessions")} isLoading={isPinLoading} />;
-  }
-
   return (
     <div className="fade-in">
-      {/* Header */}
-      <div className="px-4 py-6 bg-card">
+      <PinModal 
+        open={showPinModal} 
+        onVerify={handlePinVerify} 
+        onClose={() => navigate("/sessions")} 
+        isLoading={isPinLoading} 
+      />
+
+      {pinVerified && (
+        <>
+          {/* Header */}
+          <div className="px-4 py-6 bg-card">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         </div>
@@ -358,6 +365,46 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+  {/* Security Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Security</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col py-3 border-b border-border space-y-3">
+              <div>
+                <Label className="font-medium">Access PIN</Label>
+                <p className="text-sm text-muted-foreground">
+                  Change the 6-digit PIN required to access these settings.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="Enter new 6-digit PIN"
+                  value={newPin}
+                  onChange={(e) => {
+                    if (/^\d*$/.test(e.target.value)) {
+                      setNewPin(e.target.value);
+                    }
+                  }}
+                  className="max-w-[200px]"
+                />
+                <Button 
+                  disabled={newPin.length !== 6 || updateSettingsMutation.isPending}
+                  onClick={() => {
+                    handleSettingChange('pin', newPin);
+                    setNewPin("");
+                  }}
+                >
+                  Update PIN
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
   {/* About */}
         <Card>
@@ -373,6 +420,8 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+        </>
+      )}
     </div>
   );
 }
