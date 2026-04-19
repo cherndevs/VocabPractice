@@ -242,7 +242,7 @@ class PgStorage implements IStorage {
   }
 }
 
-const shouldUsePg = process.env.NODE_ENV === "production" && !!process.env.DATABASE_URL;
+const shouldUsePg = !!process.env.DATABASE_URL;
 export const storage: IStorage = shouldUsePg
   ? new PgStorage(process.env.DATABASE_URL as string)
   : new MemStorage();
