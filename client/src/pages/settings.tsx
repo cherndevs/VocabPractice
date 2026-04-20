@@ -388,7 +388,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex gap-2">
                 <Input
-                  type="text"
+                  type="password"
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="Enter new 6-digit PIN"
