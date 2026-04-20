@@ -368,7 +368,7 @@ export default function SettingsPage() {
   {/* Security Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>Security</CardTitle>
+            <CardTitle>Security Settings</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col py-3 border-b border-border space-y-3">
