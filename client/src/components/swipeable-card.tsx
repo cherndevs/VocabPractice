@@ -1,24 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface SwipeableCardProps {
   children: React.ReactNode;
   onDelete: () => void;
+  onEdit?: () => void;
   className?: string;
   'data-testid'?: string;
 }
 
-export function SwipeableCard({ children, onDelete, className = '', 'data-testid': testId }: SwipeableCardProps) {
+export function SwipeableCard({ children, onDelete, onEdit, className = '', 'data-testid': testId }: SwipeableCardProps) {
+  const BUTTON_WIDTH = 80;
+  const TOTAL_ACTION_WIDTH = onEdit ? BUTTON_WIDTH * 2 : BUTTON_WIDTH;
+  const SWIPE_THRESHOLD = TOTAL_ACTION_WIDTH * 0.5;
+
   const [translateX, setTranslateX] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
   const currentX = useRef(0);
-  const DELETE_BUTTON_WIDTH = 80; // Width of the delete button area
-  const SWIPE_THRESHOLD = DELETE_BUTTON_WIDTH * 0.5; // Threshold to auto-reveal delete button
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
@@ -28,20 +31,15 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    
-    const clientX = e.touches[0].clientX;
-    const deltaX = startX.current - clientX; // Positive when swiping left
-    const newTranslateX = Math.max(0, Math.min(DELETE_BUTTON_WIDTH, currentX.current + deltaX));
-    
+    const deltaX = startX.current - e.touches[0].clientX;
+    const newTranslateX = Math.max(0, Math.min(TOTAL_ACTION_WIDTH, currentX.current + deltaX));
     setTranslateX(newTranslateX);
   };
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    
-    // Snap to revealed or closed state based on threshold
     if (translateX > SWIPE_THRESHOLD) {
-      setTranslateX(DELETE_BUTTON_WIDTH);
+      setTranslateX(TOTAL_ACTION_WIDTH);
       setIsRevealed(true);
     } else {
       setTranslateX(0);
@@ -53,26 +51,20 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
     setIsDragging(true);
     startX.current = e.clientX;
     currentX.current = translateX;
-    
-    // Prevent text selection while dragging
     e.preventDefault();
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
-    
-    const deltaX = startX.current - e.clientX; // Positive when swiping left
-    const newTranslateX = Math.max(0, Math.min(DELETE_BUTTON_WIDTH, currentX.current + deltaX));
-    
+    const deltaX = startX.current - e.clientX;
+    const newTranslateX = Math.max(0, Math.min(TOTAL_ACTION_WIDTH, currentX.current + deltaX));
     setTranslateX(newTranslateX);
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    
-    // Snap to revealed or closed state based on threshold
     if (translateX > SWIPE_THRESHOLD) {
-      setTranslateX(DELETE_BUTTON_WIDTH);
+      setTranslateX(TOTAL_ACTION_WIDTH);
       setIsRevealed(true);
     } else {
       setTranslateX(0);
@@ -86,6 +78,13 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
     onDelete();
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resetCard();
+    onEdit?.();
+  };
+
   const resetCard = () => {
     setTranslateX(0);
     setIsRevealed(false);
@@ -96,7 +95,6 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -111,13 +109,12 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
         resetCard();
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isRevealed]);
 
   return (
-    <div 
+    <div
       ref={cardRef}
       className="relative overflow-hidden"
       data-testid={testId}
@@ -136,18 +133,30 @@ export function SwipeableCard({ children, onDelete, className = '', 'data-testid
         </Card>
       </div>
 
-      {/* Delete button revealed on swipe */}
-      <div 
-        className="absolute top-0 right-0 h-full flex items-center justify-center bg-red-500 text-white"
-        style={{ 
-          width: `${DELETE_BUTTON_WIDTH}px`,
-          transform: `translateX(${DELETE_BUTTON_WIDTH - translateX}px)`,
+      {/* Action buttons revealed on swipe */}
+      <div
+        className="absolute top-0 right-0 h-full flex items-stretch"
+        style={{
+          width: `${TOTAL_ACTION_WIDTH}px`,
+          transform: `translateX(${TOTAL_ACTION_WIDTH - translateX}px)`,
+          transition: isDragging ? 'none' : 'transform 300ms ease-out',
         }}
       >
+        {onEdit && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-full flex-1 bg-indigo-500 text-white hover:bg-indigo-600 hover:text-white rounded-none flex flex-col items-center justify-center gap-1"
+            onClick={handleEditClick}
+            data-testid={testId ? `${testId}-edit` : undefined}
+          >
+            <Pencil className="h-5 w-5" />
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"
-          className="h-full w-full text-white hover:bg-red-600 hover:text-white rounded-none"
+          className="h-full flex-1 bg-red-500 text-white hover:bg-red-600 hover:text-white rounded-none flex flex-col items-center justify-center gap-1"
           onClick={handleDeleteClick}
           data-testid={testId ? `${testId}-delete` : undefined}
         >
