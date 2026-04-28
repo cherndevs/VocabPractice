@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { format } from "date-fns";
 
 export default function Sessions() {
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
   const { data: sessions = [], isLoading } = useQuery<Session[]>({
     queryKey: ["/api/sessions"],
   });
@@ -111,8 +112,8 @@ export default function Sessions() {
       <div className="px-4 py-4">
         {/* Create New Session Button */}
         <div className="mb-6">
-          <Button 
-            asChild 
+          <Button
+            asChild
             className="w-full flex items-center justify-between p-4 h-auto bg-card text-foreground border border-border hover:shadow-md"
             variant="outline"
             data-testid="button-create-session"
@@ -165,6 +166,7 @@ export default function Sessions() {
                   className="word-card hover:shadow-md transition-shadow cursor-pointer"
                   data-testid={`card-session-${session.id}`}
                   onDelete={() => handleDeleteSession(session.id)}
+                  onEdit={() => navigate(`/edit-session/${session.id}`)}
                 >
                   <Link href={`/practice/${session.id}`}>
                     <CardContent className="p-4">

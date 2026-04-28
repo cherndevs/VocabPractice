@@ -8,6 +8,7 @@ import Sessions from "@/pages/sessions";
 import Settings from "@/pages/settings";
 import CreateSession from "@/pages/create-session";
 import PracticeSession from "@/pages/practice-session";
+import EditSession from "@/pages/edit-session";
 import NotFound from "@/pages/not-found";
 import BottomNavigation from "@/components/bottom-navigation";
 
@@ -21,6 +22,7 @@ function Router() {
           <Route path="/settings" component={Settings} />
           <Route path="/create-session" component={CreateSession} />
           <Route path="/practice/:id" component={PracticeSession} />
+          <Route path="/edit-session/:id" component={EditSession} />
           <Route component={NotFound} />
         </Switch>
       </div>
