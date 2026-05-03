@@ -432,23 +432,6 @@ export default function PracticeSession() {
               >
                 <Volume2 className="w-6 h-6" />
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="p-3 rounded-full"
-                onClick={toggleMute}
-                data-testid="button-toggle-mute"
-              >
-                {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => speak("test")}
-                className="px-4 py-2"
-              >
-                Test
-              </Button>
             </div>
 
             {/* Navigation Controls */}
