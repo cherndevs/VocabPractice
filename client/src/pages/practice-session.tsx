@@ -32,7 +32,6 @@ export default function PracticeSession() {
   const [mode, setMode] = useState<SessionViewMode>("write");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
-  const [wordsCompleted, setWordsCompleted] = useState<Set<number>>(new Set());
   const [sessionSkipped, setSessionSkipped] = useState<Set<number>>(new Set());
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
@@ -131,21 +130,6 @@ export default function PracticeSession() {
 
     return () => clearInterval(interval);
   }, [sessionStartTime]);
-
-  // Auto-save progress (only when wordsCompleted changes, not every second)
-  useEffect(() => {
-    if (session && wordsCompleted.size > 0) {
-      const progress = Math.floor((wordsCompleted.size / session.words.length) * 100);
-      const status = progress === 100 ? "completed" : "in-progress";
-
-      updateSessionMutation.mutate({
-        progress: wordsCompleted.size,
-        timeSpent,
-        status,
-      });
-    }
-  }, [wordsCompleted.size, session?.words.length]); // Remove timeSpent dependency
-
 
   // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
   useEffect(() => {
@@ -335,10 +319,6 @@ export default function PracticeSession() {
     }
   };
 
-  const markWordCompleted = () => {
-    setWordsCompleted(prev => new Set(Array.from(prev).concat(currentWordIndex)));
-  };
-
   // Finds the next word index in `direction` that isn't in `skipSet`, or null if none remain.
   const findNextUnskippedIndex = (fromIndex: number, direction: 1 | -1, skipSet: Set<number>) => {
     if (!session) return null;
@@ -372,7 +352,7 @@ export default function PracticeSession() {
   };
 
   // Session-scoped "I've Got This": marks the word skipped for this session only
-  // (never persisted, never affects wordsCompleted/spaced-repetition), then advances.
+  // (never persisted, never affects spaced-repetition), then advances.
   // Falls back to searching backward when nothing unmarked remains ahead (e.g. marking
   // the last word while an earlier word is still unmarked).
   const handleIveGotThis = () => {
@@ -452,7 +432,7 @@ export default function PracticeSession() {
 
   const currentWord = session.words[currentWordIndex];
   const currentWordPinyin = getPinyinAnnotation(currentWord);
-  const progressPercentage = Math.floor((wordsCompleted.size / session.words.length) * 100);
+  const progressPercentage = Math.floor((sessionSkipped.size / session.words.length) * 100);
   const allWordsSkipped = session.words.length > 0 && sessionSkipped.size === session.words.length;
   const isCurrentWordSkipped = sessionSkipped.has(currentWordIndex);
 
@@ -532,7 +512,7 @@ export default function PracticeSession() {
                 <p className="text-sm text-muted-foreground">
                   You've marked every word in this session. Reset to go through them again.
                 </p>
-                <Button onClick={() => setResetDialogOpen(true)} data-testid="button-reset-to-continue">
+                <Button onClick={handleResetSkipped} data-testid="button-reset-to-continue">
                   Reset and try again?
                 </Button>
               </CardContent>
@@ -617,7 +597,7 @@ export default function PracticeSession() {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Words Mastered:</span>
                 <span className="font-medium text-foreground" data-testid="text-words-completed">
-                  {wordsCompleted.size}/{session.words.length}
+                  {sessionSkipped.size}/{session.words.length}
                 </span>
               </div>
 
