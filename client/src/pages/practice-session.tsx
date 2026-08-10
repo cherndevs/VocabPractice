@@ -1,10 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell, Pin } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, RotateCcw, Pin, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
@@ -23,6 +33,8 @@ export default function PracticeSession() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   const [wordsCompleted, setWordsCompleted] = useState<Set<number>>(new Set());
+  const [sessionSkipped, setSessionSkipped] = useState<Set<number>>(new Set());
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
@@ -327,6 +339,71 @@ export default function PracticeSession() {
     setWordsCompleted(prev => new Set(Array.from(prev).concat(currentWordIndex)));
   };
 
+  // Finds the next word index in `direction` that isn't in `skipSet`, or null if none remain.
+  const findNextUnskippedIndex = (fromIndex: number, direction: 1 | -1, skipSet: Set<number>) => {
+    if (!session) return null;
+    let idx = fromIndex + direction;
+    while (idx >= 0 && idx < session.words.length) {
+      if (!skipSet.has(idx)) return idx;
+      idx += direction;
+    }
+    return null;
+  };
+
+  const nextWordRead = () => {
+    const next = findNextUnskippedIndex(currentWordIndex, 1, sessionSkipped);
+    if (next === null) return;
+    stopAllPlayback();
+    setIsPaused(true);
+    setIsPaused(false);
+    setIsLooping(false);
+    setCurrentWordIndex(next);
+    setCurrentRepetition(1);
+  };
+
+  const previousWordRead = () => {
+    const prev = findNextUnskippedIndex(currentWordIndex, -1, sessionSkipped);
+    if (prev === null) return;
+    stopAllPlayback();
+    setIsPaused(true);
+    setIsLooping(false);
+    setCurrentWordIndex(prev);
+    setCurrentRepetition(1);
+  };
+
+  // Session-scoped "I've Got This": marks the word skipped for this session only
+  // (never persisted, never affects wordsCompleted/spaced-repetition), then advances.
+  // Falls back to searching backward when nothing unmarked remains ahead (e.g. marking
+  // the last word while an earlier word is still unmarked).
+  const handleIveGotThis = () => {
+    if (!session) return;
+    const updated = new Set(sessionSkipped);
+    updated.add(currentWordIndex);
+    setSessionSkipped(updated);
+
+    const next =
+      findNextUnskippedIndex(currentWordIndex, 1, updated) ??
+      findNextUnskippedIndex(currentWordIndex, -1, updated);
+    if (next !== null) {
+      stopAllPlayback();
+      setIsPaused(true);
+      setIsPaused(false);
+      setIsLooping(false);
+      setCurrentWordIndex(next);
+      setCurrentRepetition(1);
+    }
+  };
+
+  const handleResetSkipped = () => {
+    setSessionSkipped(new Set());
+    setCurrentWordIndex(0);
+    setCurrentRepetition(1);
+    stopAllPlayback();
+    setIsPaused(false);
+    setIsLooping(false);
+    setResetDialogOpen(false);
+  };
+
   const switchMode = (newMode: SessionViewMode) => {
     // Force stop all speech immediately and reset state
     stopAllPlayback();
@@ -336,6 +413,8 @@ export default function PracticeSession() {
     setCurrentRepetition(1);
     // Reinitialize so it's not automatically set to pause upon first play
     setIsPaused(false);
+    // Session-scoped skip marks don't survive a tab switch
+    setSessionSkipped(new Set());
   };
 
   const formatTime = (seconds: number) => {
@@ -374,6 +453,8 @@ export default function PracticeSession() {
   const currentWord = session.words[currentWordIndex];
   const currentWordPinyin = getPinyinAnnotation(currentWord);
   const progressPercentage = Math.floor((wordsCompleted.size / session.words.length) * 100);
+  const allWordsSkipped = session.words.length > 0 && sessionSkipped.size === session.words.length;
+  const isCurrentWordSkipped = sessionSkipped.has(currentWordIndex);
 
   return (
     <div className="fade-in">
@@ -398,9 +479,35 @@ export default function PracticeSession() {
             <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
               <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
             </Button>
-            <Button variant="ghost" size="sm" className="p-2">
-              <Bell className="w-5 h-5" />
-            </Button>
+            {mode === "read" && (
+              <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-2"
+                  onClick={() => setResetDialogOpen(true)}
+                  disabled={sessionSkipped.size === 0}
+                  aria-label="Reset completed words"
+                  data-testid="button-reset-skipped"
+                >
+                  <RotateCcw className="w-5 h-5" />
+                </Button>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset all completed marks?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This clears "I've Got This" marks for this session and takes you back to the first word.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetSkipped} data-testid="button-confirm-reset">
+                      Reset
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 
@@ -416,7 +523,22 @@ export default function PracticeSession() {
       {/* Read Mode Content */}
       {mode === "read" && (
         <div className="px-4 py-8">
-          {/* Word Display */}
+          {allWordsSkipped ? (
+            /* All words marked with "I've Got This" for this session */
+            <Card className="mb-8" data-testid="card-all-completed">
+              <CardContent className="pt-6 text-center space-y-4">
+                <PartyPopper className="w-10 h-10 mx-auto text-primary" />
+                <p className="text-lg font-medium text-foreground">All Done!</p>
+                <p className="text-sm text-muted-foreground">
+                  You've marked every word in this session. Reset to go through them again.
+                </p>
+                <Button onClick={() => setResetDialogOpen(true)} data-testid="button-reset-to-continue">
+                  Reset and try again?
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+          /* Word Display */
           <div className="text-center mb-8">
             <div
               className={`text-4xl font-bold text-foreground ${currentWordPinyin ? "" : "mb-6"}`}
@@ -431,11 +553,17 @@ export default function PracticeSession() {
               </div>
             )}
 
+            {isCurrentWordSkipped && (
+              <div className="text-sm text-muted-foreground mb-6" data-testid="badge-word-completed">
+                ✓ Marked this session
+              </div>
+            )}
+
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-8">
-              <Button 
-                variant="outline" 
-                size="lg" 
+              <Button
+                variant="outline"
+                size="lg"
                 className="p-3 rounded-full"
                 onClick={() => playWord(1)}
                 disabled={isMuted}
@@ -447,22 +575,22 @@ export default function PracticeSession() {
 
             {/* Navigation Controls */}
             <div className="flex items-center justify-center space-x-6 mb-6">
-              <Button 
-                variant="outline" 
-                size="lg" 
+              <Button
+                variant="outline"
+                size="lg"
                 className="p-4 rounded-full"
-                onClick={previousWord}
-                disabled={currentWordIndex === 0}
+                onClick={previousWordRead}
+                disabled={findNextUnskippedIndex(currentWordIndex, -1, sessionSkipped) === null}
                 data-testid="button-previous-word"
               >
                 <ChevronLeft className="w-6 h-6" />
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
+              <Button
+                variant="outline"
+                size="lg"
                 className="p-4 rounded-full"
-                onClick={nextWord}
-                disabled={currentWordIndex === session.words.length - 1}
+                onClick={nextWordRead}
+                disabled={findNextUnskippedIndex(currentWordIndex, 1, sessionSkipped) === null}
                 data-testid="button-next-word"
               >
                 <ChevronRight className="w-6 h-6" />
@@ -474,10 +602,11 @@ export default function PracticeSession() {
               {currentWordIndex + 1}/{session.words.length} words
             </div>
 
-            <Button onClick={markWordCompleted} data-testid="button-mark-completed">
-              Mark as Completed
+            <Button onClick={handleIveGotThis} data-testid="button-mark-completed">
+              I've Got This
             </Button>
           </div>
+          )}
 
           {/* Session Overview */}
           <Card>
