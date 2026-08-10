@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { getPinyinAnnotation } from "@/lib/pinyin";
 import type { Session, Settings } from "@shared/schema";
 
 type SessionViewMode = "read" | "write";
@@ -371,6 +372,7 @@ export default function PracticeSession() {
   }
 
   const currentWord = session.words[currentWordIndex];
+  const currentWordPinyin = getPinyinAnnotation(currentWord);
   const progressPercentage = Math.floor((wordsCompleted.size / session.words.length) * 100);
 
   return (
@@ -416,9 +418,18 @@ export default function PracticeSession() {
         <div className="px-4 py-8">
           {/* Word Display */}
           <div className="text-center mb-8">
-            <div className="text-4xl font-bold text-foreground mb-6" data-testid="text-current-word">
+            <div
+              className={`text-4xl font-bold text-foreground ${currentWordPinyin ? "" : "mb-6"}`}
+              data-testid="text-current-word"
+            >
               {currentWord}
             </div>
+
+            {currentWordPinyin && (
+              <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
+                {currentWordPinyin}
+              </div>
+            )}
 
             {/* Audio Controls */}
             <div className="flex items-center justify-center space-x-4 mb-8">
