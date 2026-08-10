@@ -12,13 +12,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import type { Session, Settings } from "@shared/schema";
 
-type PracticeMode = "practice" | "test";
+type SessionViewMode = "read" | "write";
 
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [mode, setMode] = useState<PracticeMode>("test");
+  const [mode, setMode] = useState<SessionViewMode>("write");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   const [wordsCompleted, setWordsCompleted] = useState<Set<number>>(new Set());
@@ -145,7 +145,7 @@ export default function PracticeSession() {
 
   
   // This is the main playWord function
-  // It handles the logic for playing a word, including repetitions in test mode
+  // It handles the logic for playing a word, including repetitions in write mode
 
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
@@ -207,14 +207,14 @@ export default function PracticeSession() {
       });
 
       // Use the ref value which updates immediately, not the state which is stale
-      if (isPausedRef.current || isMuted || mode !== "test") {
+      if (isPausedRef.current || isMuted || mode !== "write") {
         console.log('❌ NOT SCHEDULING - state changed during speech (using ref)');
         setIsLooping(false);
         return; // Exit early, don't schedule timeout
       }
 
-      // Handle repetitions in test mode (use effective settings fallback)
-      if (mode === "test") {
+      // Handle repetitions in write mode (use effective settings fallback)
+      if (mode === "write") {
         const maxRepetitions = effectiveSettings.wordRepetitions;
         const pauseDuration = effectiveSettings.pauseBetweenWords;
 
@@ -236,7 +236,7 @@ export default function PracticeSession() {
             });
 
             // Check ref value in timeout as well
-            if (mode === "test" && !isMuted && !isPausedRef.current) {
+            if (mode === "write" && !isMuted && !isPausedRef.current) {
               console.log(`🔄 NEXT REPETITION (${repetitionCount + 1}/${maxRepetitions})`);
               playWord(repetitionCount + 1);
             } else {
@@ -326,7 +326,7 @@ export default function PracticeSession() {
     setWordsCompleted(prev => new Set(Array.from(prev).concat(currentWordIndex)));
   };
 
-  const switchMode = (newMode: PracticeMode) => {
+  const switchMode = (newMode: SessionViewMode) => {
     // Force stop all speech immediately and reset state
     stopAllPlayback();
     setIsPaused(true);
@@ -403,16 +403,16 @@ export default function PracticeSession() {
         </div>
 
         {/* Mode Toggle */}
-        <Tabs value={mode} onValueChange={(value) => switchMode(value as PracticeMode)} className="mt-4">
+        <Tabs value={mode} onValueChange={(value) => switchMode(value as SessionViewMode)} className="mt-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="test" data-testid="tab-test">Test</TabsTrigger>
-            <TabsTrigger value="practice" data-testid="tab-practice">Practice</TabsTrigger>
+            <TabsTrigger value="write" data-testid="tab-write">Write</TabsTrigger>
+            <TabsTrigger value="read" data-testid="tab-read">Read</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      {/* Practice Mode Content */}
-      {mode === "practice" && (
+      {/* Read Mode Content */}
+      {mode === "read" && (
         <div className="px-4 py-8">
           {/* Word Display */}
           <div className="text-center mb-8">
@@ -502,8 +502,8 @@ export default function PracticeSession() {
         </div>
       )}
 
-      {/* Test Mode Content */}
-      {mode === "test" && (
+      {/* Write Mode Content */}
+      {mode === "write" && (
         <div className="px-4 py-8">
           {/* Word Display Hidden */}
           <div className="text-center mb-8">

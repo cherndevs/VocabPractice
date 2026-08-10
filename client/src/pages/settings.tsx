@@ -254,7 +254,7 @@ export default function SettingsPage() {
                 <div>
                   <Label className="font-medium">Word Repetitions</Label>
                   <p className="text-sm text-muted-foreground">
-                    Adjust how many times a word is read aloud during practice.
+                    Adjust how many times a word is read aloud during write mode.
                   </p>
                 </div>
                 <span className="text-foreground font-medium" data-testid="text-repetitions-value">
@@ -362,7 +362,7 @@ export default function SettingsPage() {
               <div>
                 <Label className="font-medium">Show Pause Button</Label>
                 <p className="text-sm text-muted-foreground">
-                  Display pause/resume button during test mode dictation.
+                  Display pause/resume button during write mode dictation.
                 </p>
               </div>
               <Switch

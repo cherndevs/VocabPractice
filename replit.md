@@ -2,7 +2,7 @@
 
 ## Overview
 
-Spelling Pro is a Progressive Web Application (PWA) designed as a mobile-first spelling practice tool specifically optimized for iPhone. The application enables users to capture images of spelling worksheets using their device camera, extract text using OCR (Optical Character Recognition), and create interactive spelling practice sessions. The app features both practice and test modes with audio playback capabilities for enhanced learning.
+Spelling Pro is a Progressive Web Application (PWA) designed as a mobile-first spelling practice tool specifically optimized for iPhone. The application enables users to capture images of spelling worksheets using their device camera, extract text using OCR (Optical Character Recognition), and create interactive spelling practice sessions. The app features both Read and Write modes with audio playback capabilities for enhanced learning.
 
 The application follows a camera-to-practice workflow: users photograph spelling worksheets, the app processes the images to extract individual words, users can edit and curate the word list, and finally engage in structured spelling practice sessions with customizable audio feedback and timing controls.
 
