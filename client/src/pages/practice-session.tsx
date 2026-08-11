@@ -21,9 +21,8 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
+import { resolveSessionViewMode, type SessionViewMode } from "@/lib/session-mode";
 import type { Session, Settings } from "@shared/schema";
-
-type SessionViewMode = "read" | "write";
 
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
@@ -130,6 +129,14 @@ export default function PracticeSession() {
 
     return () => clearInterval(interval);
   }, [sessionStartTime]);
+
+  // Peek has nothing to show for a word with no pinyin (e.g. English words
+  // in a mixed-language session) - fall back to Read if the word changes
+  // out from under an open Peek tab.
+  const currentWordPinyin = session ? getPinyinAnnotation(session.words[currentWordIndex]) : null;
+  useEffect(() => {
+    setMode((prev) => resolveSessionViewMode(prev, currentWordPinyin !== null));
+  }, [currentWordPinyin]);
 
   // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
   useEffect(() => {
@@ -431,7 +438,6 @@ export default function PracticeSession() {
   }
 
   const currentWord = session.words[currentWordIndex];
-  const currentWordPinyin = getPinyinAnnotation(currentWord);
   const progressPercentage = Math.floor((sessionSkipped.size / session.words.length) * 100);
   const allWordsSkipped = session.words.length > 0 && sessionSkipped.size === session.words.length;
   const isCurrentWordSkipped = sessionSkipped.has(currentWordIndex);
@@ -493,15 +499,18 @@ export default function PracticeSession() {
 
         {/* Mode Toggle */}
         <Tabs value={mode} onValueChange={(value) => switchMode(value as SessionViewMode)} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className={`grid w-full ${currentWordPinyin ? "grid-cols-3" : "grid-cols-2"}`}>
             <TabsTrigger value="write" data-testid="tab-write">Write</TabsTrigger>
             <TabsTrigger value="read" data-testid="tab-read">Read</TabsTrigger>
+            {currentWordPinyin && (
+              <TabsTrigger value="peek" data-testid="tab-peek">Peek</TabsTrigger>
+            )}
           </TabsList>
         </Tabs>
       </div>
 
-      {/* Read Mode Content */}
-      {mode === "read" && (
+      {/* Read / Peek Mode Content */}
+      {(mode === "read" || mode === "peek") && (
         <div className="px-4 py-8">
           {allWordsSkipped ? (
             /* All words marked with "I've Got This" for this session */
@@ -521,13 +530,13 @@ export default function PracticeSession() {
           /* Word Display */
           <div className="text-center mb-8">
             <div
-              className={`text-4xl font-bold text-foreground ${currentWordPinyin ? "" : "mb-6"}`}
+              className={`text-4xl font-bold text-foreground ${mode === "peek" && currentWordPinyin ? "" : "mb-6"}`}
               data-testid="text-current-word"
             >
               {currentWord}
             </div>
 
-            {currentWordPinyin && (
+            {mode === "peek" && currentWordPinyin && (
               <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
                 {currentWordPinyin}
               </div>
@@ -540,18 +549,20 @@ export default function PracticeSession() {
             )}
 
             {/* Audio Controls */}
-            <div className="flex items-center justify-center space-x-4 mb-8">
-              <Button
-                variant="outline"
-                size="lg"
-                className="p-3 rounded-full"
-                onClick={() => playWord(1)}
-                disabled={isMuted}
-                data-testid="button-play-audio"
-              >
-                <Volume2 className="w-6 h-6" />
-              </Button>
-            </div>
+            {mode === "peek" && (
+              <div className="flex items-center justify-center space-x-4 mb-8">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="p-3 rounded-full"
+                  onClick={() => playWord(1)}
+                  disabled={isMuted}
+                  data-testid="button-play-audio"
+                >
+                  <Volume2 className="w-6 h-6" />
+                </Button>
+              </div>
+            )}
 
             {/* Navigation Controls */}
             <div className="flex items-center justify-center space-x-6 mb-6">
@@ -582,9 +593,11 @@ export default function PracticeSession() {
               {currentWordIndex + 1}/{session.words.length} words
             </div>
 
-            <Button onClick={handleIveGotThis} data-testid="button-mark-completed">
-              I've Got This
-            </Button>
+            {mode === "read" && (
+              <Button onClick={handleIveGotThis} data-testid="button-mark-completed">
+                I've Got This
+              </Button>
+            )}
           </div>
           )}
 
