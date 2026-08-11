@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCamera } from "@/hooks/use-camera";
@@ -15,11 +15,27 @@ export default function CameraCapture({ onImageCapture, onSkip }: CameraCaptureP
   
   const { startCamera, stopCamera, capturePhoto, error } = useCamera(videoRef);
 
-  const handleStartCamera = async () => {
-    const success = await startCamera();
-    if (success) {
-      setIsCameraActive(true);
-    }
+  // The <video> only exists once the camera UI is showing, so flip the UI on
+  // first and attach the stream afterwards — starting the camera before the
+  // element is mounted leaves videoRef null and the preview never appears.
+  useEffect(() => {
+    if (!isCameraActive) return;
+
+    let cancelled = false;
+    startCamera().then((success) => {
+      if (!success && !cancelled) setIsCameraActive(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isCameraActive]);
+
+  // Release the camera if we navigate away mid-capture.
+  useEffect(() => stopCamera, []);
+
+  const handleStartCamera = () => {
+    setIsCameraActive(true);
   };
 
   const handleCapture = async () => {
