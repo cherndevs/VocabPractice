@@ -53,7 +53,13 @@ export default function CameraCapture({ onImageCapture, onSkip }: CameraCaptureP
   };
 
   return (
-    <div className="px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]">
+    <div
+      className={
+        isCameraActive
+          ? "px-4 py-4 flex flex-col items-center"
+          : "px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]"
+      }
+    >
       {!isCameraActive ? (
         <>
           <div className="camera-frame w-64 h-48 flex flex-col items-center justify-center mb-6 border-2 border-dashed border-border rounded-lg bg-muted">
@@ -90,13 +96,18 @@ export default function CameraCapture({ onImageCapture, onSkip }: CameraCaptureP
         </>
       ) : (
         <>
-          <div className="relative w-full max-w-sm mb-6">
+          <div className="relative w-full max-w-sm mb-4">
+            {/* A portrait phone stream is far taller than it is wide, so cap the
+                height — unconstrained it pushes the capture button off screen.
+                Width stays fixed rather than hugging the video: `w-auto` has no
+                intrinsic size until stream metadata arrives and collapses the
+                frame in the meantime. */}
             <video
               ref={videoRef}
               autoPlay
               playsInline
               muted
-              className="w-full rounded-lg"
+              className="w-full max-h-[55vh] object-contain rounded-lg bg-black"
               data-testid="video-camera-feed"
             />
             {/* Selection overlay */}

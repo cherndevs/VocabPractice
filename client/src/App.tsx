@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,9 +13,17 @@ import NotFound from "@/pages/not-found";
 import BottomNavigation from "@/components/bottom-navigation";
 
 function Router() {
+  const [location] = useLocation();
+
+  // Creating a session is a focused flow with its own back button, and the nav
+  // bar sits directly under the camera controls — a stray tap there both loses
+  // the work in progress and, on touch devices, catches the synthesized click
+  // that follows a capture.
+  const showBottomNavigation = location !== "/create-session";
+
   return (
     <div className="mobile-container max-w-sm mx-auto min-h-screen bg-background">
-      <div className="pb-20">
+      <div className={showBottomNavigation ? "pb-20" : undefined}>
         <Switch>
           <Route path="/" component={Sessions} />
           <Route path="/sessions" component={Sessions} />
@@ -26,7 +34,7 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </div>
-      <BottomNavigation />
+      {showBottomNavigation && <BottomNavigation />}
     </div>
   );
 }
