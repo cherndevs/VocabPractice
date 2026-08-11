@@ -7,6 +7,15 @@ export function useCamera(videoRef: React.RefObject<HTMLVideoElement>) {
   const startCamera = async (): Promise<boolean> => {
     try {
       setError(null);
+      if (!navigator.mediaDevices?.getUserMedia) {
+        // getUserMedia only exists in a secure context — http:// over a LAN
+        // address (e.g. testing on a phone against the dev server) won't have it.
+        setError(
+          "Camera unavailable. The camera only works over HTTPS or on localhost.",
+        );
+        return false;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: "environment" }, // Use back camera if available
@@ -14,13 +23,22 @@ export function useCamera(videoRef: React.RefObject<HTMLVideoElement>) {
           height: { ideal: 720 },
         },
       });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        return true;
+
+      streamRef.current = stream;
+
+      if (!videoRef.current) {
+        // Nothing to attach the stream to — release the camera rather than
+        // leaving it running with the indicator light on.
+        stopCamera();
+        setError("Failed to start the camera preview. Please try again.");
+        return false;
       }
-      return false;
+
+      videoRef.current.srcObject = stream;
+      // iOS Safari doesn't reliably honour the autoplay attribute for a stream
+      // attached after mount, so start playback explicitly.
+      await videoRef.current.play().catch(() => {});
+      return true;
     } catch (err) {
       console.error("Error accessing camera:", err);
       setError("Failed to access camera. Please ensure camera permissions are granted.");
