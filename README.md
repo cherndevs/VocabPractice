@@ -5,7 +5,7 @@ Set `DATABASE_URL` to your Neon pooled connection string (PgBouncer), which typi
 ### Required env vars
 
 - `DATABASE_URL`: Neon Postgres pooled URL
-- `ANTHROPIC_API_KEY`: Anthropic API key, used by the spelling-list extraction endpoint to read worksheet photos. Server-side only — it must never be exposed to the browser (see [ADR-0002](docs/adr/0002-server-proxy-for-image-extraction-no-persistence.md)). Without it, `POST /api/extract-spelling-lists` returns 503 and the rest of the app is unaffected.
+- `GEMINI_API_KEY`: Google Gemini API key, used by the spelling-list extraction endpoint to read worksheet photos. Server-side only — it must never be exposed to the browser (see [ADR-0002](docs/adr/0002-server-proxy-for-image-extraction-no-persistence.md) and [ADR-0003](docs/adr/0003-gemini-over-claude-for-spelling-list-extraction.md)). Without it, `POST /api/extract-spelling-lists` returns 503 and the rest of the app is unaffected.
 - `NODE_ENV`: `production` on deploy
 - `PORT`: optional, default 5000
 
