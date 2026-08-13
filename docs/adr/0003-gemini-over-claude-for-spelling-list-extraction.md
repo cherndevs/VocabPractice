@@ -1,5 +1,7 @@
 # Use Gemini rather than Claude for spelling-list extraction
 
+**Superseded by [0004](0004-qwen3-vl-8b-two-call-extraction.md).** Gemini's accuracy held up, but real per-image cost (driven by billed thinking tokens) was consistently higher than every other option tried, including the one eventually chosen. Kept here as the record of why Claude was dropped and what free-tier Gemini actually cost in practice, both of which are still true.
+
 CHE-19 originally built the extraction proxy against Claude Haiku 4.5, validated by hand against two real worksheets (English and Chinese) with a measured cost of ~$0.003/image. That work assumed an Anthropic Console API key, which requires its own billing setup — a credit card and pay-as-you-go account separate from a Claude.ai Pro/Max subscription. For this project, that separate billing account was a real blocker, not a preference: this is a small personal side project, and standing up a second billing relationship for a feature that costs cents was more friction than the feature was worth.
 
 There is no supported way around this by reusing a Pro/Max subscription instead — a Claude.ai subscription authenticates the Claude apps (claude.ai, Claude Code) and isn't a general-purpose API credential; there's no mechanism to point the Messages API SDK at a subscription login, and repurposing one would be outside what the subscription is licensed for.
