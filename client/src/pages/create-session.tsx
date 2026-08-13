@@ -1,31 +1,30 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Camera, Plus, Trash2, Check } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import CameraCapture from "@/components/camera-capture";
-import { useOCR } from "@/hooks/use-ocr";
+import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
+import { extractSpellingLists } from "@/lib/extract-spelling-lists";
+import { sanitizeExtractedCandidates } from "@/lib/extraction-candidates";
 import type { InsertSession } from "@shared/schema";
 
 type CreateSessionStep = "camera" | "selection" | "processing" | "edit-words" | "session-created";
+
+function defaultSessionTitle(): string {
+  return `Spelling Session ${new Date().toLocaleDateString()}`;
+}
 
 export default function CreateSession() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<CreateSessionStep>("camera");
-  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingProgress, setProcessingProgress] = useState(0);
-  
-  const { extractText } = useOCR();
 
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: InsertSession) => {
@@ -47,43 +46,35 @@ export default function CreateSession() {
       });
     },
   });
-// camera still not launching still
   const handleImageCapture = async (imageData: string) => {
-    setCapturedImage(imageData);
     setCurrentStep("processing");
-    setIsProcessing(true);
-    setProcessingProgress(10);
 
     try {
-      // Simulate processing steps
-      setProcessingProgress(25);
-      
-      // Extract text from image
-      const extractedText = await extractText(imageData);
-      setProcessingProgress(75);
-      
-      // Process extracted text into words
-      const extractedWords = extractedText
-        .split(/\s+/)
-        .filter(word => word.length > 0)
-        .map(word => word.replace(/[^\w\s]/g, '').toLowerCase())
-        .filter(word => word.length > 2);
-      
-      setWords(extractedWords);
-      setProcessingProgress(100);
-      
-      setTimeout(() => {
-        setIsProcessing(false);
-        setCurrentStep("edit-words");
-      }, 1000);
-      
+      const prepared = await prepareWorksheetImage(imageData);
+      const raw = await extractSpellingLists(prepared);
+      const { candidates, isEmpty } = sanitizeExtractedCandidates(raw, defaultSessionTitle());
+
+      // Multiple candidates get a selection step in CHE-22; for now the
+      // first one is used, matching CHE-21's scope.
+      const first = candidates[0];
+      setWords(isEmpty ? [""] : first.words);
+      setSessionTitle(isEmpty ? "" : first.title);
+
+      if (isEmpty) {
+        toast({
+          title: "No words found",
+          description: "Couldn't read a word list from that photo. You can add words manually.",
+          variant: "destructive",
+        });
+      }
+
+      setCurrentStep("edit-words");
     } catch (error) {
-      console.error('OCR processing failed:', error);
-      setIsProcessing(false);
+      console.error("Extraction failed:", error);
       setCurrentStep("edit-words");
       toast({
-        title: "OCR Processing Failed",
-        description: "Text extraction failed. You can manually add words.",
+        title: "Extraction failed",
+        description: "Couldn't read that photo. You can add words manually.",
         variant: "destructive",
       });
     }
@@ -215,8 +206,7 @@ export default function CreateSession() {
             </svg>
           </div>
           <div className="text-xl font-medium text-foreground mb-2">Analyzing image...</div>
-          <Progress value={processingProgress} className="w-48 mb-2" />
-          <div className="text-sm text-muted-foreground">{processingProgress}%</div>
+          <div className="text-sm text-muted-foreground">This can take a few seconds.</div>
         </div>
       )}
 
