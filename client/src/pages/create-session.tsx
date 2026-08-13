@@ -4,19 +4,25 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
-import { sanitizeExtractedCandidates } from "@/lib/extraction-candidates";
+import { sanitizeExtractedCandidates, type ExtractedCandidate } from "@/lib/extraction-candidates";
 import type { InsertSession } from "@shared/schema";
 
 type CreateSessionStep = "camera" | "selection" | "processing" | "edit-words" | "session-created";
 
 function defaultSessionTitle(): string {
   return `Spelling Session ${new Date().toLocaleDateString()}`;
+}
+
+/** Splits a candidate's `words`/`title` back into the two pieces of state the edit-words screen edits. */
+function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; title: string } {
+  return { words: candidate.words, title: candidate.title };
 }
 
 export default function CreateSession() {
@@ -26,6 +32,16 @@ export default function CreateSession() {
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
 
+  // Multi-candidate selection state. `queue` holds the candidates the user
+  // chose to create, one at a time through the same edit-words screen used
+  // for a single candidate — non-empty exactly while working through a
+  // multi-unit batch. `multiCandidates`/`selected` back the selection
+  // screen's checkboxes and are only read while currentStep is "selection".
+  const [multiCandidates, setMultiCandidates] = useState<ExtractedCandidate[]>([]);
+  const [selected, setSelected] = useState<boolean[]>([]);
+  const [queue, setQueue] = useState<ExtractedCandidate[]>([]);
+  const [queueIndex, setQueueIndex] = useState(0);
+
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: InsertSession) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
@@ -33,17 +49,6 @@ export default function CreateSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
-      setCurrentStep("session-created");
-      setTimeout(() => {
-        navigate("/sessions");
-      }, 2000);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to create session. Please try again.",
-        variant: "destructive",
-      });
     },
   });
   const handleImageCapture = async (imageData: string) => {
@@ -54,21 +59,31 @@ export default function CreateSession() {
       const raw = await extractSpellingLists(prepared);
       const { candidates, isEmpty } = sanitizeExtractedCandidates(raw, defaultSessionTitle());
 
-      // Multiple candidates get a selection step in CHE-22; for now the
-      // first one is used, matching CHE-21's scope.
-      const first = candidates[0];
-      setWords(isEmpty ? [""] : first.words);
-      setSessionTitle(isEmpty ? "" : first.title);
-
       if (isEmpty) {
+        setWords([""]);
+        setSessionTitle("");
+        setCurrentStep("edit-words");
         toast({
           title: "No words found",
           description: "Couldn't read a word list from that photo. You can add words manually.",
           variant: "destructive",
         });
+        return;
       }
 
-      setCurrentStep("edit-words");
+      if (candidates.length === 1) {
+        const { words, title } = loadCandidateFields(candidates[0]);
+        setWords(words);
+        setSessionTitle(title);
+        setCurrentStep("edit-words");
+        return;
+      }
+
+      // Several units detected — let the user pick which to create before
+      // any of them reach the edit-words screen.
+      setMultiCandidates(candidates);
+      setSelected(candidates.map(() => true));
+      setCurrentStep("selection");
     } catch (error) {
       console.error("Extraction failed:", error);
       setCurrentStep("edit-words");
@@ -81,6 +96,22 @@ export default function CreateSession() {
   };
 
   const handleSkipCamera = () => {
+    setCurrentStep("edit-words");
+  };
+
+  const handleToggleCandidate = (index: number) => {
+    setSelected((prev) => prev.map((value, i) => (i === index ? !value : value)));
+  };
+
+  const handleConfirmSelection = () => {
+    const chosen = multiCandidates.filter((_, i) => selected[i]);
+    if (chosen.length === 0) return;
+
+    const { words, title } = loadCandidateFields(chosen[0]);
+    setQueue(chosen);
+    setQueueIndex(0);
+    setWords(words);
+    setSessionTitle(title);
     setCurrentStep("edit-words");
   };
 
@@ -124,7 +155,7 @@ export default function CreateSession() {
     }
   };
 
-  const handleConfirmWordList = () => {
+  const handleConfirmWordList = async () => {
     const filteredWords = words.filter(word => word.trim().length > 0);
     if (filteredWords.length === 0) {
       toast({
@@ -135,23 +166,69 @@ export default function CreateSession() {
       return;
     }
 
-    const title = sessionTitle.trim() || `Spelling Session ${new Date().toLocaleDateString()}`;
-    
-    createSessionMutation.mutate({
-      title,
-      words: filteredWords,
-      wordCount: filteredWords.length,
-      status: "new",
-      progress: 0,
-      timeSpent: 0,
-    });
+    const title = sessionTitle.trim() || defaultSessionTitle();
+
+    try {
+      await createSessionMutation.mutateAsync({
+        title,
+        words: filteredWords,
+        wordCount: filteredWords.length,
+        status: "new",
+        progress: 0,
+        timeSpent: 0,
+      });
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to create session. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Mid-batch: move on to the next selected candidate's word list rather
+    // than treating this one creation as the end of the flow.
+    const nextIndex = queueIndex + 1;
+    if (nextIndex < queue.length) {
+      const { words: nextWords, title: nextTitle } = loadCandidateFields(queue[nextIndex]);
+      setQueueIndex(nextIndex);
+      setWords(nextWords);
+      setSessionTitle(nextTitle);
+      return;
+    }
+
+    setQueue([]);
+    setQueueIndex(0);
+    setCurrentStep("session-created");
+    setTimeout(() => {
+      navigate("/sessions");
+    }, 2000);
   };
 
   const goBack = () => {
     if (currentStep === "camera") {
       navigate("/sessions");
-    } else if (currentStep === "edit-words") {
+    } else if (currentStep === "selection") {
+      setMultiCandidates([]);
+      setSelected([]);
       setCurrentStep("camera");
+    } else if (currentStep === "edit-words") {
+      if (queue.length > 0) {
+        // Mid-batch: back goes to reselecting rather than to the camera.
+        // Sessions already created earlier in this batch stay created —
+        // there's no way to undo a save that already landed — so they're
+        // dropped from the list entirely rather than left checked, or
+        // Continue would recreate them as duplicates.
+        const alreadyCreated = queue.slice(0, queueIndex);
+        const remaining = multiCandidates.filter((c) => !alreadyCreated.includes(c));
+        setMultiCandidates(remaining);
+        setSelected(remaining.map(() => true));
+        setQueue([]);
+        setQueueIndex(0);
+        setCurrentStep("selection");
+      } else {
+        setCurrentStep("camera");
+      }
     }
   };
 
@@ -198,6 +275,48 @@ export default function CreateSession() {
         />
       )}
 
+      {currentStep === "selection" && (
+        <div className="px-4 py-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-2">Multiple Units Found</h2>
+            <p className="text-sm text-muted-foreground">
+              This worksheet has more than one spelling list. Choose which ones to create.
+            </p>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            {multiCandidates.map((candidate, index) => (
+              <label
+                key={index}
+                className="flex items-center space-x-3 p-3 bg-card rounded-lg border border-border cursor-pointer"
+                data-testid={`candidate-${index}`}
+              >
+                <Checkbox
+                  checked={selected[index] ?? false}
+                  onCheckedChange={() => handleToggleCandidate(index)}
+                  data-testid={`checkbox-candidate-${index}`}
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-foreground">{candidate.title}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {candidate.words.length} {candidate.words.length === 1 ? "word" : "words"}
+                  </div>
+                </div>
+              </label>
+            ))}
+          </div>
+
+          <Button
+            onClick={handleConfirmSelection}
+            className="w-full"
+            disabled={!selected.some(Boolean)}
+            data-testid="button-confirm-selection"
+          >
+            Continue
+          </Button>
+        </div>
+      )}
+
       {currentStep === "processing" && (
         <div className="px-4 py-12 flex flex-col items-center justify-center">
           <div className="status-indicator w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6">
@@ -215,6 +334,11 @@ export default function CreateSession() {
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-foreground mb-2">Review & Edit Your Word List</h2>
             <p className="text-sm text-muted-foreground">Make any necessary changes to the extracted words or add new ones.</p>
+            {queue.length > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Session {queueIndex + 1} of {queue.length}
+              </p>
+            )}
           </div>
 
           {/* Session Title */}
