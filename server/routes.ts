@@ -1,9 +1,51 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertSessionSchema, insertSettingsSchema } from "@shared/schema";
+import {
+  extractSpellingLists,
+  ExtractionServiceError,
+  SUPPORTED_MEDIA_TYPES,
+  type SupportedMediaType,
+} from "./spelling-extraction";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Spelling list extraction — relays a worksheet photo to Claude and returns
+  // the sessions it reads off the page. Takes the image as raw bytes rather
+  // than JSON so the global express.json() limit stays small for every other
+  // route; nothing is persisted (ADR-0002).
+  app.post(
+    "/api/extract-spelling-lists",
+    express.raw({ type: SUPPORTED_MEDIA_TYPES as unknown as string[], limit: "10mb" }),
+    async (req, res) => {
+      const mediaType = req.get("content-type")?.split(";")[0]?.trim();
+
+      if (!mediaType || !SUPPORTED_MEDIA_TYPES.includes(mediaType as SupportedMediaType)) {
+        return res.status(415).json({
+          message: `Unsupported image type. Send one of: ${SUPPORTED_MEDIA_TYPES.join(", ")}.`,
+        });
+      }
+
+      if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        return res.status(400).json({ message: "No image provided." });
+      }
+
+      try {
+        const candidates = await extractSpellingLists(
+          req.body,
+          mediaType as SupportedMediaType,
+        );
+        res.json({ candidates });
+      } catch (error) {
+        if (error instanceof ExtractionServiceError) {
+          return res.status(error.status).json({ message: error.message });
+        }
+        console.error("[extract] Unexpected failure", error);
+        res.status(500).json({ message: "Failed to extract spelling lists." });
+      }
+    },
+  );
+
   // Sessions routes
   app.get("/api/sessions", async (_req, res) => {
     try {

@@ -5,6 +5,7 @@ Set `DATABASE_URL` to your Neon pooled connection string (PgBouncer), which typi
 ### Required env vars
 
 - `DATABASE_URL`: Neon Postgres pooled URL
+- `OPENROUTER_API_KEY`: OpenRouter API key, used by the spelling-list extraction endpoint to read worksheet photos via Qwen3-VL-8B. Server-side only — it must never be exposed to the browser (see [ADR-0002](docs/adr/0002-server-proxy-for-image-extraction-no-persistence.md) and [ADR-0004](docs/adr/0004-qwen3-vl-8b-two-call-extraction.md)). Without it, `POST /api/extract-spelling-lists` returns 503 and the rest of the app is unaffected.
 - `NODE_ENV`: `production` on deploy
 - `PORT`: optional, default 5000
 
