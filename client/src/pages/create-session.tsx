@@ -5,6 +5,16 @@ import { ArrowLeft, Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
@@ -42,6 +52,14 @@ export default function CreateSession() {
   const [queue, setQueue] = useState<ExtractedCandidate[]>([]);
   const [queueIndex, setQueueIndex] = useState(0);
 
+  // The most recently captured photo, kept so a failed extraction can be
+  // retried without asking the user to recapture. Cleared on retake.
+  const [lastCapturedImage, setLastCapturedImage] = useState<string | null>(null);
+  // Which recoverable extraction outcome to prompt the user about, if any —
+  // "api-error" for a failed call (network/rate-limit/5xx/prep failure),
+  // "empty" for a call that succeeded but found no usable word list.
+  const [extractionError, setExtractionError] = useState<"api-error" | "empty" | null>(null);
+
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: InsertSession) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
@@ -52,6 +70,8 @@ export default function CreateSession() {
     },
   });
   const handleImageCapture = async (imageData: string) => {
+    setLastCapturedImage(imageData);
+    setExtractionError(null);
     setCurrentStep("processing");
 
     try {
@@ -60,14 +80,10 @@ export default function CreateSession() {
       const { candidates, isEmpty } = sanitizeExtractedCandidates(raw, defaultSessionTitle());
 
       if (isEmpty) {
-        setWords([""]);
-        setSessionTitle("");
-        setCurrentStep("edit-words");
-        toast({
-          title: "No words found",
-          description: "Couldn't read a word list from that photo. You can add words manually.",
-          variant: "destructive",
-        });
+        // Read fine, but nothing usable came back — ask before dropping the
+        // user into a blank form rather than doing it silently.
+        setCurrentStep("camera");
+        setExtractionError("empty");
         return;
       }
 
@@ -85,18 +101,43 @@ export default function CreateSession() {
       setSelected(candidates.map(() => true));
       setCurrentStep("selection");
     } catch (error) {
+      // Covers both a failed call (network/rate-limit/5xx) and a failure to
+      // prepare the image — either way the photo is likely fine and worth
+      // retrying as-is, so land on "camera" (behind the dialog) rather than
+      // routing straight to manual entry.
       console.error("Extraction failed:", error);
-      setCurrentStep("edit-words");
-      toast({
-        title: "Extraction failed",
-        description: "Couldn't read that photo. You can add words manually.",
-        variant: "destructive",
-      });
+      setCurrentStep("camera");
+      setExtractionError("api-error");
     }
+  };
+
+  const handleRetryExtraction = () => {
+    setExtractionError(null);
+    if (lastCapturedImage) handleImageCapture(lastCapturedImage);
+  };
+
+  const handleEnterWordsManually = () => {
+    setWords([""]);
+    setSessionTitle("");
+    setExtractionError(null);
+    setCurrentStep("edit-words");
   };
 
   const handleSkipCamera = () => {
     setCurrentStep("edit-words");
+  };
+
+  /** Discards any extraction result in progress and returns to the camera for a fresh capture. */
+  const handleRetake = () => {
+    setWords([""]);
+    setSessionTitle("");
+    setMultiCandidates([]);
+    setSelected([]);
+    setQueue([]);
+    setQueueIndex(0);
+    setLastCapturedImage(null);
+    setExtractionError(null);
+    setCurrentStep("camera");
   };
 
   const handleToggleCandidate = (index: number) => {
@@ -308,11 +349,20 @@ export default function CreateSession() {
 
           <Button
             onClick={handleConfirmSelection}
-            className="w-full"
+            className="w-full mb-4"
             disabled={!selected.some(Boolean)}
             data-testid="button-confirm-selection"
           >
             Continue
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleRetake}
+            className="w-full"
+            data-testid="button-retake-photo"
+          >
+            Retake Photo
           </Button>
         </div>
       )}
@@ -390,11 +440,20 @@ export default function CreateSession() {
 
           <Button
             onClick={handleConfirmWordList}
-            className="w-full"
+            className="w-full mb-4"
             disabled={createSessionMutation.isPending}
             data-testid="button-confirm-word-list"
           >
             {createSessionMutation.isPending ? "Creating..." : "Confirm Word List"}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleRetake}
+            className="w-full"
+            data-testid="button-retake-photo"
+          >
+            Retake Photo
           </Button>
         </div>
       )}
@@ -418,6 +477,37 @@ export default function CreateSession() {
           </Button>
         </div>
       )}
+
+      <AlertDialog
+        open={extractionError !== null}
+        onOpenChange={(open) => {
+          if (!open) setExtractionError(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {extractionError === "api-error" ? "Couldn't read that photo" : "No word list found"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {extractionError === "api-error"
+                ? "Something went wrong processing that photo. You can try again or enter the words yourself."
+                : "That photo didn't seem to have a spelling list on it. Would you like to enter the words manually?"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-dismiss-extraction-error">Not Now</AlertDialogCancel>
+            {extractionError === "api-error" && (
+              <AlertDialogAction onClick={handleRetryExtraction} data-testid="button-retry-extraction">
+                Retry
+              </AlertDialogAction>
+            )}
+            <AlertDialogAction onClick={handleEnterWordsManually} data-testid="button-enter-manually">
+              Enter Words Manually
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
