@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
 import type { Session } from "@shared/schema";
@@ -71,68 +70,29 @@ export default function Sessions() {
     return bCreated - aCreated; // newest created first
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Completed";
-      case "in-progress":
-        return "In Progress";
-      default:
-        return "New";
-    }
-  };
-
   return (
     <div className="fade-in">
       {/* Header */}
       <div className="px-4 py-6 bg-card">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">Mber Spelling Pro</h1>
-          <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-            <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
-          </div>
+          <Button
+            asChild
+            variant="default"
+            size="icon"
+            aria-label="Create New Session"
+            data-testid="button-create-session"
+          >
+            <Link href="/create-session">
+              <Plus className="w-4 h-4" />
+            </Link>
+          </Button>
         </div>
 
       </div>
 
       {/* Content */}
       <div className="px-4 py-4">
-        {/* Create New Session Button */}
-        <div className="mb-6">
-          <Button
-            asChild
-            className="w-full flex items-center justify-between p-4 h-auto bg-card text-foreground border border-border hover:shadow-md"
-            variant="outline"
-            data-testid="button-create-session"
-          >
-            <Link href="/create-session">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <Plus className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div className="text-left">
-                  <div className="font-medium">Create New Session</div>
-                  <div className="text-sm text-muted-foreground">Create from photo or from scratch</div>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </Link>
-          </Button>
-        </div>
-
         {/* Recent Sessions */}
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-foreground mb-3">Recent Sessions</h2>
@@ -185,9 +145,6 @@ export default function Sessions() {
                           >
                             <Pin className="w-4 h-4" />
                           </Button>
-                          <Badge className={getStatusColor(session.status)} data-testid={`badge-status-${session.id}`}>
-                            {getStatusText(session.status)}
-                          </Badge>
                         </div>
                       </div>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
