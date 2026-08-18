@@ -93,11 +93,6 @@ export default function Sessions() {
 
       {/* Content */}
       <div className="px-4 py-4">
-        {/* Recent Sessions */}
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-foreground mb-3">Recent Sessions</h2>
-        </div>
-
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
