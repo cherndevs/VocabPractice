@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
 import type { Session } from "@shared/schema";
@@ -70,28 +69,6 @@ export default function Sessions() {
     const bCreated = b.createdAt ? new Date(b.createdAt as unknown as string).getTime() : 0;
     return bCreated - aCreated; // newest created first
   });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Completed";
-      case "in-progress":
-        return "In Progress";
-      default:
-        return "New";
-    }
-  };
 
   return (
     <div className="fade-in">
@@ -168,9 +145,6 @@ export default function Sessions() {
                           >
                             <Pin className="w-4 h-4" />
                           </Button>
-                          <Badge className={getStatusColor(session.status)} data-testid={`badge-status-${session.id}`}>
-                            {getStatusText(session.status)}
-                          </Badge>
                         </div>
                       </div>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
