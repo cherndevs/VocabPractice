@@ -1,0 +1,1066 @@
+level,unit_id,unit_title,word_id,zh,py,en,sentence,sentencePy,sentenceEn
+P1,p1u1,第一课·我上学了,p1u1w1,衣,yi1,clothes,这件衣服很漂亮。,zhe4 jian4 yi1 fu hen3 piao4 liang.,This piece of clothing is very beautiful.
+P1,p1u1,第一课·我上学了,p1u1w2,鱼,yu2,fish,鱼在水里游。,yu2 zai4 shui3 li3 you2.,The fish swims in the water.
+P1,p1u1,第一课·我上学了,p1u1w3,雨,yu3,rain,今天下雨了。,jin1 tian1 xia4 yu3 le.,It is raining today.
+P1,p1u1,第一课·我上学了,p1u1w4,一,yi1,one,我有一双手。,wo3 you3 yi1 shuang1 shou3.,I have a pair of hands.
+P1,p1u1,第一课·我上学了,p1u1w5,二,er4,two,今天是星期二。,jin1 tian1 shi4 xing1 qi1 er4.,Today is Tuesday.
+P1,p1u1,第一课·我上学了,p1u1w6,五,wu3,five,我有五根手指。,wo3 you3 wu3 gen1 shou3 zhi3.,I have five fingers.
+P1,p1u1,第一课·我上学了,p1u1w7,雨衣,yu3 yi1,raincoat,下雨要穿雨衣。,xia4 yu3 yao4 chuan1 yu3 yi1.,Wear a raincoat when it rains.
+P1,p1u1,第一课·我上学了,p1u1w8,耳,er3,ear,我有两只耳朵。,wo3 you3 liang3 zhi1 er3 duo.,I have two ears.
+P1,p1u1,第一课·我上学了,p1u1w9,牙,ya2,tooth / teeth,我每天要刷牙。,wo3 mei3 tian1 yao4 shua1 ya2.,I need to brush my teeth every day.
+P1,p1u1,第一课·我上学了,p1u1w10,口,kou3,mouth,我有一张口。,wo3 you3 yi1 zhang1 kou3.,I have a mouth.
+P1,p1u1,第一课·我上学了,p1u1w11,人,ren2,person / people,公园里有很多人。,gong1 yuan2 li3 you3 hen3 duo1 ren2.,There are many people in the park.
+P1,p1u2,第二课·你家有几个人,p1u2w1,木,mu4,wood,桌子是木做的。,zhuo1 zi shi4 mu4 zuo4 de.,The table is made of wood.
+P1,p1u2,第二课·你家有几个人,p1u2w2,土,tu3,soil,我们在土里种花。,wo3 men zai4 tu3 li3 zhong4 hua1.,We plant flowers in soil.
+P1,p1u2,第二课·你家有几个人,p1u2w3,马,ma3,horse,马跑得很快。,ma3 pao3 de hen3 kuai4.,The horse runs very fast.
+P1,p1u2,第二课·你家有几个人,p1u2w4,八,ba1,eight,我们班有八个男生。,wo3 men ban1 you3 ba1 ge nan2 sheng1.,There are eight boys in our class.
+P1,p1u2,第二课·你家有几个人,p1u2w5,木马,mu4 ma3,wooden horse / rocking horse,我喜欢骑木马。,wo3 xi3 huan1 qi2 mu4 ma3.,I like to ride the rocking horse.
+P1,p1u2,第二课·你家有几个人,p1u2w6,巴士,ba1 shi4,bus,我坐巴士上学。,wo3 zuo4 ba1 shi4 shang4 xue2.,I take the bus to school.
+P1,p1u2,第二课·你家有几个人,p1u2w7,你,ni3,you,你是我的好朋友。,ni3 shi4 wo3 de hao3 peng2 you3.,Hello!
+P1,p1u2,第二课·你家有几个人,p1u2w8,我,wo3,I / me,我是小明。,wo3 shi4 xiao3 ming2.,I am Xiao Ming.
+P1,p1u2,第二课·你家有几个人,p1u2w9,也,ye3,also / too,我喜欢吃苹果，也喜欢吃西瓜。,"wo3 xi3 huan1 chi1 ping2 guo3, ye3 xi3 huan1 chi1 xi1 gua1.",I also like to eat fruit.
+P1,p1u2,第二课·你家有几个人,p1u2w10,他,ta1,he / him,他是我的朋友。,ta1 shi4 wo3 de peng2 you3.,He is my friend.
+P1,p1u2,第二课·你家有几个人,p1u2w11,弟弟,di4 di,younger brother,弟弟很可爱。,di4 di hen3 ke3 ai4.,My younger brother is very cute.
+P1,p1u2,第二课·你家有几个人,p1u2w12,不,bu4,not,我不喜欢吃苦瓜。,wo3 bu4 xi3 huan1 chi1 ku3 gua1.,I do not like to eat bitter gourd.
+P1,p1u2,第二课·你家有几个人,p1u2w13,爸爸,ba4 ba,father / dad,爸爸去上班了。,ba4 ba qu4 shang4 ban1 le.,Dad has gone to work.
+P1,p1u2,第二课·你家有几个人,p1u2w14,她,ta1,she / her,她很聪明。,ta1 hen3 cong1 ming2.,She is very clever.
+P1,p1u2,第二课·你家有几个人,p1u2w15,妈妈,ma1 ma,mother / mum,妈妈给我做饭。,ma1 ma gei3 wo3 zuo4 fan4.,Mum cooks food for me.
+P1,p1u2,第二课·你家有几个人,p1u2w16,的,de,particle (used after an attribute),这是我的书包。,zhe4 shi4 wo3 de shu1 bao1.,This is my school bag.
+P1,p1u2,第二课·你家有几个人,p1u2w17,父母,fu4 mu3,parents,我爱我的父母。,wo3 ai4 wo3 de fu4 mu3.,I love my parents.
+P1,p1u2,第二课·你家有几个人,p1u2w18,女儿,nv3 er2,daughter,他们只有一个女儿。,ta1 men zhi3 you3 yi2 ge nv3 er2.,She is the daughter of her parents.
+P1,p1u3,第三课·今天是我的生日,p1u3w1,力,li4,strength / power / force,他的力气很大。,ta1 de li4 qi4 hen3 da4.,He has great strength.
+P1,p1u3,第三课·今天是我的生日,p1u3w2,河,he2,river,河里有很多鱼。,he2 li3 you3 hen3 duo1 yu2.,There are many fish in the river.
+P1,p1u3,第三课·今天是我的生日,p1u3w3,禾,he2,grain seedlings,农夫在田里种了禾。,nong2 fu1 zai4 tian2 li3 zhong4 le he2.,The farmer planted grain seedlings in the field.
+P1,p1u3,第三课·今天是我的生日,p1u3w4,立,li4,stand,老师一进教室，同学们马上起立。,"lao3 shi1 yi2 jin4 jiao4 shi4, tong2 xue2 men ma3 shang4 qi3 li4.",Please stand up straight.
+P1,p1u3,第三课·今天是我的生日,p1u3w5,米,mi3,rice / metre,妈妈在煮米饭。,ma1 ma zai4 zhu3 mi3 fan4.,Mum is cooking rice.
+P1,p1u3,第三课·今天是我的生日,p1u3w6,合,he2,close / combine,请合上书本。,qing3 he2 shang4 shu1 ben3.,Please close your book.
+P1,p1u3,第三课·今天是我的生日,p1u3w7,气,qi4,air / smell / gas,外面的空气很新鲜。,wai4 mian4 de kong1 qi4 hen3 xin1 xian1.,The air outside is very fresh.
+P1,p1u3,第三课·今天是我的生日,p1u3w8,和,he2,and,我和妈妈去买菜。,wo3 he2 ma1 ma qu4 mai3 cai4.,Mum and I go to buy groceries.
+P1,p1u3,第三课·今天是我的生日,p1u3w9,哥哥,ge1 ge,elder brother,哥哥帮我拿书包。,ge1 ge bang1 wo3 na2 shu1 bao1.,Elder brother helps me carry my school bag.
+P1,p1u3,第三课·今天是我的生日,p1u3w10,几,ji3,how many / a few,你家有几个人？,ni3 jia1 you3 ji3 ge ren2?,How many people are in your family?
+P1,p1u3,第三课·今天是我的生日,p1u3w11,七,qi1,seven,我今年七岁。,wo3 jin1 nian2 qi1 sui4.,I am seven years old this year.
+P1,p1u3,第三课·今天是我的生日,p1u3w12,了,le,particle (shows completed action),我吃完饭了。,wo3 chi1 wan2 fan4 le.,I have finished eating.
+P1,p1u3,第三课·今天是我的生日,p1u3w13,个,ge4,measure word (for some nouns),我有三个好朋友。,wo3 you3 san1 ge hao3 peng2 you3.,I have three good friends.
+P1,p1u3,第三课·今天是我的生日,p1u3w14,句子,ju4 zi,sentence,老师叫我写句子。,lao3 shi1 jiao4 wo3 xie3 ju4 zi.,The teacher asked me to write a sentence.
+P1,p1u3,第三课·今天是我的生日,p1u3w15,可以,ke3 yi3,can / may,我可以去玩了。,wo3 ke3 yi3 qu4 wan2 le.,I can go and play now.
+P1,p1u3,第三课·今天是我的生日,p1u3w16,吗,ma,particle (question word),你会写字吗？,ni3 hui4 xie3 zi4 ma?,Can you write characters?
+P1,p1u3,第三课·今天是我的生日,p1u3w17,去,qu4,go,我们去公园玩吧。,wo3 men qu4 gong1 yuan2 wan2 ba.,Let us go to the park.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w1,日,ri4,sun / day / date,今日天气很好。,jin1 ri4 tian1 qi4 hen3 hao3.,The weather is very good today.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w2,石,shi2,stone / rock,河边有很多小石子。,he2 bian1 you3 hen3 duo1 xiao3 shi2 zi.,There are many small stones by the river.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w3,子,zi3,child,她有四个孩子。,ta1 you3 si4 ge4 hai2 zi.,She has four children.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w4,字,zi4,Chinese character,我会写很多字。,wo3 hui4 xie3 hen3 duo1 zi4.,I can write many characters.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w5,车,che1,car / vehicle,爸爸开车上班。,ba4 ba kai1 che1 shang4 ban1.,Dad drives to work.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w6,四,si4,four,桌子有四条腿。,zhuo1 zi you3 si4 tiao2 tui3.,The table has four legs.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w7,十,shi2,ten,今天是十月十日。,jin1 tian1 shi4 shi2 yue4 shi2 ri4.,Today is the 10th of October.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w8,一只,yi1 zhi1,measure word (for some nouns),树上有一只小鸟。,shu4 shang4 you3 yi4 zhi1 xiao3 niao3.,There is a small bird on the tree.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w9,一把尺,yi1 ba3 chi3,a ruler,我的铅笔盒里有一把尺。,wo3 de qian1 bi3 he2 li3 you3 yi4 ba3 chi3.,There is a ruler in my pencil case.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w10,是,shi4,is / am / are,这是我的书包。,zhe4 shi4 wo3 de shu1 bao1.,This is my school bag.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w11,读书,du2 shu1,read a book,我喜欢读书。,wo3 xi3 huan1 du2 shu1.,I like to read books.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w12,出去,chu1 qu4,go out,我们出去玩吧。,wo3 men chu1 qu4 wan2 ba.,Let us go out to play.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w13,自己,zi4 ji3,oneself / self,我自己读书。,wo3 zi4 ji3 du2 shu1.,I read by myself.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w14,它,ta1,it,那里有一只小猫。它很可爱。,na4 li3 you3 yi4 zhi1 xiao3 mao1. ta1 hen3 ke3 ai4.,There is a little cat over there. It is very cute.
+P1,p1u4,第四课·我喜欢打篮球,p1u4w15,吃,chi1,eat,我们一起吃饭。,wo3 men yi4 qi3 chi1 fan4.,Let us eat together.
+P1,p1u5,第五课·现在几点,p1u5w1,山,shan1,mountain / hill,我们去爬山。,wo3 men qu4 pa2 shan1.,We go hiking up the hill.
+P1,p1u5,第五课·现在几点,p1u5w2,羊,yang2,sheep,草地上有几只羊。,cao3 di4 shang4 you3 ji3 zhi1 yang2.,There are a few sheep on the grass.
+P1,p1u5,第五课·现在几点,p1u5w3,羊毛,yang2 mao2,wool,羊毛可以用来做毛衣。,yang2 mao2 ke3 yi3 yong4 lai2 zuo4 mao2 yi1.,Wool can be used to make clothes.
+P1,p1u5,第五课·现在几点,p1u5w4,草,cao3,grass,草地上的草很绿。,cao3 di4 shang4 de cao3 hen3 lv4.,The grass on the lawn is very green.
+P1,p1u5,第五课·现在几点,p1u5w5,太阳,tai4 yang2,sun,太阳从东边升起。,tai4 yang2 cong2 dong1 bian1 sheng1 qi3.,The sun rises from the east.
+P1,p1u5,第五课·现在几点,p1u5w6,王,wang2,king / Wang (surname),他姓王。,ta1 xing4 wang2.,His surname is Wang.
+P1,p1u5,第五课·现在几点,p1u5w7,三,san1,three,我有三个好朋友。,wo3 you3 san1 ge hao3 peng2 you3.,I have three good friends.
+P1,p1u5,第五课·现在几点,p1u5w8,伞,san3,umbrella,下雨要带伞出门。,xia4 yu3 yao4 dai4 san3 chu1 men2.,Bring an umbrella when it rains.
+P1,p1u5,第五课·现在几点,p1u5w9,书包,shu1 bao1,school bag,我的书包很重。,wo3 de shu1 bao1 hen3 zhong4.,My school bag is very heavy.
+P1,p1u5,第五课·现在几点,p1u5w10,老师,lao3 shi1,teacher,老师对我们很好。,lao3 shi1 dui4 wo3 men hen3 hao3.,The teacher is very kind to us.
+P1,p1u5,第五课·现在几点,p1u5w11,早安,zao3 an1,good morning,我向老师说早安。,wo3 xiang4 lao3 shi1 shuo1 zao3 an1.,I say good morning to the teacher.
+P1,p1u5,第五课·现在几点,p1u5w12,半,ban4,half,现在是八点半。,xian4 zai4 shi4 ba1 dian3 ban4.,It is now half past eight.
+P1,p1u5,第五课·现在几点,p1u5w13,午安,wu3 an1,good afternoon,我对同学们说午安。,wo3 dui4 tong2 xue2 men shuo1 wu3 an1.,I say good afternoon to my classmates.
+P1,p1u5,第五课·现在几点,p1u5w14,奶奶,nai3 nai,grandmother (paternal),奶奶给我讲故事。,nai3 nai gei3 wo3 jiang3 gu4 shi4.,Grandmother tells me stories.
+P1,p1u5,第五课·现在几点,p1u5w15,玩具,wan2 ju4,toy,我有很多玩具。,wo3 you3 hen3 duo1 wan2 ju4.,I have many toys.
+P1,p1u6,第六课·这是我的学校,p1u6w1,鸟,niao3,bird,小鸟在树上唱歌。,xiao3 niao3 zai4 shu4 shang4 chang4 ge1.,The little bird sings in the tree.
+P1,p1u6,第六课·这是我的学校,p1u6w2,竹子,zhu2 zi,bamboo,熊猫喜欢吃竹子。,xiong2 mao1 xi3 huan1 chi1 zhu2 zi.,Pandas like to eat bamboo.
+P1,p1u6,第六课·这是我的学校,p1u6w3,田,tian2,farm / field,农夫在田里种菜。,nong2 fu1 zai4 tian2 li3 zhong4 cai4.,The farmer grows vegetables in the field.
+P1,p1u6,第六课·这是我的学校,p1u6w4,苗,miao2,seedling,农夫每天给禾苗浇水。,nong2 fu1 mei3 tian1 gei3 he2 miao2 jiao1 shui3.,The farmer waters the seedlings every day.
+P1,p1u6,第六课·这是我的学校,p1u6w5,象,xiang4,elephant,象的鼻子很长。,xiang4 de bi2 zi hen3 chang2.,The elephant's trunk is very long.
+P1,p1u6,第六课·这是我的学校,p1u6w6,家,jia1,home / house,放学后，我自己走路回家。,"fang4 xue2 hou4, wo3 zi4 ji3 zou3 lu4 hui2 jia1.","After school, I walk home by myself."
+P1,p1u6,第六课·这是我的学校,p1u6w7,刀,dao1,knife,妈妈用刀切菜。,ma1 ma yong4 dao1 qie1 cai4.,Mum uses a knife to cut vegetables.
+P1,p1u6,第六课·这是我的学校,p1u6w8,网,wang3,net,渔夫用网捕鱼。,yu2 fu1 yong4 wang3 bu3 yu2.,The fisherman uses a net to catch fish.
+P1,p1u6,第六课·这是我的学校,p1u6w9,在,zai4,at / in / located at,妈妈在房间里睡觉。,ma1 ma zai4 fang2 jian1 li3 shui4 jiao4.,Mum is sleeping in the bedroom.
+P1,p1u6,第六课·这是我的学校,p1u6w10,里,li3,inside / in,书包里有很多书。,shu1 bao1 li3 you3 hen3 duo1 shu1.,There are many books inside the school bag.
+P1,p1u6,第六课·这是我的学校,p1u6w11,上,shang4,up / on / above,我的书在桌子上。,wo3 de shu1 zai4 zhuo1 zi shang4.,My book is on the table.
+P1,p1u6,第六课·这是我的学校,p1u6w12,下,xia4,down / under / below,小猫在椅子下面。,xiao3 mao1 zai4 yi3 zi xia4 mian4.,The kitten is under the chair.
+P1,p1u6,第六课·这是我的学校,p1u6w13,大,da4,big / large,大象比猫大。,da4 xiang4 bi3 mao1 da4.,An elephant is bigger than a cat.
+P1,p1u6,第六课·这是我的学校,p1u6w14,小,xiao3,small / little,桌子上的苹果真小。,zhuo1 zi shang4 de ping2 guo3 zhen1 xiao3.,The apple on the table is really small.
+P1,p1u6,第六课·这是我的学校,p1u6w15,来,lai2,come,爸爸来学校接我。,ba4 ba lai2 xue2 xiao4 jie1 wo3.,Dad comes to school to pick me up.
+P1,p1u6,第六课·这是我的学校,p1u6w16,哭,ku1,cry,弟弟跌倒后，哭了起来。,"di4 di die1 dao3 hou4, ku1 le qi3 lai2.","After falling down, little brother burst into tears."
+P1,p1u6,第六课·这是我的学校,p1u6w17,笑,xiao4,smile / laugh,她笑得很开心。,ta1 xiao4 de hen3 kai1 xin1.,She laughs very happily.
+P1,p1u6,第六课·这是我的学校,p1u6w18,男人,nan2 ren2,man / male,那个男人是我爸爸。,na4 ge nan2 ren2 shi4 wo3 ba4 ba.,That man is my dad.
+P1,p1u6,第六课·这是我的学校,p1u6w19,爷爷,ye2 ye,grandfather (paternal),他是我的爷爷。,ta1 shi4 wo3 de ye2 ye.,He is my grandfather.
+P1,p1u6,第六课·这是我的学校,p1u6w20,姐姐,jie3 jie,elder sister,她是我的姐姐。,ta1 shi4 wo3 de jie3 jie.,She is my elder sister.
+P1,p1u7,第七课·我的东西不见了,p1u7w1,芒果,mang2 guo3,mango,芒果甜甜的，很好吃。,"mang2 guo3 tian2 tian2 de, hen3 hao3 chi1.",The mango is sweet and delicious.
+P1,p1u7,第七课·我的东西不见了,p1u7w2,开,kai1,open,我帮妈妈开门。,wo3 bang1 ma1 ma kai1 men2.,I help Mum open the door.
+P1,p1u7,第七课·我的东西不见了,p1u7w3,木瓜,mu4 gua1,papaya,木瓜是黄色的。,mu4 gua1 shi4 huang2 se4 de.,The papaya is yellow.
+P1,p1u7,第七课·我的东西不见了,p1u7w4,火,huo3,fire,我们不可以玩火。,wo3 men bu4 ke3 yi3 wan2 huo3.,We are not allowed to play with fire.
+P1,p1u7,第七课·我的东西不见了,p1u7w5,花,hua1,flower,花园里有很多花。,hua1 yuan2 li3 you3 hen3 duo1 hua1.,There are many flowers in the garden.
+P1,p1u7,第七课·我的东西不见了,p1u7w6,叶子,ye4 zi,leaf,树上的叶子是绿色的。,shu4 shang4 de ye4 zi shi4 lv4 se4 de.,The leaves on the tree are green.
+P1,p1u7,第七课·我的东西不见了,p1u7w7,面,mian4,noodle / surface,我喜欢吃炒面。,wo3 xi3 huan1 chi1 chao3 mian4.,I like to eat fried noodles.
+P1,p1u7,第七课·我的东西不见了,p1u7w8,关,guan1,close / shut,天黑了，我关灯睡觉。,"tian1 hei1 le, wo3 guan1 deng1 shui4 jiao4.","When it gets dark, I turn off the light to sleep."
+P1,p1u7,第七课·我的东西不见了,p1u7w9,朵,duo3,measure word (for flowers),花园里有三朵花。,hua1 yuan2 li3 you3 san1 duo3 hua1.,There are three flowers in the garden.
+P1,p1u7,第七课·我的东西不见了,p1u7w10,两,liang3,two,我有两只手。,wo3 you3 liang3 zhi1 shou3.,I have two hands.
+P1,p1u7,第七课·我的东西不见了,p1u7w11,片,pian4,piece / slice,我吃了一片面包。,wo3 chi1 le yi1 pian4 mian4 bao1.,I ate a piece of bread.
+P1,p1u7,第七课·我的东西不见了,p1u7w12,画,hua4,drawing / draw,我喜欢画画。,wo3 xi3 huan1 hua4 hua4.,I like to draw.
+P1,p1u7,第七课·我的东西不见了,p1u7w13,笔,bi3,pen / pencil,我用笔写字。,wo3 yong4 bi3 xie3 zi4.,I use a pen to write.
+P1,p1u7,第七课·我的东西不见了,p1u7w14,长,chang2,long,长颈鹿的脖子很长。,chang2 jing3 lu4 de bo2 zi hen3 chang2.,The giraffe's neck is very long.
+P1,p1u7,第七课·我的东西不见了,p1u7w15,广场,guang3 chang3,plaza / square,我们在广场上玩。,wo3 men zai4 guang3 chang3 shang4 wan2.,We play in the plaza.
+P1,p1u7,第七课·我的东西不见了,p1u7w16,多,duo1,many / much,公园里有很多人。,gong1 yuan2 li3 you3 hen3 duo1 ren2.,There are many people in the park.
+P1,p1u7,第七课·我的东西不见了,p1u7w17,少,shao3,few / little,今天人很少。,jin1 tian1 ren2 hen3 shao3.,There are few people today.
+P1,p1u7,第七课·我的东西不见了,p1u7w18,床,chuang2,bed,我的床很舒服。,wo3 de chuang2 hen3 shu1 fu.,My bed is very comfortable.
+P1,p1u8,第八课·我感冒了,p1u8w1,目,mu4,eye,目是眼睛的意思。,mu4 shi4 yan3 jing de yi4 si.,Mu means eye.
+P1,p1u8,第八课·我感冒了,p1u8w2,舌,she2,tongue,我的舌头可以尝到味道。,wo3 de she2 tou ke3 yi3 chang2 dao4 wei4 dao.,My tongue can taste flavours.
+P1,p1u8,第八课·我感冒了,p1u8w3,手,shou3,hand,我们吃饭前要洗手。,wo3 men chi1 fan4 qian2 yao4 xi3 shou3.,We need to wash our hands before eating.
+P1,p1u8,第八课·我感冒了,p1u8w4,足,zu2,foot,我用双足走路。,wo3 yong4 shuang1 zu2 zou3 lu4.,I walk with both feet.
+P1,p1u8,第八课·我感冒了,p1u8w5,本子,ben3 zi,notebook / exercise book,我在本子上写字。,wo3 zai4 ben3 zi shang4 xie3 zi4.,I write in my exercise book.
+P1,p1u8,第八课·我感冒了,p1u8w6,工厂,gong1 chang3,factory,爸爸在工厂上班。,ba4 ba zai4 gong1 chang3 shang4 ban1.,Dad works at a factory.
+P1,p1u8,第八课·我感冒了,p1u8w7,走,zou3,walk,我走路去学校。,wo3 zou3 lu4 qu4 xue2 xiao4.,I walk to school.
+P1,p1u8,第八课·我感冒了,p1u8w8,跑,pao3,run,他跑得很快。,ta1 pao3 de hen3 kuai4.,He runs very fast.
+P1,p1u8,第八课·我感冒了,p1u8w9,飞,fei1,fly,鸟在天上飞。,niao3 zai4 tian1 shang4 fei1.,Birds fly in the sky.
+P1,p1u8,第八课·我感冒了,p1u8w10,妹妹,mei4 mei,younger sister,妹妹在玩玩具。,mei4 mei zai4 wan2 wan2 ju4.,Younger sister is playing with toys.
+P1,p1u8,第八课·我感冒了,p1u8w11,出门,chu1 men2,go out / leave the house,妹妹出门了。,mei4 mei chu1 men2 le.,Younger sister has gone out.
+P1,p1u8,第八课·我感冒了,p1u8w12,看见,kan4 jian4,see / catch sight of,我看见一只小狗。,wo3 kan4 jian4 yi1 zhi1 xiao3 gou3.,I saw a puppy.
+P1,p1u8,第八课·我感冒了,p1u8w13,问,wen4,ask,我问老师一个问题。,wo3 wen4 lao3 shi1 yi1 ge wen4 ti2.,I ask the teacher a question.
+P1,p1u8,第八课·我感冒了,p1u8w14,又,you4,again / also,昨天我忘了带课本，今天我又忘了。,"zuo2 tian1 wo3 wang4 le dai4 ke4 ben3, jin1 tian1 wo3 you4 wang4 le.","Yesterday I forgot to bring my textbook, and today I forgot again."
+P1,p1u8,第八课·我感冒了,p1u8w15,头,tou2,head,我的头有点痛。,wo3 de tou2 you3 dian3 tong4.,My head hurts a little.
+P1,p1u8,第八课·我感冒了,p1u8w16,它们,ta1 men,they / them (animals or objects),小猫和小狗在玩，它们很开心。,"xiao3 mao1 he2 xiao3 gou3 zai4 wan2, ta1 men hen3 kai1 xin1.","The kitten and puppy are playing, they are very happy."
+P1,p1u8,第八课·我感冒了,p1u8w17,身体,shen1 ti3,body,运动对身体好。,yun4 dong4 dui4 shen1 ti3 hao3.,Exercise is good for the body.
+P1,p1u9,第九课·今天有体育课吗,p1u9w1,牛,niu2,cow,牛在草地上吃草。,niu2 zai4 cao3 di4 shang4 chi1 cao3.,The cow eats grass on the field.
+P1,p1u9,第九课·今天有体育课吗,p1u9w2,井,jing3,well,井里有水。,jing3 li3 you3 shui3.,There is water in the well.
+P1,p1u9,第九课·今天有体育课吗,p1u9w3,虫,chong2,insect / worm,树上有一条虫。,shu4 shang4 you3 yi1 tiao2 chong2.,There is a worm on the tree.
+P1,p1u9,第九课·今天有体育课吗,p1u9w4,弓,gong1,bow,哥哥有一把弓。,ge1 ge you3 yi1 ba3 gong1.,Elder brother has a bow.
+P1,p1u9,第九课·今天有体育课吗,p1u9w5,贝壳,bei4 ke2,shell,海边有很多贝壳。,hai3 bian1 you3 hen3 duo1 bei4 ke2.,There are many shells by the sea.
+P1,p1u9,第九课·今天有体育课吗,p1u9w6,心,xin1,heart,我用心做作业。,wo3 yong4 xin1 zuo4 zuo4 ye4.,I do my homework with heart.
+P1,p1u9,第九课·今天有体育课吗,p1u9w7,豆,dou4,pea / bean,碗里有十粒红豆。,wan3 li3 you3 shi2 li4 hong2 dou4.,There are ten red beans in the bowl.
+P1,p1u9,第九课·今天有体育课吗,p1u9w8,六,liu4,six,花园里开了六朵花。,hua1 yuan2 li3 kai1 le liu4 duo3 hua1.,Six flowers bloomed in the garden.
+P1,p1u9,第九课·今天有体育课吗,p1u9w9,支,zhi1,measure word (for some nouns),我有三支铅笔。,wo3 you3 san1 zhi1 qian1 bi3.,I have three pencils.
+P1,p1u9,第九课·今天有体育课吗,p1u9w10,条,tiao2,measure word (for some nouns),草地上有三条虫。,cao3 di4 shang4 you3 san1 tiao2 chong2.,There are three worms on the grass.
+P1,p1u9,第九课·今天有体育课吗,p1u9w11,九,jiu3,nine,我九岁了。,wo3 jiu3 sui4 le.,I am nine years old.
+P1,p1u9,第九课·今天有体育课吗,p1u9w12,粒,li4,measure word (for small round objects),我吃了一粒糖。,wo3 chi1 le yi1 li4 tang2.,I ate one sweet.
+P1,p1u9,第九课·今天有体育课吗,p1u9w13,今天,jin1 tian1,today,今天是我的生日。,jin1 tian1 shi4 wo3 de sheng1 ri4.,Today is my birthday.
+P1,p1u9,第九课·今天有体育课吗,p1u9w14,什么,shen2 me,what,你叫什么名字？,ni3 jiao4 shen2 me ming2 zi4?,What is your name?
+P1,p1u9,第九课·今天有体育课吗,p1u9w15,华文,hua2 wen2,Chinese (language/subject),我喜欢上华文课。,wo3 xi3 huan1 shang4 hua2 wen2 ke4.,I like Chinese class.
+P1,p1u9,第九课·今天有体育课吗,p1u9w16,点,dian3,o'clock / dot,现在是三点。,xian4 zai4 shi4 san1 dian3.,It is now three o'clock.
+P1,p1u9,第九课·今天有体育课吗,p1u9w17,说,shuo1,say / speak,老师说今天没有作业。,lao3 shi1 shuo1 jin1 tian1 mei2 you3 zuo4 ye4.,The teacher said there is no homework today.
+P1,p1u9,第九课·今天有体育课吗,p1u9w18,华语,hua2 yu3,Mandarin Chinese,我会说华语。,wo3 hui4 shuo1 hua2 yu3.,I can speak Mandarin.
+P1,p1u10,第十课·课室里有什么,p1u10w1,月,yue4,moon / month,月亮又圆又亮。,yue4 liang4 you4 yuan2 you4 liang4.,The moon is round and bright.
+P1,p1u10,第十课·课室里有什么,p1u10w2,天,tian1,sky / day,天上有很多星星。,tian1 shang4 you3 hen3 duo1 xing1 xing.,There are many stars in the sky.
+P1,p1u10,第十课·课室里有什么,p1u10w3,地,di4,ground / land,地上有很多树叶。,di4 shang4 you3 hen3 duo1 shu4 ye4.,There are many leaves on the ground.
+P1,p1u10,第十课·课室里有什么,p1u10w4,风,feng1,wind,今天风很大。,jin1 tian1 feng1 hen3 da4.,The wind is very strong today.
+P1,p1u10,第十课·课室里有什么,p1u10w5,雷,lei2,thunder,打雷时不要出门。,da3 lei2 shi2 bu4 yao4 chu1 men2.,Do not go out when there is thunder.
+P1,p1u10,第十课·课室里有什么,p1u10w6,电,dian4,lightning / electricity,闪电很危险。,shan3 dian4 hen3 wei1 xian3.,Lightning is very dangerous.
+P1,p1u10,第十课·课室里有什么,p1u10w7,水,shui3,water,每天要喝很多水。,mei3 tian1 yao4 he1 hen3 duo1 shui3.,Drink lots of water every day.
+P1,p1u10,第十课·课室里有什么,p1u10w8,寸,cun4,inch (unit of length),一寸等于多少厘米？,yi1 cun4 deng3 yu2 duo1 shao3 li2 mi3?,How many centimetres is one inch?
+P1,p1u10,第十课·课室里有什么,p1u10w9,方,fang1,square / direction,这块地是方形的。,zhe4 kuai4 di4 shi4 fang1 xing2 de.,This piece of land is square-shaped.
+P1,p1u10,第十课·课室里有什么,p1u10w10,正,zheng4,front / upright / correct,这是活动纸的正面。,zhe4 shi4 huo2 dong4 zhi3 de zheng4 mian4.,This is the front side of the activity sheet.
+P1,p1u10,第十课·课室里有什么,p1u10w11,反,fan3,back / reverse / opposite,小明的裤子穿反了。,xiao3 ming2 de ku4 zi chuan1 fan3 le.,Xiao Ming's pants are worn inside out.
+P1,p1u10,第十课·课室里有什么,p1u10w12,好,hao3,good,今天天气很好。,jin1 tian1 tian1 qi4 hen3 hao3.,The weather is very good today.
+P1,p1u10,第十课·课室里有什么,p1u10w13,坏,huai4,bad / rotten,这个苹果坏了。,zhe4 ge ping2 guo3 huai4 le.,This apple has gone bad.
+P1,p1u10,第十课·课室里有什么,p1u10w14,对,dui4,correct / right,小明的答案是对的。,xiao3 ming2 de da2 an4 shi4 dui4 de.,Xiao Ming's answer is correct.
+P1,p1u10,第十课·课室里有什么,p1u10w15,古,gu3,ancient / old,这是一座古老的庙。,zhe4 shi4 yi1 zuo4 gu3 lao3 de miao4.,This is an ancient temple.
+P1,p1u10,第十课·课室里有什么,p1u10w16,旧,jiu4,old / worn,这个玩具已经很旧了。,zhe4 ge wan2 ju4 yi3 jing1 hen3 jiu4 le.,This toy is already very old.
+P1,p1u10,第十课·课室里有什么,p1u10w17,有,you3,have / there is,我有一只小狗。,wo3 you3 yi1 zhi1 xiao3 gou3.,I have a puppy.
+P1,p1u10,第十课·课室里有什么,p1u10w18,没有,mei2 you3,do not have / there is no,我没有弟弟。,wo3 mei2 you3 di4 di.,I do not have a younger brother.
+P1,p1u10,第十课·课室里有什么,p1u10w19,云,yun2,cloud,天上有很多云。,tian1 shang4 you3 hen3 duo1 yun2.,There are many clouds in the sky.
+P1,p1u11,第十一课·我的同学,p1u11w1,甲,jia3,first / grade A,甲组在左边。,jia3 zu3 zai4 zuo3 bian1.,Group A is on the left.
+P1,p1u11,第十一课·我的同学,p1u11w2,丁,ding1,fourth / grade D,丁组的同学站过来。,ding1 zu3 de tong2 xue2 zhan4 guo4 lai2.,"Students in group D, come over."
+P1,p1u11,第十一课·我的同学,p1u11w3,前,qian2,front / before,我坐在小安前面。,wo3 zuo4 zai4 xiao3 an1 qian2 mian4.,I sit in front of Xiao An.
+P1,p1u11,第十一课·我的同学,p1u11w4,后,hou4,back / behind,我坐在他的后面。,wo3 zuo4 zai4 ta1 de hou4 mian4.,I sit behind him.
+P1,p1u11,第十一课·我的同学,p1u11w5,左,zuo3,left,你向左转就到公园了。,ni3 xiang4 zuo3 zhuan3 jiu4 dao4 gong1 yuan2 le.,Turn left and you will reach the park.
+P1,p1u11,第十一课·我的同学,p1u11w6,右,you4,right,小丽坐在我的左边。,xiao3 li4 zuo4 zai4 wo3 de zuo3 bian1.,Xiao Li sits on my left.
+P1,p1u11,第十一课·我的同学,p1u11w7,中间,zhong1 jian1,middle / between,她坐在我们中间。,ta1 zuo4 zai4 wo3 men zhong1 jian1.,She sits between us.
+P1,p1u11,第十一课·我的同学,p1u11w8,同学,tong2 xue2,classmate,他是我的同学。,ta1 shi4 wo3 de tong2 xue2.,He is my classmate.
+P1,p1u11,第十一课·我的同学,p1u11w9,朋友,peng2 you3,friend,我和她是好朋友。,wo3 he2 ta1 shi4 hao3 peng2 you3.,She and I are good friends.
+P1,p1u11,第十一课·我的同学,p1u11w10,坐,zuo4,sit,请坐在椅子上。,qing3 zuo4 zai4 yi3 zi shang4.,Please sit on the chair.
+P1,p1u11,第十一课·我的同学,p1u11w11,高,gao1,tall / high,哥哥长得很高。,ge1 ge zhang3 de hen3 gao1.,Older brother is very tall.
+P1,p1u11,第十一课·我的同学,p1u11w12,头发,tou2 fa,hair,她的头发很长。,ta1 de tou2 fa hen3 chang2.,Her hair is very long.
+P1,p1u11,第十一课·我的同学,p1u11w13,直,zhi2,straight,这条线画得很直。,zhe4 tiao2 xian4 hua4 de hen3 zhi2.,This line is drawn very straight.
+P1,p1u11,第十一课·我的同学,p1u11w14,一起,yi4 qi3,together,我们一起去公园。,wo3 men yi4 qi3 qu4 gong1 yuan2.,We go to the park together.
+P1,p1u11,第十一课·我的同学,p1u11w15,回家,hui2 jia1,return home,放学后我回家。,fang4 xue2 hou4 wo3 hui2 jia1.,I go home after school.
+P1,p1u11,第十一课·我的同学,p1u11w16,周末,zhou1 mo4,weekend,刚过的周末，我和家人出门玩。,"gang1 guo4 de zhou1 mo4, wo3 he2 jia1 ren2 chu1 men2 wan2.","Last weekend, I went out with my family."
+P1,p1u12,第十二课·你想吃什么,p1u12w1,鸡饭,ji1 fan4,chicken rice,我最喜欢吃鸡饭。,wo3 zui4 xi3 huan1 chi1 ji1 fan4.,I like chicken rice the most.
+P1,p1u12,第十二课·你想吃什么,p1u12w2,鸭面,ya1 mian4,duck noodles,妈妈买了鸭面给我吃。,ma1 ma mai3 le ya1 mian4 gei3 wo3 chi1.,Mum bought duck noodles for me.
+P1,p1u12,第十二课·你想吃什么,p1u12w3,两元,liang3 yuan2,two dollars,这碗面两元。,zhe4 wan3 mian4 liang3 yuan2.,This bowl of noodles costs two dollars.
+P1,p1u12,第十二课·你想吃什么,p1u12w4,饿,e4,hungry,我肚子饿了。,wo3 du4 zi e4 le.,I am hungry.
+P1,p1u12,第十二课·你想吃什么,p1u12w5,饱,bao3,full (from eating),我吃得很饱了。,wo3 chi1 de hen3 bao3 le.,I am very full.
+P1,p1u12,第十二课·你想吃什么,p1u12w6,饼干,bing3 gan1,biscuit,我喜欢吃饼干。,wo3 xi3 huan1 chi1 bing3 gan1.,I like to eat biscuits.
+P1,p1u12,第十二课·你想吃什么,p1u12w7,小狗,xiao3 gou3,puppy / small dog,我家有一只小狗。,wo3 jia1 you3 yi4 zhi1 xiao3 gou3.,I have a puppy at home.
+P1,p1u12,第十二课·你想吃什么,p1u12w8,喜欢,xi3 huan1,like,我喜欢吃水果。,wo3 xi3 huan1 chi1 shui3 guo3.,I like to eat fruit.
+P1,p1u12,第十二课·你想吃什么,p1u12w9,肉,rou4,meat,我喜欢吃肉。,wo3 xi3 huan1 chi1 rou4.,I like to eat meat.
+P1,p1u12,第十二课·你想吃什么,p1u12w10,小猫,xiao3 mao1,kitten / small cat,那只小猫很可爱。,na4 zhi1 xiao3 mao1 hen3 ke3 ai4.,That kitten is very cute.
+P1,p1u12,第十二课·你想吃什么,p1u12w11,采,cai3,pick (fruits or flowers),猴子在采水果。,hou2 zi zai4 cai3 shui3 guo3.,The monkey is picking fruit.
+P1,p1u12,第十二课·你想吃什么,p1u12w12,歌,ge1,song,这首歌很好听。,zhe4 shou3 ge1 hen3 hao3 ting1.,This song sounds very nice.
+P1,p1u12,第十二课·你想吃什么,p1u12w13,唱,chang4,sing,她喜欢唱歌。,ta1 xi3 huan1 chang4 ge1.,She likes to sing.
+P1,p1u12,第十二课·你想吃什么,p1u12w14,青菜,qing1 cai4,green vegetables,多吃青菜身体好。,duo1 chi1 qing1 cai4 shen1 ti3 hao3.,Eating more vegetables is good for health.
+P1,p1u12,第十二课·你想吃什么,p1u12w15,鱼汤,yu2 tang1,fish soup,妈妈煮了鱼汤。,ma1 ma zhu3 le yu2 tang1.,Mum cooked fish soup.
+P1,p1u12,第十二课·你想吃什么,p1u12w16,鸡蛋,ji1 dan4,egg,我每天吃一个鸡蛋。,wo3 mei3 tian1 chi1 yi1 ge ji1 dan4.,I eat one egg every day.
+P1,p1u12,第十二课·你想吃什么,p1u12w17,香,xiang1,fragrant / good smell,这朵花很香。,zhe4 duo3 hua1 hen3 xiang1.,This flower smells very fragrant.
+P1,p1u13,第十三课·我爱干净,p1u13w1,用,yong4,use,我用笔写字。,wo3 yong4 bi3 xie3 zi4.,I use a pen to write.
+P1,p1u13,第十三课·我爱干净,p1u13w2,牙刷,ya2 shua1,toothbrush,我的牙刷是蓝色的。,wo3 de ya2 shua1 shi4 lan2 se4 de.,My toothbrush is blue.
+P1,p1u13,第十三课·我爱干净,p1u13w3,刷牙,shua1 ya2,brush teeth,我们早晚都要刷牙。,wo3 men zao3 wan3 dou1 yao4 shua1 ya2.,We need to brush our teeth morning and night.
+P1,p1u13,第十三课·我爱干净,p1u13w4,毛巾,mao2 jin1,towel,洗脸后，我用毛巾擦脸。,"xi3 lian3 hou4, wo3 yong4 mao2 jin1 ca1 lian3.","After washing my face, I wipe it with a towel."
+P1,p1u13,第十三课·我爱干净,p1u13w5,抹,ma1,wipe,我帮妈妈抹地。,wo3 bang1 ma1 ma ma1 di4.,I help mum mop the floor.
+P1,p1u13,第十三课·我爱干净,p1u13w6,洗发水,xi3 fa4 shui3,shampoo,我用洗发水洗头。,wo3 yong4 xi3 fa4 shui3 xi3 tou2.,I wash my hair with shampoo.
+P1,p1u13,第十三课·我爱干净,p1u13w7,要,yao4,want / need to,我要喝水。,wo3 yao4 he1 shui3.,I want to drink water.
+P1,p1u13,第十三课·我爱干净,p1u13w8,洗脸,xi3 lian3,wash the face,我早上起来要洗脸。,wo3 zao3 shang4 qi3 lai2 yao4 xi3 lian3.,I need to wash my face when I wake up in the morning.
+P1,p1u13,第十三课·我爱干净,p1u13w9,放学,fang4 xue2,after school / school ends,放学后，我去图书馆看书。,"fang4 xue2 hou4, wo3 qu4 tu2 shu1 guan3 kan4 shu1.","After school, I go to the library to read."
+P1,p1u13,第十三课·我爱干净,p1u13w10,冲凉,chong1 liang2,shower / bathe,我每天冲凉两次。,wo3 mei3 tian1 chong1 liang2 liang3 ci4.,I shower twice every day.
+P1,p1u13,第十三课·我爱干净,p1u13w11,冲水,chong1 shui3,flush (the toilet),我上完厕所要冲水。,wo3 shang4 wan2 ce4 suo3 yao4 chong1 shui3.,I flush the toilet after using it.
+P1,p1u13,第十三课·我爱干净,p1u13w12,东西,dong1 xi,things / stuff,桌子上有很多东西。,zhuo1 zi shang4 you3 hen3 duo1 dong1 xi.,There are many things on the table.
+P1,p1u13,第十三课·我爱干净,p1u13w13,到,dao4,arrive / reach (complement),我七点到学校。,wo3 qi1 dian3 dao4 xue2 xiao4.,I arrive at school at seven o'clock.
+P1,p1u13,第十三课·我爱干净,p1u13w14,先,xian1,first / before,我先洗手，再吃饭。,"wo3 xian1 xi3 shou3, zai4 chi1 fan4.","I wash my hands first, then eat."
+P1,p1u13,第十三课·我爱干净,p1u13w15,请,qing3,please / invite,小云请我吃面包。,xiao3 yun2 qing3 wo3 chi1 mian4 bao1.,Xiao Yun treats me to bread.
+P1,p1u13,第十三课·我爱干净,p1u13w16,很,hen3,very,今天天气很好。,jin1 tian1 tian1 qi4 hen3 hao3.,The weather is very good today.
+P1,p1u13,第十三课·我爱干净,p1u13w17,泡泡,pao4 pao,bubble,我喜欢吹泡泡。,wo3 xi3 huan1 chui1 pao4 pao.,I like to blow bubbles.
+P1,p1u13,第十三课·我爱干净,p1u13w18,变,bian4,become / change,爷爷老了，头发变白了。,"ye2 ye lao3 le, tou2 fa bian4 bai2 le.",Grandpa has grown old and his hair has turned white.
+P1,p1u13,第十三课·我爱干净,p1u13w19,谢谢,xie4 xie,thank you,姐姐教我做功课，我向她说谢谢。,"jie3 jie jiao1 wo3 zuo4 gong1 ke4, wo3 xiang4 ta1 shuo1 xie4 xie.","Elder sister teaches me to do homework, and I thank her."
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w1,这,zhe4,this,这是我的书。,zhe4 shi4 wo3 de shu1.,This is my book.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w2,双,shuang1,measure word (a pair),我有一双新鞋子。,wo3 you3 yi1 shuang1 xin1 xie2 zi.,I have a new pair of shoes.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w3,袜子,wa4 zi,socks,我的袜子是白色的。,wo3 de wa4 zi shi4 bai2 se4 de.,My socks are white.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w4,那,na4,that,那是谁的书包？,na4 shi4 shei2 de shu1 bao1?,Whose school bag is that?
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w5,皮鞋,pi2 xie2,leather shoes,爸爸穿皮鞋上班。,ba4 ba chuan1 pi2 xie2 shang4 ban1.,Dad wears leather shoes to work.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w6,件,jian4,measure word (for clothing),她穿了一件红色的衣服。,ta1 chuan1 le yi1 jian4 hong2 se4 de yi1 fu.,She is wearing a red piece of clothing.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w7,衣服,yi1 fu,clothes,我换了一件新衣服。,wo3 huan4 le yi1 jian4 xin1 yi1 fu.,I changed into a new piece of clothing.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w8,被子,bei4 zi,blanket / quilt,天冷了，我们要盖被子。,"tian1 leng3 le, wo3 men yao4 gai4 bei4 zi.","When it is cold, we need to cover ourselves with a blanket."
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w9,还是,hai2 shi4,or,你要吃鸡饭，还是吃鸭面？,"ni3 yao4 chi1 ji1 fan4, hai2 shi4 chi1 ya1 mian4?",Do you want to eat chicken rice or duck noodles?
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w10,白色,bai2 se4,white,我的校服是白色的。,wo3 de xiao4 fu2 shi4 bai2 se4 de.,My school uniform is white.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w11,红色,hong2 se4,red,苹果是红色的。,ping2 guo3 shi4 hong2 se4 de.,The apple is red.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w12,都,dou1,all / both,爸爸和妈妈都不在家。,ba4 ba he2 ma1 ma dou1 bu4 zai4 jia1.,Both dad and mum are not at home.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w13,动作,dong4 zuo4,movement / action,他的动作很快，一下子就穿好鞋子。,"ta1 de dong4 zuo4 hen3 kuai4, yi1 xia4 zi jiu4 chuan1 hao3 xie2 zi.",His movements are very fast; he put on his shoes in an instant.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w14,收拾,shou1 shi,tidy up / pack,我收拾好书包了。,wo3 shou1 shi hao3 shu1 bao1 le.,I have packed my school bag.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w15,穿,chuan1,wear / put on,今天我穿蓝色的上衣。,jin1 tian1 wo3 chuan1 lan2 se4 de shang4 yi1.,Today I am wearing a blue top.
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w16,事,shi4,task / matter / thing,你有什么事吗？,ni3 you3 shen2 me shi4 ma?,Is there something you need?
+P1,p1u14,第十四课·你看见我的袜子了吗,p1u14w17,做,zuo4,do / make,我在做作业。,wo3 zai4 zuo4 zuo4 ye4.,I am doing my homework.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w1,甜,tian2,sweet,西瓜甜甜的。,xi1 gua1 tian2 tian2 de.,The watermelon is sweet.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w2,苦,ku3,bitter,苦瓜很苦。,ku3 gua1 hen3 ku3.,Bitter gourd is very bitter.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w3,臭,chou4,smelly,榴莲的味道很臭。,liu2 lian2 de wei4 dao hen3 chou4.,The durian smells very bad.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w4,生,sheng1,raw / uncooked,这块肉还是生的。,zhe4 kuai4 rou4 hai2 shi4 sheng1 de.,This piece of meat is still raw.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w5,重,zhong4,heavy,这个书包很重。,zhe4 ge shu1 bao1 hen3 zhong4.,This school bag is very heavy.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w6,喝,he1,drink,我喜欢喝果汁。,wo3 xi3 huan1 he1 guo3 zhi1.,I like to drink fruit juice.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w7,甘蔗汁,gan1 zhe4 zhi1,sugarcane juice,甘蔗汁又甜又好喝。,gan1 zhe4 zhi1 you4 tian2 you4 hao3 he1.,Sugarcane juice is sweet and delicious.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w8,买,mai3,buy,妈妈去买水果。,ma1 ma qu4 mai3 shui3 guo3.,Mum goes to buy fruit.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w9,公斤,gong1 jin1,kilogram,这个西瓜有两公斤。,zhe4 ge xi1 gua1 you3 liang3 gong1 jin1.,This watermelon weighs two kilograms.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w10,串,chuan4,measure word (for bunches),妈妈买了一串香蕉。,ma1 ma mai3 le yi1 chuan4 xiang1 jiao1.,Mum bought a bunch of bananas.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w11,弯弯的,wan1 wan1 de,curved / bent,香蕉是弯弯的。,xiang1 jiao1 shi4 wan1 wan1 de.,Bananas are curved.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w12,选,xuan3,choose / select,我选了一个大西瓜。,wo3 xuan3 le yi1 ge da4 xi1 gua1.,I chose a big watermelon.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w13,最,zui4,most,我最喜欢吃西瓜。,wo3 zui4 xi3 huan1 chi1 xi1 gua1.,I like watermelon the most.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w14,抱,bao4,carry with both arms / hug,妈妈抱着大西瓜。,ma1 ma bao4 zhe da4 xi1 gua1.,Mum is carrying the big watermelon in her arms.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w15,拿,na2,take / hold,他拿着一本书。,ta1 na2 zhe yi4 ben3 shu1.,He is holding a book.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w16,办法,ban4 fa3,method / way,我想到了一个好办法。,wo3 xiang3 dao4 le yi1 ge hao3 ban4 fa3.,I thought of a good solution.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w17,圆圆的,yuan2 yuan2 de,round,西瓜是圆圆的。,xi1 gua1 shi4 yuan2 yuan2 de.,Watermelons are round.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w18,切,qie1,cut,妈妈把西瓜切开。,ma1 ma ba3 xi1 gua1 qie1 kai1.,Mum cuts the watermelon open.
+P1,p1u15,第十五课·我最喜欢吃西瓜,p1u15w19,怎么,zen3 me,how,这个字怎么写？,zhe4 ge zi4 zen3 me xie3?,How do you write this character?
+P1,p1u16,第十六课·好帮手,p1u16w1,扫地,sao3 di4,sweep the floor,我帮妈妈扫地。,wo3 bang1 ma1 ma sao3 di4.,I help mum sweep the floor.
+P1,p1u16,第十六课·好帮手,p1u16w2,窗户,chuang1 hu4,window,你抹窗户，我抹地。,"ni3 ma1 chuang1 hu4, wo3 ma1 di4.","You wipe the window, I mop the floor."
+P1,p1u16,第十六课·好帮手,p1u16w3,桌子,zhuo1 zi,table,桌子上有很多书。,zhuo1 zi shang4 you3 hen3 duo1 shu1.,There are many books on the table.
+P1,p1u16,第十六课·好帮手,p1u16w4,椅子,yi3 zi,chair,椅子上有一个玩具。,yi3 zi shang4 you3 yi1 ge wan2 ju4.,There is a toy on the chair.
+P1,p1u16,第十六课·好帮手,p1u16w5,兄弟,xiong1 di4,brothers,他们是兄弟。,ta1 men shi4 xiong1 di4.,They are brothers.
+P1,p1u16,第十六课·好帮手,p1u16w6,房间,fang2 jian1,room,我的房间很小。,wo3 de fang2 jian1 hen3 xiao3.,My room is very small.
+P1,p1u16,第十六课·好帮手,p1u16w7,阿姨,a1 yi2,aunt,阿姨来我家做客。,a1 yi2 lai2 wo3 jia1 zuo4 ke4.,Auntie comes to visit our home.
+P1,p1u16,第十六课·好帮手,p1u16w8,叔叔,shu1 shu,uncle,叔叔带我去动物园。,shu1 shu dai4 wo3 qu4 dong4 wu4 yuan2.,Uncle takes me to the zoo.
+P1,p1u16,第十六课·好帮手,p1u16w9,会,hui4,know how to / can,我会游泳。,wo3 hui4 you2 yong3.,I know how to swim.
+P1,p1u16,第十六课·好帮手,p1u16w10,写,xie3,write,我会写自己的名字。,wo3 hui4 xie3 zi4 ji3 de ming2 zi4.,I can write my own name.
+P1,p1u16,第十六课·好帮手,p1u16w11,啊,a,particle (pause or emphasis),今天天气真好啊！,jin1 tian1 tian1 qi4 zhen1 hao3 a!,The weather is really nice today!
+P1,p1u16,第十六课·好帮手,p1u16w12,完,wan2,finish / done,我吃完饭才去看电视。,wo3 chi1 wan2 fan4 cai2 qu4 kan4 dian4 shi4.,I only watch TV after finishing my meal.
+P1,p1u16,第十六课·好帮手,p1u16w13,作业,zuo4 ye4,homework / assignment,我做完作业了。,wo3 zuo4 wan2 zuo4 ye4 le.,I have finished my homework.
+P1,p1u16,第十六课·好帮手,p1u16w14,躲,duo3,hide,弟弟躲在床底下。,di4 di duo3 zai4 chuang2 di3 xia4.,Little brother is hiding under the bed.
+P1,p1u16,第十六课·好帮手,p1u16w15,进门,jin4 men2,enter the door / come in,我一进门就洗手。,wo3 yi1 jin4 men2 jiu4 xi3 shou3.,"As soon as I enter the door, I wash my hands."
+P1,p1u16,第十六课·好帮手,p1u16w16,干净,gan1 jing4,clean,我把房间收拾得很干净。,wo3 ba3 fang2 jian1 shou1 shi de hen3 gan1 jing4.,I tidied my room very cleanly.
+P1,p1u16,第十六课·好帮手,p1u16w17,谁,shei2,who,这是谁的书？,zhe4 shi4 shei2 de shu1?,Whose book is this?
+P1,p1u16,第十六课·好帮手,p1u16w18,打扫,da3 sao3,clean up a place,我们一起打扫教室。,wo3 men yi4 qi3 da3 sao3 jiao4 shi4.,We clean up the classroom together.
+P1,p1u16,第十六课·好帮手,p1u16w19,听见,ting1 jian4,hear,我听见有人敲门。,wo3 ting1 jian4 you3 ren2 qiao1 men2.,I heard someone knocking on the door.
+P1,p1u16,第十六课·好帮手,p1u16w20,笑声,xiao4 sheng1,laughter,教室里传来笑声。,jiao4 shi4 li3 chuan2 lai2 xiao4 sheng1.,Laughter came from the classroom.
+P1,p1u17,第十七课·庆祝节日,p1u17w1,昨天,zuo2 tian1,yesterday,昨天，我去了公园。,"zuo2 tian1, wo3 qu4 le gong1 yuan2.","Yesterday, I went to the park."
+P1,p1u17,第十七课·庆祝节日,p1u17w2,晚上,wan3 shang,at night / evening,我们晚上一起看月亮。,wo3 men wan3 shang yi4 qi3 kan4 yue4 liang.,We look at the moon together in the evening.
+P1,p1u17,第十七课·庆祝节日,p1u17w3,星星,xing1 xing,star,天上有很多星星。,tian1 shang4 you3 hen3 duo1 xing1 xing.,There are many stars in the sky.
+P1,p1u17,第十七课·庆祝节日,p1u17w4,明天,ming2 tian1,tomorrow,明天是我的生日。,ming2 tian1 shi4 wo3 de sheng1 ri4.,Tomorrow is my birthday.
+P1,p1u17,第十七课·庆祝节日,p1u17w5,庆祝,qing4 zhu4,celebrate,我们一起庆祝中秋节。,wo3 men yi4 qi3 qing4 zhu4 zhong1 qiu1 jie2.,We celebrate the Mid-Autumn Festival together.
+P1,p1u17,第十七课·庆祝节日,p1u17w6,中秋节,zhong1 qiu1 jie2,Mid-Autumn Festival,中秋节，我们吃月饼。,"zhong1 qiu1 jie2, wo3 men chi1 yue4 bing3.","During the Mid-Autumn Festival, we eat mooncakes."
+P1,p1u17,第十七课·庆祝节日,p1u17w7,爱,ai4,love,我爱我的家人。,wo3 ai4 wo3 de jia1 ren2.,I love my family.
+P1,p1u17,第十七课·庆祝节日,p1u17w8,给,gei3,give (something) to,妈妈给我买了礼物。,ma1 ma gei3 wo3 mai3 le li3 wu4.,Mum bought me a present.
+P1,p1u17,第十七课·庆祝节日,p1u17w9,国庆日,guo2 qing4 ri4,National Day,国庆日，我们一起看烟花。,"guo2 qing4 ri4, wo3 men yi4 qi3 kan4 yan1 hua1.","On National Day, we watch fireworks together."
+P1,p1u17,第十七课·庆祝节日,p1u17w10,快乐,kuai4 le4,happy,今天我很快乐。,jin1 tian1 wo3 hen3 kuai4 le4.,I am very happy today.
+P1,p1u17,第十七课·庆祝节日,p1u17w11,上课,shang4 ke4,attend class,我们在教室里上课。,wo3 men zai4 jiao4 shi4 li3 shang4 ke4.,We attend class in the classroom.
+P1,p1u17,第十七课·庆祝节日,p1u17w12,台上,tai2 shang4,on stage,他在台上表演。,ta1 zai4 tai2 shang4 biao3 yan3.,He performs on stage.
+P1,p1u17,第十七课·庆祝节日,p1u17w13,讲,jiang3,tell (a story),爷爷给我讲故事。,ye2 ye gei3 wo3 jiang3 gu4 shi.,Grandfather tells me a story.
+P1,p1u17,第十七课·庆祝节日,p1u17w14,故事,gu4 shi,story,这个故事很有趣。,zhe4 ge gu4 shi hen3 you3 qu4.,This story is very interesting.
+P1,p1u17,第十七课·庆祝节日,p1u17w15,每个,mei3 ge,each / every,每个同学都有一本书。,mei3 ge tong2 xue2 dou1 you3 yi1 ben3 shu1.,Every classmate has a book.
+P1,p1u17,第十七课·庆祝节日,p1u17w16,儿童节,er2 tong2 jie2,Children's Day,儿童节那天，我们去游乐场玩。,"er2 tong2 jie2 na4 tian1, wo3 men qu4 you2 le4 chang3 wan2.","On Children's Day, we go to the playground to play."
+P1,p1u17,第十七课·庆祝节日,p1u17w17,因为,yin1 wei4,because,我很高兴，因为今天是儿童节。,"wo3 hen3 gao1 xing4, yin1 wei4 jin1 tian1 shi4 er2 tong2 jie2.",I am very happy because today is Children's Day.
+P1,p1u18,第十八课·动物园,p1u18w1,兔子,tu4 zi,rabbit,兔子的耳朵很长。,tu4 zi de er3 duo hen3 chang2.,The rabbit has very long ears.
+P1,p1u18,第十八课·动物园,p1u18w2,尾巴,wei3 ba,tail,小狗的尾巴摇来摇去。,xiao3 gou3 de wei3 ba yao2 lai2 yao2 qu4.,The puppy's tail wags back and forth.
+P1,p1u18,第十八课·动物园,p1u18w3,短,duan3,short (length),兔子的尾巴很短。,tu4 zi de wei3 ba hen3 duan3.,The rabbit's tail is very short.
+P1,p1u18,第十八课·动物园,p1u18w4,眼睛,yan3 jing,eyes,她有一双大眼睛。,ta1 you3 yi4 shuang1 da4 yan3 jing.,She has a pair of big eyes.
+P1,p1u18,第十八课·动物园,p1u18w5,爪子,zhua3 zi,claws,老虎的爪子很尖。,lao3 hu3 de zhua3 zi hen3 jian1.,The tiger's claws are very sharp.
+P1,p1u18,第十八课·动物园,p1u18w6,尖,jian1,sharp / pointed,这支铅笔很尖。,zhe4 zhi1 qian1 bi3 hen3 jian1.,This pencil is very sharp.
+P1,p1u18,第十八课·动物园,p1u18w7,动物,dong4 wu4,animal,动物园里有很多动物。,dong4 wu4 yuan2 li3 you3 hen3 duo1 dong4 wu4.,There are many animals in the zoo.
+P1,p1u18,第十八课·动物园,p1u18w8,老虎,lao3 hu3,tiger,老虎是森林之王。,lao3 hu3 shi4 sen1 lin2 zhi1 wang2.,The tiger is the king of the forest.
+P1,p1u18,第十八课·动物园,p1u18w9,狮子,shi1 zi,lion,狮子的叫声很大。,shi1 zi de jiao4 sheng1 hen3 da4.,The lion's roar is very loud.
+P1,p1u18,第十八课·动物园,p1u18w10,动物园,dong4 wu4 yuan2,zoo,爸爸带我去动物园。,ba4 ba dai4 wo3 qu4 dong4 wu4 yuan2.,Dad takes me to the zoo.
+P1,p1u18,第十八课·动物园,p1u18w11,星期,xing1 qi1,week / day of the week,一个星期有七天。,yi1 ge xing1 qi1 you3 qi1 tian1.,There are seven days in a week.
+P1,p1u18,第十八课·动物园,p1u18w12,带,dai4,bring / take,妈妈带我去动物园。,ma1 ma dai4 wo3 qu4 dong4 wu4 yuan2.,Mum takes me to the zoo.
+P1,p1u18,第十八课·动物园,p1u18w13,黑,hei1,black,斑马有黑白条纹。,ban1 ma3 you3 hei1 bai2 tiao2 wen2.,Zebras have black and white stripes.
+P1,p1u18,第十八课·动物园,p1u18w14,站,zhan4,stand,弟弟站在校门口等妈妈。,di4 di zhan4 zai4 xiao4 men2 kou3 deng3 ma1 ma.,Little brother stands at the school gate waiting for Mum.
+P1,p1u18,第十八课·动物园,p1u18w15,叫,jiao4,roar / call / cry / shout,老虎会大声地叫。,lao3 hu3 hui4 da4 sheng1 de jiao4.,Tigers can roar loudly.
+P1,p1u18,第十八课·动物园,p1u18w16,认,ren4,recognise,我认得这个字。,wo3 ren4 de zhe4 ge zi4.,I recognise this character.
+P1,p1u18,第十八课·动物园,p1u18w17,说话,shuo1 hua4,talk / speak,我们上课时不要说话。,wo3 men shang4 ke4 shi2 bu4 yao4 shuo1 hua4.,We should not talk during class.
+P1,p1u18,第十八课·动物园,p1u18w18,再,zai4,again,我想再去一次动物园。,wo3 xiang3 zai4 qu4 yi1 ci4 dong4 wu4 yuan2.,I want to go to the zoo again.
+P1,p1u18,第十八课·动物园,p1u18w19,孩子,hai2 zi,child,那个孩子很可爱。,na4 ge hai2 zi hen3 ke3 ai4.,That child is very cute.
+P1,p1u19,第十九课·我家附近,p1u19w1,组屋,zu3 wu1,flat (HDB),我住在组屋。,wo3 zhu4 zai4 zu3 wu1 li3.,I live in an HDB flat.
+P1,p1u19,第十九课·我家附近,p1u19w2,公园,gong1 yuan2,park,我家附近有一个大公园。,wo3 jia1 fu4 jin4 you3 yi1 ge da4 gong1 yuan2.,There is a big park near my home.
+P1,p1u19,第十九课·我家附近,p1u19w3,学校,xue2 xiao4,school,我的学校离家不远。,wo3 de xue2 xiao4 li2 jia1 bu4 yuan3.,My school is not far from home.
+P1,p1u19,第十九课·我家附近,p1u19w4,广场,guang3 chang3,square / plaza,广场上有很多人在散步。,guang3 chang3 shang4 you3 hen3 duo1 ren2 zai4 san4 bu4.,Many people are walking in the square.
+P1,p1u19,第十九课·我家附近,p1u19w5,商店,shang1 dian4,shop / store,妈妈去商店买鸡蛋。,ma1 ma qu4 shang1 dian4 mai3 ji1 dan4.,Mum goes to the shop to buy eggs.
+P1,p1u19,第十九课·我家附近,p1u19w6,电梯,dian4 ti1,lift / elevator,我们坐电梯上楼。,wo3 men zuo4 dian4 ti1 shang4 lou2.,We take the lift upstairs.
+P1,p1u19,第十九课·我家附近,p1u19w7,自动扶梯,zi4 dong4 fu2 ti1,escalator,购物中心里有自动扶梯。,gou4 wu4 zhong1 xin1 li3 you3 zi4 dong4 fu2 ti1.,There is an escalator in the shopping centre.
+P1,p1u19,第十九课·我家附近,p1u19w8,常常,chang2 chang2,often,我常常去公园散步。,wo3 chang2 chang2 qu4 gong1 yuan2 san4 bu4.,I often go for a walk in the park.
+P1,p1u19,第十九课·我家附近,p1u19w9,打球,da3 qiu2,play ball games,哥哥喜欢在公园打球。,ge1 ge xi3 huan1 zai4 gong1 yuan2 da3 qiu2.,Elder brother likes to play ball at the park.
+P1,p1u19,第十九课·我家附近,p1u19w10,图书馆,tu2 shu1 guan3,library,放学后，我去图书馆看书。,"fang4 xue2 hou4, wo3 qu4 tu2 shu1 guan3 kan4 shu1.","After school, I go to the library to read books."
+P1,p1u19,第十九课·我家附近,p1u19w11,学习,xue2 xi2,learn / study,我努力学习华文。,wo3 nu3 li4 xue2 xi2 hua2 wen2.,I study Chinese hard.
+P1,p1u19,第十九课·我家附近,p1u19w12,伙伴,huo3 ban4,companion / partner,他是我的好伙伴。,ta1 shi4 wo3 de hao3 huo3 ban4.,He is my good companion.
+P1,p1u19,第十九课·我家附近,p1u19w13,游乐场,you2 le4 chang3,playground,小朋友在游乐场玩耍。,xiao3 peng2 you3 zai4 you2 le4 chang3 wan2 shua3.,Children play at the playground.
+P1,p1u19,第十九课·我家附近,p1u19w14,拍,pai1,bounce (a ball),他在拍皮球。,ta1 zai4 pai1 pi2 qiu2.,He is bouncing a ball.
+P1,p1u19,第十九课·我家附近,p1u19w15,高高兴兴,gao1 gao1 xing4 xing4,happily,孩子们高高兴兴地玩耍。,hai2 zi men gao1 gao1 xing4 xing4 de wan2 shua3.,The children play happily.
+P1,p1u19,第十九课·我家附近,p1u19w16,游戏,you2 xi4,game,我们一起玩游戏吧。,wo3 men yi4 qi3 wan2 you2 xi4 ba.,Let us play a game together.
+P2,p2u1,第一课·我的衣服小了,p2u1w1,外,wai4,outside,外面天气很好。,wai4 mian4 tian1 qi4 hen3 hao3.,The weather outside is very good.
+P2,p2u1,第一课·我的衣服小了,p2u1w2,美,mei3,beautiful,这朵花真美。,zhe4 duo3 hua1 zhen1 mei3.,This flower is truly beautiful.
+P2,p2u1,第一课·我的衣服小了,p2u1w3,新,xin1,new,我的书包是新的。,wo3 de shu1 bao1 shi4 xin1 de.,My school bag is new.
+P2,p2u1,第一课·我的衣服小了,p2u1w4,父亲,fu4 qin1,father,父亲每天上班很辛苦。,fu4 qin1 mei3 tian1 shang4 ban1 hen3 xin1 ku3.,Father works very hard every day.
+P2,p2u1,第一课·我的衣服小了,p2u1w5,母亲,mu3 qin1,mother,母亲送我去上学。,mu3 qin1 song4 wo3 qu4 shang4 xue2.,Mother takes me to school.
+P2,p2u1,第一课·我的衣服小了,p2u1w6,过去,guo4 qu4,in the past,这件事已经过去了。,zhe4 jian4 shi4 yi3 jing1 guo4 qu4 le.,This matter has already passed.
+P2,p2u1,第一课·我的衣服小了,p2u1w7,现在,xian4 zai4,now,现在我长高了。,xian4 zai4 wo3 zhang3 gao1 le.,Now I have grown taller.
+P2,p2u1,第一课·我的衣服小了,p2u1w8,合适,he2 shi4,appropriate / fitting,这双鞋不大不小，很合适。,"zhe4 shuang1 xie2 bu4 da4 bu4 xiao3, hen3 he2 shi4.",These shoes are not too big and not too small — they fit perfectly.
+P2,p2u1,第一课·我的衣服小了,p2u1w9,今年,jin1 nian2,this year,今年我上二年级了。,jin1 nian2 wo3 shang4 er4 nian2 ji2 le.,This year I am in Primary Two.
+P2,p2u1,第一课·我的衣服小了,p2u1w10,二年级,er4 nian2 ji2,Primary Two,我是二年级的学生。,wo3 shi4 er4 nian2 ji2 de xue2 sheng1.,I am a Primary Two student.
+P2,p2u1,第一课·我的衣服小了,p2u1w11,专心,zhuan1 xin1,attentive / focused,我们上课要专心听讲。,wo3 men shang4 ke4 yao4 zhuan1 xin1 ting1 jiang3.,We need to pay attention during class.
+P2,p2u1,第一课·我的衣服小了,p2u1w12,帮助,bang1 zhu4,help,同学帮助我做作业。,tong2 xue2 bang1 zhu4 wo3 zuo4 zuo4 ye4.,My classmate helps me with homework.
+P2,p2u1,第一课·我的衣服小了,p2u1w13,丑,chou3,ugly,这个玩具又旧又丑。,zhe4 ge wan2 ju4 you4 jiu4 you4 chou3.,This toy is old and ugly.
+P2,p2u1,第一课·我的衣服小了,p2u1w14,卖,mai4,sell,商店里卖很多新玩具。,shang1 dian4 li3 mai4 hen3 duo1 xin1 wan2 ju4.,The shop sells many new toys.
+P2,p2u1,第一课·我的衣服小了,p2u1w15,加,jia1,add / plus,请帮我加一点水。,qing3 bang1 wo3 jia1 yi1 dian3 shui3.,Please help me add a little water.
+P2,p2u1,第一课·我的衣服小了,p2u1w16,这些,zhe4 xie1,these,这些玩具都是我的。,zhe4 xie1 wan2 ju4 dou1 shi4 wo3 de.,These toys are all mine.
+P2,p2u1,第一课·我的衣服小了,p2u1w17,试一试,shi4 yi1 shi4,give it a try,妈妈要我试一试这双运动鞋。,ma1 ma yao4 wo3 shi4 yi1 shi4 zhe4 shuang1 yun4 dong4 xie2.,Mum asked me to try on these sports shoes.
+P2,p2u1,第一课·我的衣服小了,p2u1w18,读,du2,read (aloud),我每天大声读课文。,wo3 mei3 tian1 da4 sheng1 du2 ke4 wen2.,I read the text aloud every day.
+P2,p2u1,第一课·我的衣服小了,p2u1w19,甲班,jia3 ban1,Class A,我在二年级甲班。,wo3 zai4 er4 nian2 ji2 jia3 ban1.,I am in Primary Two Class A.
+P2,p2u1,第一课·我的衣服小了,p2u1w20,折衣服,zhe2 yi1 fu,fold clothes,我帮妈妈折衣服。,wo3 bang1 ma1 ma zhe2 yi1 fu.,I help mum fold clothes.
+P2,p2u2,第二课·新年到了,p2u2w1,大吉大利,da4 ji2 da4 li4,good luck and great prosperity,过年时，我祝叔叔大吉大利。,"guo4 nian2 shi2, wo3 zhu4 shu1 shu da4 ji2 da4 li4.","During Chinese New Year, I wish uncle good luck and prosperity."
+P2,p2u2,第二课·新年到了,p2u2w2,岁岁平安,sui4 sui4 ping2 an1,peace and safety every year,奶奶祝我新年快乐，岁岁平安。,"nai3 nai zhu4 wo3 xin1 nian2 kuai4 le4, sui4 sui4 ping2 an1.",Grandma wishes me a happy New Year and peace every year.
+P2,p2u2,第二课·新年到了,p2u2w3,年年有余,nian2 nian2 you3 yu2,abundance every year,我祝大家年年有余。,wo3 zhu4 da4 jia1 nian2 nian2 you3 yu2.,I wish everyone abundance every year.
+P2,p2u2,第二课·新年到了,p2u2w4,全家,quan2 jia1,the whole family,我们全家一起过新年。,wo3 men quan2 jia1 yi4 qi3 guo4 xin1 nian2.,The whole family celebrates New Year together.
+P2,p2u2,第二课·新年到了,p2u2w5,大扫除,da4 sao3 chu2,spring cleaning,过年前我们大扫除。,guo4 nian2 qian2 wo3 men da4 sao3 chu2.,We do spring cleaning before the New Year.
+P2,p2u2,第二课·新年到了,p2u2w6,舞龙,wu3 long2,dragon dance,新年时，我们看舞龙表演。,"xin1 nian2 shi2, wo3 men kan4 wu3 long2 biao3 yan3.","During the New Year, we watch the dragon dance performance."
+P2,p2u2,第二课·新年到了,p2u2w7,舞狮,wu3 shi1,lion dance,我喜欢看舞龙舞狮表演。,wo3 xi3 huan1 kan4 wu3 long2 wu3 shi1 biao3 yan3.,I like to watch dragon and lion dance performances.
+P2,p2u2,第二课·新年到了,p2u2w8,外婆,wai4 po2,grandmother (maternal),外婆很关心我。,wai4 po2 hen3 guan1 xin1 wo3.,Grandma cares a lot about me.
+P2,p2u2,第二课·新年到了,p2u2w9,拜年,bai4 nian2,wish someone Happy New Year,我去爷爷奶奶家拜年。,wo3 qu4 ye2 ye nai3 nai jia1 bai4 nian2.,I go to grandpa and grandma's home to wish them Happy New Year.
+P2,p2u2,第二课·新年到了,p2u2w10,鸡蛋卷,ji1 dan4 juan3,love letters (egg roll biscuit),过年时，我吃了鸡蛋卷。,"guo4 nian2 shi2, wo3 chi1 le ji1 dan4 juan3.","During the New Year, I ate love letters."
+P2,p2u2,第二课·新年到了,p2u2w11,贴,tie1,paste / stick,我们在门上贴春联。,wo3 men zai4 men2 shang4 tie1 chun1 lian2.,We paste couplets on the door.
+P2,p2u2,第二课·新年到了,p2u2w12,「福」字,fu2 zi4,character 'Fu' (fortune),我们把「福」字贴在门上。,wo3 men ba3 fu2 zi4 tie1 zai4 men2 shang4.,We paste the 'Fu' character on the door.
+P2,p2u2,第二课·新年到了,p2u2w13,时,shi2,when / at that time,过年时，我们很开心。,"guo4 nian2 shi2, wo3 men hen3 kai1 xin1.","When it is the New Year, we are very happy."
+P2,p2u2,第二课·新年到了,p2u2w14,表演,biao3 yan3,performance / perform,我喜欢看表演。,wo3 xi3 huan1 kan4 biao3 yan3.,I like to watch performances.
+P2,p2u2,第二课·新年到了,p2u2w15,着,zhe,(ongoing action particle),他笑着说新年快乐。,ta1 xiao4 zhe shuo1 xin1 nian2 kuai4 le.,He smiled and said Happy New Year.
+P2,p2u2,第二课·新年到了,p2u2w16,您,nin2,you (polite/respectful),"我对爷爷说：""爷爷，祝您新年快乐！""","wo3 dui4 ye2 ye shuo1: ""ye2 ye, zhu4 nin2 xin1 nian2 kuai4 le!""","I said to grandpa: ""Grandpa, wishing you a Happy New Year!"""
+P2,p2u2,第二课·新年到了,p2u2w17,接,jie1,receive / accept,我接过红包后，向奶奶说谢谢。,"wo3 jie1 guo4 hong2 bao1 hou4, xiang4 nai3 nai shuo1 xie4 xie.","After receiving the red packet, I said thank you to grandma."
+P2,p2u2,第二课·新年到了,p2u2w18,真,zhen1,really / truly,新年时，大家一起庆祝，真热闹！,"xin1 nian2 shi2, da4 jia1 yi4 qi3 qing4 zhu4, zhen1 re4 nao!","During New Year, everyone celebrates together — it's really lively!"
+P2,p2u3,第三课·客人来了,p2u3w1,碗,wan3,bowl,我用碗吃饭。,wo3 yong4 wan3 chi1 fan4.,I eat rice from a bowl.
+P2,p2u3,第三课·客人来了,p2u3w2,盘,pan2,plate,盘子里有很多菜。,pan2 zi li3 you3 hen3 duo1 cai4.,There are many dishes on the plate.
+P2,p2u3,第三课·客人来了,p2u3w3,筷子,kuai4 zi,chopsticks,我会用筷子吃饭。,wo3 hui4 yong4 kuai4 zi chi1 fan4.,I can use chopsticks to eat.
+P2,p2u3,第三课·客人来了,p2u3w4,杯子,bei1 zi,cup,杯子里有水。,bei1 zi li3 you3 shui3.,There is water in the cup.
+P2,p2u3,第三课·客人来了,p2u3w5,水壶,shui3 hu2,water bottle / kettle,我带了水壶上学。,wo3 dai4 le shui3 hu2 shang4 xue2.,I brought my water bottle to school.
+P2,p2u3,第三课·客人来了,p2u3w6,客人,ke4 ren2,guest,家里来了很多客人。,jia1 li3 lai2 le hen3 duo1 ke4 ren2.,Many guests came to our home.
+P2,p2u3,第三课·客人来了,p2u3w7,主人,zhu3 ren2,host,主人热情地招待客人。,zhu3 ren2 re4 qing2 de zhao1 dai4 ke4 ren2.,The host warmly entertained the guests.
+P2,p2u3,第三课·客人来了,p2u3w8,汽水,qi4 shui3,soft drink,我喜欢喝汽水。,wo3 xi3 huan1 he1 qi4 shui3.,I like to drink soft drinks.
+P2,p2u3,第三课·客人来了,p2u3w9,肉骨头,rou4 gu3 tou,bak kut teh (pork rib soup),小狗喜欢吃肉骨头。,xiao3 gou3 xi3 huan1 chi1 rou4 gu3 tou.,The puppy likes to eat pork ribs.
+P2,p2u3,第三课·客人来了,p2u3w10,非常,fei1 chang2,very / extremely,今天的饭菜非常好吃。,jin1 tian1 de fan4 cai4 fei1 chang2 hao3 chi1.,Today's food is extremely delicious.
+P2,p2u3,第三课·客人来了,p2u3w11,叉,cha1,fork,我用叉子吃蛋糕。,wo3 yong4 cha1 zi chi1 dan4 gao1.,I eat cake with a fork.
+P2,p2u3,第三课·客人来了,p2u3w12,送,song4,give / deliver,我送礼物给客人。,wo3 song4 li3 wu4 gei3 ke4 ren2.,I give a gift to the guest.
+P2,p2u3,第三课·客人来了,p2u3w13,递,di4,pass / hand over,妈妈把筷子递给我。,ma1 ma ba3 kuai4 zi di4 gei3 wo3.,Mum passed me the chopsticks.
+P2,p2u3,第三课·客人来了,p2u3w14,忙,mang2,busy,妈妈在忙着煮饭。,ma1 ma zai4 mang2 zhe zhu3 fan4.,Mum is busy cooking.
+P2,p2u3,第三课·客人来了,p2u3w15,伸,shen1,stretch / extend,我伸手拿杯子。,wo3 shen1 shou3 na2 bei1 zi.,I reached out my hand to get the cup.
+P2,p2u3,第三课·客人来了,p2u3w16,尝,chang2,taste / try food,妈妈要我尝一尝她煮的菜。,ma1 ma yao4 wo3 chang2 yi1 chang2 ta1 zhu3 de cai4.,Mum asked me to taste the dish she cooked.
+P2,p2u3,第三课·客人来了,p2u3w17,原来,yuan2 lai2,it turns out / originally,我找到了我的玩具，原来它在床底下。,"wo3 zhao3 dao4 le wo3 de wan2 ju4, yuan2 lai2 ta1 zai4 chuang2 di3 xia4.",I found my toy; it turns out it was under the bed.
+P2,p2u3,第三课·客人来了,p2u3w18,各自,ge4 zi4,each one / individually,下课后，同学们各自回家。,"xia4 ke4 hou4, tong2 xue2 men ge4 zi4 hui2 jia1.","After class, the classmates each went home."
+P2,p2u3,第三课·客人来了,p2u3w19,一定,yi1 ding4,certainly / definitely,我一定会做完功课才出去玩。,wo3 yi1 ding4 hui4 zuo4 wan2 gong1 ke4 cai2 chu1 qu4 wan2.,I will definitely finish my homework before going out to play.
+P2,p2u3,第三课·客人来了,p2u3w20,第二天,di4 er4 tian1,the next day,我生病的第二天，一直躺在床上休息。,"wo3 sheng1 bing4 de di4 er4 tian1, yi1 zhi2 tang3 zai4 chuang2 shang4 xiu1 xi.","On the second day of my illness, I stayed in bed to rest."
+P2,p2u3,第三课·客人来了,p2u3w21,捉,zhuo1,catch,我们去捉蝴蝶。,wo3 men qu4 zhuo1 hu2 die2.,We went to catch butterflies.
+P2,p2u4,第四课·我是艺术家,p2u4w1,树,shu4,tree,公园里有很多大树。,gong1 yuan2 li3 you3 hen3 duo1 da4 shu4.,There are many big trees in the park.
+P2,p2u4,第四课·我是艺术家,p2u4w2,树林,shu4 lin2,forest / woods,树林里有很多动物。,shu4 lin2 li3 you3 hen3 duo1 dong4 wu4.,There are many animals in the forest.
+P2,p2u4,第四课·我是艺术家,p2u4w3,圆形,yuan2 xing2,circle,球是圆形的。,qiu2 shi4 yuan2 xing2 de.,A ball is round.
+P2,p2u4,第四课·我是艺术家,p2u4w4,三角形,san1 jiao3 xing2,triangle,三角形有三个角。,san1 jiao3 xing2 you3 san1 ge jiao3.,A triangle has three corners.
+P2,p2u4,第四课·我是艺术家,p2u4w5,颜色,yan2 se4,colour,我最喜欢的颜色是黄色。,wo3 zui4 xi3 huan1 de yan2 se4 shi4 huang2 se4.,My favourite colour is yellow.
+P2,p2u4,第四课·我是艺术家,p2u4w6,天空,tian1 kong1,sky,天空是蓝色的。,tian1 kong1 shi4 lan2 se4 de.,The sky is blue.
+P2,p2u4,第四课·我是艺术家,p2u4w7,彩色笔,cai3 se4 bi3,colour pencils,我用彩色笔画画。,wo3 yong4 cai3 se4 bi3 hua4 hua4.,I draw with colour pencils.
+P2,p2u4,第四课·我是艺术家,p2u4w8,蓝色,lan2 se4,blue,天空是蓝色的。,tian1 kong1 shi4 lan2 se4 de.,The sky is blue.
+P2,p2u4,第四课·我是艺术家,p2u4w9,绿色,lv4 se4,green,草地是绿色的。,cao3 di4 shi4 lv4 se4 de.,The grass is green.
+P2,p2u4,第四课·我是艺术家,p2u4w10,黄色,huang2 se4,yellow,香蕉是黄色的。,xiang1 jiao1 shi4 huang2 se4 de.,The banana is yellow.
+P2,p2u4,第四课·我是艺术家,p2u4w11,一棵,yi4 ke1,one (tree / plant),公园里有一棵大树。,gong1 yuan2 li3 you3 yi1 ke1 da4 shu4.,There is a big tree in the park.
+P2,p2u4,第四课·我是艺术家,p2u4w12,剪,jian3,cut with scissors,我用剪刀剪纸。,wo3 yong4 jian3 dao1 jian3 zhi3.,I cut paper with scissors.
+P2,p2u4,第四课·我是艺术家,p2u4w13,一排,yi4 pai2,a row of,树林里有一排大树。,shu4 lin2 li3 you3 yi1 pai2 da4 shu4.,There is a row of big trees in the forest.
+P2,p2u4,第四课·我是艺术家,p2u4w14,然后,ran2 hou4,then / afterwards,我先画圆形，然后涂颜色。,"wo3 xian1 hua4 yuan2 xing2, ran2 hou4 tu2 yan2 se4.","I first drew a circle, then coloured it."
+P2,p2u4,第四课·我是艺术家,p2u4w15,拉开,la1 kai1,pull open,我拉开门。,wo3 la1 kai1 men2.,I pulled open the door.
+P2,p2u4,第四课·我是艺术家,p2u4w16,森,sen1,forest (character),森林里有很多树木和小动物。,sen1 lin2 li3 you3 hen3 duo1 shu4 mu4 he2 xiao3 dong4 wu4.,There are many trees and small animals in the forest.
+P2,p2u4,第四课·我是艺术家,p2u4w17,从,cong2,from,我从家里走去公园。,wo3 cong2 jia1 li3 zou3 qu4 gong1 yuan2.,I walked from home to the park.
+P2,p2u4,第四课·我是艺术家,p2u4w18,众人,zhong4 ren2,everyone / the crowd,众人一起唱歌，真开心！,"zhong4 ren2 yi4 qi3 chang4 ge1, zhen1 kai1 xin1!",Everyone sang together — it was so joyful!
+P2,p2u4,第四课·我是艺术家,p2u4w19,一共,yi2 gong4,altogether / in total,我一共借了三本故事书。,wo3 yi1 gong4 jie4 le san1 ben3 gu4 shi4 shu1.,I borrowed three storybooks altogether.
+P2,p2u4,第四课·我是艺术家,p2u4w20,页,ye4,page,这本书有二十页。,zhe4 ben3 shu1 you3 er4 shi2 ye4.,This book has twenty pages.
+P2,p2u4,第四课·我是艺术家,p2u4w21,想,xiang3,think / want,我想画一棵大树。,wo3 xiang3 hua4 yi1 ke1 da4 shu4.,I want to draw a big tree.
+P2,p2u5,第五课·今天是学校开放日,p2u5w1,音乐室,yin1 yue4 shi4,music room,我们在音乐室唱歌。,wo3 men zai4 yin1 yue4 shi4 chang4 ge1.,We sing in the music room.
+P2,p2u5,第五课·今天是学校开放日,p2u5w2,哪里,na3 li3,where,音乐室在哪里？,yin1 yue4 shi4 zai4 na3 li3?,Where is the music room?
+P2,p2u5,第五课·今天是学校开放日,p2u5w3,顶楼,ding3 lou2,top floor,音乐室在顶楼。,yin1 yue4 shi4 zai4 ding3 lou2.,The music room is on the top floor.
+P2,p2u5,第五课·今天是学校开放日,p2u5w4,美术室,mei3 shu4 shi4,art room,美术室在三楼。,mei3 shu4 shi4 zai4 san1 lou2.,The art room is on the third floor.
+P2,p2u5,第五课·今天是学校开放日,p2u5w5,旁边,pang2 bian1,beside / next to,图书馆在食堂旁边。,tu2 shu1 guan3 zai4 shi2 tang2 pang2 bian1.,The library is next to the canteen.
+P2,p2u5,第五课·今天是学校开放日,p2u5w6,向前走,xiang4 qian2 zou3,walk straight ahead,你向前走就是操场。,ni3 xiang4 qian2 zou3 jiu4 shi4 cao1 chang3.,Walk straight ahead and you will see the field.
+P2,p2u5,第五课·今天是学校开放日,p2u5w7,往右转,wang3 you4 zhuan3,turn right,你往右转就到美术室了。,ni3 wang3 you4 zhuan3 jiu4 dao4 mei3 shu4 shi4 le.,Turn right and you will reach the art room.
+P2,p2u5,第五课·今天是学校开放日,p2u5w8,操场,cao1 chang3,field / sports ground,下课后，我在操场玩。,"xia4 ke4 hou4, wo3 zai4 cao1 chang3 wan2.","After class, I play on the field."
+P2,p2u5,第五课·今天是学校开放日,p2u5w9,迷路,mi2 lu4,get lost,我在学校迷路了。,wo3 zai4 xue2 xiao4 mi2 lu4 le.,I got lost in school.
+P2,p2u5,第五课·今天是学校开放日,p2u5w10,已经,yi3 jing1,already,我已经到了。,wo3 yi3 jing1 dao4 le.,I have already arrived.
+P2,p2u5,第五课·今天是学校开放日,p2u5w11,就,jiu4,then / right away,你向前走，就到公园了。,"ni3 xiang4 qian2 zou3, jiu4 dao4 gong1 yuan2 le.",Walk straight ahead and you will reach the park.
+P2,p2u5,第五课·今天是学校开放日,p2u5w12,运动,yun4 dong4,exercise / sports,每天运动对身体好。,mei3 tian1 yun4 dong4 dui4 shen1 ti3 hao3.,Exercising every day is good for health.
+P2,p2u5,第五课·今天是学校开放日,p2u5w13,路,lu4,road / path,我每天都走这条路回家。,wo3 mei3 tian1 dou1 zou3 zhe4 tiao2 lu4 hui2 jia1.,I walk this road home every day.
+P2,p2u5,第五课·今天是学校开放日,p2u5w14,远,yuan3,far,音乐室离这里很远。,yin1 yue4 shi4 li2 zhe4 li3 hen3 yuan3.,The music room is very far from here.
+P2,p2u5,第五课·今天是学校开放日,p2u5w15,山坡,shan1 po1,hillside / slope,学校旁边有一个山坡。,xue2 xiao4 pang2 bian1 you3 yi1 ge shan1 po1.,There is a hillside beside the school.
+P2,p2u5,第五课·今天是学校开放日,p2u5w16,久,jiu3,long (time),我等了很久，小明还是没来。,"wo3 deng3 le hen3 jiu3, xiao3 ming2 hai2 shi4 mei2 lai2.",I waited for a long time but Xiao Ming still did not come.
+P2,p2u5,第五课·今天是学校开放日,p2u5w17,回答,hui2 da2,answer / reply,我举手回答问题。,wo3 ju3 shou3 hui2 da2 wen4 ti2.,I raise my hand to answer questions.
+P2,p2u6,第六课·你怎么上学,p2u6w1,骑,qi2,ride,我会骑脚踏车。,wo3 hui4 qi2 jiao3 ta4 che1.,I can ride a bicycle.
+P2,p2u6,第六课·你怎么上学,p2u6w2,脚踏车,jiao3 ta4 che1,bicycle,我骑脚踏车去公园。,wo3 qi2 jiao3 ta4 che1 qu4 gong1 yuan2.,I cycle to the park.
+P2,p2u6,第六课·你怎么上学,p2u6w3,应该,ying1 gai1,should / ought to,我们过马路应该走行人道。,wo3 men guo4 ma3 lu4 ying1 gai1 zou3 xing2 ren2 dao4.,We should use the pedestrian crossing when crossing the road.
+P2,p2u6,第六课·你怎么上学,p2u6w4,行人天桥,xing2 ren2 tian1 qiao2,overhead pedestrian bridge,我走行人天桥过马路。,wo3 zou3 xing2 ren2 tian1 qiao2 guo4 ma3 lu4.,I use the overhead bridge to cross the road.
+P2,p2u6,第六课·你怎么上学,p2u6w5,等,deng3,wait,我们等绿灯亮了才过马路。,wo3 men deng3 lv4 deng1 liang4 le cai2 guo4 ma3 lu4.,We wait for the green light before crossing the road.
+P2,p2u6,第六课·你怎么上学,p2u6w6,绿灯,lv4 deng1,green light,绿灯亮了，我们才可以过马路。,"lv4 deng1 liang4 le, wo3 men cai2 ke3 yi3 guo4 ma3 lu4.","When the green light comes on, we can cross the road."
+P2,p2u6,第六课·你怎么上学,p2u6w7,邻居,lin2 ju1,neighbour,陈阿姨是我的邻居。,chen2 a1 yi2 shi4 wo3 de lin2 ju1.,Auntie Chen is my neighbour.
+P2,p2u6,第六课·你怎么上学,p2u6w8,互相,hu4 xiang1,each other / mutual,同学们互相帮助。,tong2 xue2 men hu4 xiang1 bang1 zhu4.,Classmates help each other.
+P2,p2u6,第六课·你怎么上学,p2u6w9,阳光,yang2 guang1,sunlight,阳光照在花朵上。,yang2 guang1 zhao4 zai4 hua1 duo3 shang4.,The sunlight shines on the flowers.
+P2,p2u6,第六课·你怎么上学,p2u6w10,美丽,mei3 li4,beautiful,花园里的花很美丽。,hua1 yuan2 li3 de hua1 hen3 mei3 li4.,The flowers in the garden are very beautiful.
+P2,p2u6,第六课·你怎么上学,p2u6w11,停,ting2,stop,红灯亮了，汽车停了下来。,"hong2 deng1 liang4 le, qi4 che1 ting2 le xia4 lai2.",The red light is on and the car came to a stop.
+P2,p2u6,第六课·你怎么上学,p2u6w12,才,cai2,only then / just,绿灯亮了，我们才可以过马路。,"lv4 deng1 liang4 le, wo3 men cai2 ke3 yi3 guo4 ma3 lu4.","When the green light comes on, we can cross the road."
+P2,p2u6,第六课·你怎么上学,p2u6w13,亮,liang4,bright / lit up,绿灯亮了，我们才可以过马路。,"lv4 deng1 liang4 le, wo3 men cai2 ke3 yi3 guo4 ma3 lu4.","When the green light comes on, we can cross the road."
+P2,p2u6,第六课·你怎么上学,p2u6w14,照,zhao4,shine / illuminate,阳光照在我的身上。,yang2 guang1 zhao4 zai4 wo3 de shen1 shang4.,The sunlight shines on my body.
+P2,p2u6,第六课·你怎么上学,p2u6w15,极了,ji2 le,extremely,今天的天气好极了！,jin1 tian1 de tian1 qi4 hao3 ji2 le!,The weather today is extremely good!
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w1,奶茶,nai3 cha2,milk tea,我喜欢喝奶茶。,wo3 xi3 huan1 he1 nai3 cha2.,I like to drink milk tea.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w2,糖,tang2,sugar,小朋友不要吃太多糖。,xiao3 peng2 you3 bu4 yao4 chi1 tai4 duo1 tang2.,Children should not eat too much sugar.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w3,炒饭,chao3 fan4,fried rice,妈妈做了炒饭给我吃。,ma1 ma zuo4 le chao3 fan4 gei3 wo3 chi1.,Mum made fried rice for me.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w4,炸鸡,zha2 ji1,fried chicken,我最喜欢吃炸鸡。,wo3 zui4 xi3 huan1 chi1 zha2 ji1.,I like fried chicken the most.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w5,冰水,bing1 shui3,ice water,天气很热，我向妈妈要了一杯冰水。,"tian1 qi4 hen3 re4, wo3 xiang4 ma1 ma yao4 le yi1 bei1 bing1 shui3.",The weather is very hot; I asked mum for a glass of ice water.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w6,温水,wen1 shui3,warm water,妈妈说喝温水对身体好。,ma1 ma shuo1 he1 wen1 shui3 dui4 shen1 ti3 hao3.,Mum says drinking warm water is good for health.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w7,排队,pai2 dui4,queue,我们买饭时要排队。,wo3 men mai3 fan4 shi2 yao4 pai2 dui4.,We should queue when buying food.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w8,座位,zuo4 wei4,seat,我找到座位后就坐了下来。,wo3 zhao3 dao4 zuo4 wei4 hou4 jiu4 zuo4 le xia4 lai2.,"After finding a seat, I sat down."
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w9,早餐,zao3 can1,breakfast,我每天吃了早餐才上学。,wo3 mei3 tian1 chi1 le zao3 can1 cai2 shang4 xue2.,I eat breakfast every day before going to school.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w10,食物,shi2 wu4,food,我们要珍惜食物。,wo3 men yao4 zhen1 xi1 shi2 wu4.,We must cherish food.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w11,油,you2,oil,煮饭要少放一点油比较健康。,zhu3 fan4 yao4 shao3 fang4 yi1 dian3 you2 bi3 jiao4 jian4 kang1.,Using less oil when cooking is healthier.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w12,咖啡,ka1 fei1,coffee,爸爸每天早上都喝咖啡。,ba4 ba mei3 tian1 zao3 shang4 dou1 he1 ka1 fei1.,Dad drinks coffee every morning.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w13,找,zhao3,look for / find,我找到了一个座位。,wo3 zhao3 dao4 le yi1 ge zuo4 wei4.,I found a seat.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w14,特别,te4 bie2,special / especially,这家咖啡店的早餐特别好吃。,zhe4 jia1 ka1 fei1 dian4 de zao3 can1 te4 bie2 hao3 chi1.,The breakfast at this coffeeshop is especially delicious.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w15,闻,wen2,smell / sniff,我闻到了面包的香味。,wo3 wen2 dao4 le mian4 bao1 de xiang1 wei4.,I could smell the fragrance of the bread.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w16,香味,xiang1 wei4,fragrance / aroma,我喜欢这种花的香味。,wo3 xi3 huan1 zhe4 zhong3 hua1 de xiang1 wei4.,I like the fragrance of this flower.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w17,分工合作,fen1 gong1 he2 zuo4,divide work and cooperate,我们分工合作，把课室打扫干净。,"wo3 men fen1 gong1 he2 zuo4, ba3 ke4 shi4 da3 sao3 gan1 jing4.",We divided the work and cooperated to clean the classroom.
+P2,p2u7,第七课·在咖啡店吃早餐,p2u7w18,懂事,dong3 shi4,sensible / mature,她很懂事，知道帮妈妈做家务。,"ta1 hen3 dong3 shi4, zhi1 dao4 bang1 ma1 ma zuo4 jia1 wu4.",She is very sensible and helps mum with housework.
+P2,p2u8,第八课·感谢我周围的人,p2u8w1,医生,yi1 sheng1,doctor,你生病了要去看医生。,ni3 sheng1 bing4 le yao4 qu4 kan4 yi1 sheng1.,You should see a doctor when you are sick.
+P2,p2u8,第八课·感谢我周围的人,p2u8w2,护士,hu4 shi,nurse,护士会照顾病人。,hu4 shi hui4 zhao4 gu4 bing4 ren2.,Nurses take care of patients.
+P2,p2u8,第八课·感谢我周围的人,p2u8w3,照顾,zhao4 gu4,take care of,我生病了，妈妈一直在我身边照顾我。,"wo3 sheng1 bing4 le, ma1 ma yi1 zhi2 zai4 wo3 shen1 bian1 zhao4 gu4 wo3.","When I was sick, mum stayed by my side to take care of me."
+P2,p2u8,第八课·感谢我周围的人,p2u8w4,小贩,xiao3 fan4,hawker / peddler,这里的小贩卖的食物都很好吃。,zhe4 li3 de xiao3 fan4 mai4 de shi2 wu4 dou1 hen3 hao3 chi1.,The food sold by the hawkers here is all very delicious.
+P2,p2u8,第八课·感谢我周围的人,p2u8w5,演员,yan3 yuan2,actor / actress,她长大后想当演员。,ta1 zhang3 da4 hou4 xiang3 dang1 yan3 yuan2.,She wants to be an actress when she grows up.
+P2,p2u8,第八课·感谢我周围的人,p2u8w6,消防员,xiao1 fang2 yuan2,firefighter,消防员会灭火。,xiao1 fang2 yuan2 hui4 mie4 huo3.,Firefighters can put out fires.
+P2,p2u8,第八课·感谢我周围的人,p2u8w7,消防车,xiao1 fang2 che1,fire engine,消防员开着消防车救火。,xiao1 fang2 yuan2 kai1 zhe xiao1 fang2 che1 jiu4 huo3.,Firefighters drove the fire engine to put out the fire.
+P2,p2u8,第八课·感谢我周围的人,p2u8w8,火灾,huo3 zai1,fire (disaster),那里发生火灾，大家马上逃了出去。,"na4 li3 fa1 sheng1 huo3 zai1, da4 jia1 ma3 shang4 tao2 le chu1 qu4.",A fire broke out there and everyone escaped immediately.
+P2,p2u8,第八课·感谢我周围的人,p2u8w9,保护,bao3 hu4,protect,警察的工作是保护我们的安全。,jing3 cha2 de gong1 zuo4 shi4 bao3 hu4 wo3 men de an1 quan2.,The job of the police is to protect our safety.
+P2,p2u8,第八课·感谢我周围的人,p2u8w10,建筑工人,jian4 zhu4 gong1 ren2,construction worker,建筑工人建造房子。,jian4 zhu4 gong1 ren2 jian4 zao4 fang2 zi.,Construction workers build houses.
+P2,p2u8,第八课·感谢我周围的人,p2u8w11,看病,kan4 bing4,see a doctor,我生病了，妈妈带我去给医生看病。,"wo3 sheng1 bing4 le, ma1 ma dai4 wo3 qu4 gei3 yi1 sheng1 kan4 bing4.","When I was sick, mum took me to see the doctor."
+P2,p2u8,第八课·感谢我周围的人,p2u8w12,教师,jiao4 shi1,teacher,教师的工作是教导学生。,jiao4 shi1 de gong1 zuo4 shi4 jiao4 dao3 xue2 sheng1.,The job of a teacher is to guide students.
+P2,p2u8,第八课·感谢我周围的人,p2u8w13,种花,zhong4 hua1,plant flowers,奶奶喜欢种花。,nai3 nai xi3 huan1 zhong4 hua1.,Grandma likes to plant flowers.
+P2,p2u8,第八课·感谢我周围的人,p2u8w14,林阿姨,lin2 a1 yi2,Auntie Lin,林阿姨是我的邻居。,lin2 a1 yi2 shi4 wo3 de lin2 ju1.,Auntie Lin is my neighbour.
+P2,p2u8,第八课·感谢我周围的人,p2u8w15,灭火,mie4 huo3,extinguish a fire,消防员赶来灭火。,xiao1 fang2 yuan2 gan3 lai2 mie4 huo3.,Firefighters rushed to extinguish the fire.
+P2,p2u8,第八课·感谢我周围的人,p2u8w16,抓,zhua1,catch / grab,警察抓住了小偷。,jing3 cha2 zhua1 zhu4 le xiao3 tou1.,The police caught the thief.
+P2,p2u8,第八课·感谢我周围的人,p2u8w17,怕,pa4,afraid / fear,我最怕老鼠了。,wo3 zui4 pa4 lao3 shu3 le.,I am most afraid of mice.
+P2,p2u8,第八课·感谢我周围的人,p2u8w18,住,zhu4,live / reside,我住在新加坡。,wo3 zhu4 zai4 xin1 jia1 po1.,I live in Singapore.
+P2,p2u9,第九课·今天是晴天,p2u9w1,阴,yin1,overcast / cloudy,今天是阴天，天上有乌云。,"jin1 tian1 shi4 yin1 tian1, tian1 shang4 you3 wu1 yun2.",Today is an overcast day with dark clouds in the sky.
+P2,p2u9,第九课·今天是晴天,p2u9w2,晴,qing2,sunny / clear,今天是晴天。,jin1 tian1 shi4 qing2 tian1.,Today is a sunny day.
+P2,p2u9,第九课·今天是晴天,p2u9w3,湿,shi1,wet,下雨后地面很湿。,xia4 yu3 hou4 di4 mian4 hen3 shi1.,The ground is very wet after the rain.
+P2,p2u9,第九课·今天是晴天,p2u9w4,冷,leng3,cold,今天的天气很冷，妈妈叫我穿外套出门。,"jin1 tian1 de tian1 qi4 hen3 leng3, ma1 ma jiao4 wo3 chuan1 wai4 tao4 chu1 men2.",The weather today is very cold; mum told me to wear a jacket before going out.
+P2,p2u9,第九课·今天是晴天,p2u9w5,热,re4,hot,今天天气很热，没有风。,"jin1 tian1 tian1 qi4 hen3 re4, mei2 you3 feng1.",The weather today is very hot with no wind.
+P2,p2u9,第九课·今天是晴天,p2u9w6,乌云密布,wu1 yun2 mi4 bu4,overcast with dark clouds,天空乌云密布，快下雨了。,"tian1 kong1 wu1 yun2 mi4 bu4, kuai4 xia4 yu3 le.","The sky is overcast with dark clouds, it will rain soon."
+P2,p2u9,第九课·今天是晴天,p2u9w7,电闪雷鸣,dian4 shan3 lei2 ming2,lightning and thunder,电闪雷鸣时不要站在树下。,dian4 shan3 lei2 ming2 shi2 bu4 yao4 zhan4 zai4 shu4 xia4.,Do not stand under a tree during lightning and thunder.
+P2,p2u9,第九课·今天是晴天,p2u9w8,刮风,gua1 feng1,windy,今天刮风，很凉快。,"jin1 tian1 gua1 feng1, hen3 liang2 kuai4.","It is windy today, very cooling."
+P2,p2u9,第九课·今天是晴天,p2u9w9,忘记,wang4 ji4,forget,我忘记带伞了。,wo3 wang4 ji4 dai4 san3 le.,I forgot to bring my umbrella.
+P2,p2u9,第九课·今天是晴天,p2u9w10,淋湿,lin2 shi1,get drenched,我没带伞，被雨淋湿了。,"wo3 mei2 dai4 san3, bei4 yu3 lin2 shi1 le.",I did not bring an umbrella and got drenched.
+P2,p2u9,第九课·今天是晴天,p2u9w11,暗,an4,dark / dim,乌云密布，天空变暗了。,"wu1 yun2 mi4 bu4, tian1 kong1 bian4 an4 le.",The sky is overcast and has turned dark.
+P2,p2u9,第九课·今天是晴天,p2u9w12,记得,ji4 de,remember,妈妈叫我记得带雨伞出门。,ma1 ma jiao4 wo3 ji4 de dai4 yu3 san3 chu1 men2.,Mum told me to remember to bring an umbrella when going out.
+P2,p2u9,第九课·今天是晴天,p2u9w13,窗户,chuang1 hu4,window,下雨了，你快把窗户关上。,"xia4 yu3 le, ni3 kuai4 ba3 chuang1 hu4 guan1 shang4.","It is raining, quickly close the windows."
+P2,p2u9,第九课·今天是晴天,p2u9w14,着急,zhao2 ji2,anxious / worried,妈妈看见妹妹这么迟了还没回家，感到很着急。,"ma1 ma kan4 jian4 mei4 mei zhe4 me chi2 le hai2 mei2 hui2 jia1, gan3 dao4 hen3 zhao2 ji2.",Mum felt very anxious seeing that younger sister had not come home so late.
+P2,p2u9,第九课·今天是晴天,p2u9w15,门铃,men2 ling2,doorbell,门铃响了，我把门打开。,"men2 ling2 xiang3 le, wo3 ba3 men2 da3 kai1.",The doorbell rang and I opened the door.
+P2,p2u9,第九课·今天是晴天,p2u9w16,响,xiang3,ring / sound,门铃响了，妈妈去开门。,"men2 ling2 xiang3 le, ma1 ma qu4 kai1 men2.",The doorbell rang and mum went to open the door.
+P2,p2u9,第九课·今天是晴天,p2u9w17,摸,mo1,touch / feel,妈妈摸了摸我的头称赞我是好孩子。,ma1 ma mo1 le mo1 wo3 de tou2 cheng1 zan4 wo3 shi4 hao3 hai2 zi.,Mum patted my head and praised me for being a good child.
+P2,p2u9,第九课·今天是晴天,p2u9w18,呢,ne,(question particle),你怎么忘了带伞出门呢？,ni3 zen3 me wang4 le dai4 san3 chu1 men2 ne?,How did you forget to bring an umbrella when going out?
+P2,p2u10,第十课·小侦探,p2u10w1,蚂蚁,ma3 yi3,ant,蚂蚁搬食物回家。,ma3 yi3 ban1 shi2 wu4 hui2 jia1.,Ants carry food back home.
+P2,p2u10,第十课·小侦探,p2u10w2,蜜蜂,mi4 feng1,bee,蜜蜂在花丛中飞来飞去。,mi4 feng1 zai4 hua1 cong2 zhong1 fei1 lai2 fei1 qu4.,Bees fly around among the flowers.
+P2,p2u10,第十课·小侦探,p2u10w3,花丛,hua1 cong2,flower shrubs / cluster of flowers,花丛里有很多蝴蝶。,hua1 cong2 li3 you3 hen3 duo1 hu2 die2.,There are many butterflies among the flowers.
+P2,p2u10,第十课·小侦探,p2u10w4,池塘,chi2 tang2,pond,池塘里有很多鱼。,chi2 tang2 li3 you3 hen3 duo1 yu2.,There are many fish in the pond.
+P2,p2u10,第十课·小侦探,p2u10w5,树枝,shu4 zhi1,tree branch,鸟站在树枝上唱歌。,niao3 zhan4 zai4 shu4 zhi1 shang4 chang4 ge1.,The bird stands on the branch and sings.
+P2,p2u10,第十课·小侦探,p2u10w6,青蛙,qing1 wa1,frog,青蛙住在池塘旁边。,qing1 wa1 zhu4 zai4 chi2 tang2 pang2 bian1.,Frogs live near the pond.
+P2,p2u10,第十课·小侦探,p2u10w7,害虫,hai4 chong2,pest,害虫会破坏植物。,hai4 chong2 hui4 po4 huai4 zhi2 wu4.,Pests destroy plants.
+P2,p2u10,第十课·小侦探,p2u10w8,好像,hao3 xiang4,seem like / as if,她长得好像她的妈妈。,ta1 zhang3 de hao3 xiang4 ta1 de ma1 ma.,She looks just like her mum.
+P2,p2u10,第十课·小侦探,p2u10w9,泥土,ni2 tu3,soil / earth,植物在泥土里生长。,zhi2 wu4 zai4 ni2 tu3 li3 sheng1 zhang3.,Plants grow in soil.
+P2,p2u10,第十课·小侦探,p2u10w10,长成,zhang3 cheng2,grow into,种子长成了大树。,zhong3 zi zhang3 cheng2 le da4 shu4.,The seed grew into a big tree.
+P2,p2u10,第十课·小侦探,p2u10w11,爬,pa2,crawl / climb,蚂蚁爬上了树枝。,ma3 yi3 pa2 shang4 le shu4 zhi1.,The ant crawled up the branch.
+P2,p2u10,第十课·小侦探,p2u10w12,跳来跳去,tiao4 lai2 tiao4 qu4,jump around,青蛙在池塘边跳来跳去。,qing1 wa1 zai4 chi2 tang2 bian1 tiao4 lai2 tiao4 qu4.,The frog jumps around by the pond.
+P2,p2u10,第十课·小侦探,p2u10w13,河水清清,he2 shui3 qing1 qing1,clear river water,河水清清，小鱼在水中游。,"he2 shui3 qing1 qing1, xiao3 yu2 zai4 shui3 zhong1 you2.",The river water is clear and small fish swim in it.
+P2,p2u10,第十课·小侦探,p2u10w14,事情,shi4 qing,matter / thing,妈妈告诉我自己的事情要自己做。,ma1 ma gao4 su wo3 zi4 ji3 de shi4 qing yao4 zi4 ji3 zuo4.,Mum tells me to handle my own matters by myself.
+P2,p2u10,第十课·小侦探,p2u10w15,让,rang4,let / allow,妈妈让我去公园玩。,ma1 ma rang4 wo3 qu4 gong1 yuan2 wan2.,Mum let me go to the park to play.
+P2,p2u10,第十课·小侦探,p2u10w16,窝,wo1,nest / den,小鸟回到了自己的窝。,xiao3 niao3 hui2 dao4 le zi4 ji3 de wo1.,The little bird returned to its nest.
+P2,p2u10,第十课·小侦探,p2u10w17,结,jie1,bear (fruit) / form,树上结了很多果实。,shu4 shang4 jie1 le hen3 duo1 guo3 shi2.,The tree bore many fruits.
+P2,p2u10,第十课·小侦探,p2u10w18,掉,diao4,drop / fall,苹果从树上掉下来了。,ping2 guo3 cong2 shu4 shang4 diao4 xia4 lai2 le.,The apple fell down from the tree.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w1,纸飞机,zhi3 fei1 ji1,paper airplane,我会折纸飞机。,wo3 hui4 zhe2 zhi3 fei1 ji1.,I can fold a paper airplane.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w2,魔术方块,mo2 shu4 fang1 kuai4,Rubik's cube,哥哥会玩魔术方块。,ge1 ge hui4 wan2 mo2 shu4 fang1 kuai4.,Older brother can solve the Rubik's cube.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w3,跳棋,tiao4 qi2,Chinese checkers,我和朋友玩跳棋。,wo3 he2 peng2 you3 wan2 tiao4 qi2.,I play Chinese checkers with my friend.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w4,搭积木,da1 ji1 mu4,building blocks,弟弟喜欢搭积木。,di4 di xi3 huan1 da1 ji1 mu4.,Younger brother likes to play with building blocks.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w5,布娃娃,bu4 wa2 wa,cloth doll,妹妹抱着布娃娃睡觉。,mei4 mei bao4 zhe bu4 wa2 wa shui4 jiao4.,Younger sister sleeps hugging her cloth doll.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w6,机器人,ji1 qi4 ren2,robot,我有一个机器人玩具。,wo3 you3 yi1 ge ji1 qi4 ren2 wan2 ju4.,I have a robot toy.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w7,许多,xu3 duo1,many / a lot of,我有许多玩具。,wo3 you3 xu3 duo1 wan2 ju4.,I have many toys.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w8,跳绳,tiao4 sheng2,rope skipping,我和朋友在操场上跳绳。,wo3 he2 peng2 you3 zai4 cao1 chang3 shang4 tiao4 sheng2.,I like skipping rope.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w9,拼拼图,pin1 pin2 tu2,jigsaw puzzle,我和妈妈一起拼拼图。,wo3 he2 ma1 ma yi4 qi3 pin1 pin2 tu2.,I do jigsaw puzzles with mum.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w10,纸船,zhi3 chuan2,paper boat,我折了一艘纸船。,wo3 zhe2 le yi1 sou2 zhi3 chuan2.,I folded a paper boat.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w11,跟,gen1,with / follow,我跟同学一起玩游戏。,wo3 gen1 tong2 xue2 yi4 qi3 wan2 you2 xi4.,I play games with my classmates.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w12,吧,ba,(suggestion particle),我们一起玩纸飞机吧！,wo3 men yi4 qi3 wan2 zhi3 fei1 ji1 ba!,Let's play paper airplanes together!
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w13,捏粘土,nie1 nian2 tu3,mould clay,我喜欢用手捏粘土。,wo3 xi3 huan1 yong4 shou3 nie1 nian2 tu3.,I like to mould clay with my hands.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w14,更,geng4,even more,我跟朋友一起玩更开心。,wo3 gen1 peng2 you3 yi4 qi3 wan2 geng4 kai1 xin1.,I have even more fun playing with friends.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w15,老鹰,lao3 ying1,eagle (game: eagle catches chicks),老鹰捉小鸡是一个好玩的游戏。,lao3 ying1 zhuo1 xiao3 ji1 shi4 yi1 ge hao3 wan2 de you2 xi4.,Eagle catches chicks is a fun game.
+P2,p2u11,第十一课·你玩过这个游戏吗,p2u11w16,你追我跑,ni3 zhui1 wo3 pao3,chase game (tag),我们玩你追我跑的游戏。,wo3 men wan2 ni3 zhui1 wo3 pao3 de you2 xi4.,We play the chase game.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w1,永远,yong3 yuan3,forever / always,我永远爱我的家人。,wo3 yong3 yuan3 ai4 wo3 de jia1 ren2.,I will always love my family.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w2,年轻,nian2 qing1,young,妈妈看起来很年轻。,ma1 ma kan4 qi3 lai2 hen3 nian2 qing1.,Mum looks very young.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w3,长命百岁,chang2 ming4 bai3 sui4,longevity / live to a hundred,我祝爷爷长命百岁！,wo3 zhu4 ye2 ye chang2 ming4 bai3 sui4!,I wish grandfather a long life!
+P2,p2u12,第十二课·祝您生日快乐,p2u12w4,健康,jian4 kang1,healthy,我希望爷爷身体健康。,wo3 xi1 wang4 ye2 ye shen1 ti3 jian4 kang1.,I hope grandfather stays healthy.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w5,幸福,xing4 fu2,happy / blissful,爸爸妈妈很爱我，我觉得自己很幸福。,"ba4 ba ma1 ma hen3 ai4 wo3, wo3 jue2 de zi4 ji3 hen3 xing4 fu2.",Mum and dad love me very much; I feel very blessed.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w6,许愿,xu3 yuan4,make a wish,妈妈叫我吹蜡烛前先许愿。,ma1 ma jiao4 wo3 chui1 la4 zhu2 qian2 xian1 xu3 yuan4.,Mum told me to make a wish before blowing the candles.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w7,吹,chui1,blow,我吹灭了蜡烛。,wo3 chui1 mie4 le la4 zhu2.,I blew out the candles.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w8,蛋糕,dan4 gao1,cake,这个生日蛋糕很好吃。,zhe4 ge sheng1 ri4 dan4 gao1 hen3 hao3 chi1.,This birthday cake is very delicious.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w9,礼物,li3 wu4,gift / present,我收到很多生日礼物。,wo3 shou1 dao4 hen3 duo1 sheng1 ri4 li3 wu4.,I received many birthday gifts.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w10,宝贝,bao3 bei4,darling / treasure,我是妈妈的宝贝。,wo3 shi4 ma1 ma de bao3 bei4.,I am mum's darling.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w11,一首,yi4 shou3,one (song / poem),我们唱了一首生日歌。,wo3 men chang4 le yi1 shou3 sheng1 ri4 ge1.,We sang a birthday song.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w12,一张,yi4 zhang1,one (flat thing like a card),我收到了一张生日卡。,wo3 shou1 dao4 le yi1 zhang1 sheng1 ri4 ka3.,I received a birthday card.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w13,生日卡,sheng1 ri4 ka3,birthday card,我亲手做了一张生日卡。,wo3 qin1 shou3 zuo4 le yi1 zhang1 sheng1 ri4 ka3.,I made a birthday card by hand.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w14,电影票,dian4 ying3 piao4,movie ticket,爸爸送了我两张电影票。,ba4 ba song4 le wo3 liang3 zhang1 dian4 ying3 piao4.,Dad gave me two movie tickets.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w15,客厅,ke4 ting1,living room,我们在客厅里庆祝生日。,wo3 men zai4 ke4 ting1 li3 qing4 zhu4 sheng1 ri4.,We celebrate the birthday in the living room.
+P2,p2u12,第十二课·祝您生日快乐,p2u12w16,奇怪,qi2 guai4,strange / weird,桌子上的蛋糕忽然不见了，大家感到很奇怪。,"zhuo1 zi shang4 de dan4 gao1 hu1 ran2 bu4 jian4 le, da4 jia1 gan3 dao4 hen3 qi2 guai4.","The cake on the table suddenly disappeared, and everyone felt very puzzled."
+P2,p2u12,第十二课·祝您生日快乐,p2u12w17,活动,huo2 dong4,activity / event,学校里有很多庆祝活动。,xue2 xiao4 li3 you3 hen3 duo1 qing4 zhu4 huo2 dong4.,There are many celebration activities in the school.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w1,洗澡,xi3 zao3,bathe / shower,我一回家就去洗澡。,wo3 yi1 hui2 jia1 jiu4 qu4 xi3 zao3.,I go to shower as soon as I get home.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w2,睡觉,shui4 jiao4,sleep,我每天晚上九点就去睡觉。,wo3 mei3 tian1 wan3 shang4 jiu3 dian3 jiu4 qu4 shui4 jiao4.,I go to sleep at nine every night.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w3,羽毛,yu3 mao2,feather,鸟的羽毛很漂亮。,niao3 de yu3 mao2 hen3 piao4 liang.,The bird's feathers are very beautiful.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w4,乖,guai1,well-behaved / obedient,这只小狗很乖。,zhe4 zhi1 xiao3 gou3 hen3 guai1.,This puppy is very well-behaved.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w5,聪明,cong1 ming2,clever / smart,这么难的问题小明都想到答案，他真聪明。,"zhe4 me nan2 de wen4 ti2 Xiao3 Ming2 dou1 xiang3 dao4 da2 an4, ta1 zhen1 cong1 ming2.",Xiao Ming even thought of the answer to such a difficult question — he is really smart.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w6,金鱼,jin1 yu2,goldfish,我家有五条金鱼。,wo3 jia1 you3 wu3 tiao2 jin1 yu2.,I have five goldfish at home.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w7,漂亮,piao4 liang,beautiful / pretty,她穿了一件漂亮的裙子。,ta1 chuan1 le yi1 jian4 piao4 liang de qun2 zi.,She wore a beautiful dress.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w8,宠物,chong3 wu4,pet,我想养一只宠物。,wo3 xiang3 yang3 yi1 zhi1 chong3 wu4.,I want to keep a pet.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w9,欢迎,huan1 ying2,welcome,小明欢迎我们进屋。,Xiao3 Ming2 huan1 ying2 wo3 men jin4 wu1.,Xiao Ming welcomed us into the house.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w10,认识,ren4 shi,know / get acquainted,妈妈认识小丽的爸爸。,ma1 ma ren4 shi Xiao3 Li4 de ba4 ba.,Mum knows Xiao Li's father.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w11,总是,zong3 shi4,always / all the time,我总是在睡前喂金鱼。,wo3 zong3 shi4 zai4 shui4 qian2 wei4 jin1 yu2.,I always feed the goldfish before sleeping.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w12,吐,tu3,spit out / blow (bubbles),金鱼在水里吐泡泡。,jin1 yu2 zai4 shui3 li3 tu3 pao4 pao.,The goldfish blows bubbles in the water.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w13,岛,dao3,island,新加坡是一个小岛。,xin1 jia1 po1 shi4 yi1 ge xiao3 dao3.,Singapore is a small island.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w14,欺负,qi1 fu,bully / pick on,我们不可以欺负小动物。,wo3 men bu4 ke3 yi3 qi1 fu xiao3 dong4 wu4.,We should not bully small animals.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w15,丢,diu1,lose / throw away,我的宠物丢了，我很难过。,"wo3 de chong3 wu4 diu1 le, wo3 hen3 nan2 guo4.",My pet is lost and I am very sad.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w16,梦,meng4,dream,我梦见我有一只宠物狗。,wo3 meng4 jian4 wo3 you3 yi1 zhi1 chong3 wu4 gou3.,I dreamed that I had a pet dog.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w17,围,wei2,surround / encircle,小朋友围着小狗玩。,xiao3 peng2 you3 wei2 zhe xiao3 gou3 wan2.,The children surrounded the puppy and played with it.
+P2,p2u13,第十三课·你想养什么宠物,p2u13w18,醒,xing3,wake up,我今天早上九点钟醒来。,wo3 jin1 tian1 zao3 shang4 jiu3 dian3 zhong1 xing3 lai2.,I woke up at nine o'clock this morning.
+P2,p2u14,第十四课·我们和好了,p2u14w1,难,nan2,difficult,这道问题很难，我想了很久还是不会做。,"zhe4 dao4 wen4 ti2 hen3 nan2, wo3 xiang3 le hen3 jiu3 hai2 shi4 bu4 hui4 zuo4.",This question is very difficult; I thought about it for a long time but still cannot do it.
+P2,p2u14,第十四课·我们和好了,p2u14w2,易,yi4,easy,这道问题很容易，大家都知道答案。,"zhe4 dao4 wen4 ti2 hen3 rong2 yi4, da4 jia1 dou1 zhi1 dao4 da2 an4.",This question is very easy and everyone knows the answer.
+P2,p2u14,第十四课·我们和好了,p2u14w3,抢,qiang3,snatch / grab,弟弟抢走了我的玩具。,di4 di qiang3 zou3 le wo3 de wan2 ju4.,My younger brother snatched my toy away.
+P2,p2u14,第十四课·我们和好了,p2u14w4,推,tui1,push,小明把小丽推倒了。,Xiao3 Ming2 ba3 Xiao3 Li4 tui1 dao3 le.,Xiao Ming pushed Xiao Li down.
+P2,p2u14,第十四课·我们和好了,p2u14w5,讨厌,tao3 yan4,dislike / annoying,妹妹讨厌吃青菜。,mei4 mei tao3 yan4 chi1 qing1 cai4.,Younger sister dislikes eating vegetables.
+P2,p2u14,第十四课·我们和好了,p2u14w6,争吵,zheng1 chao3,quarrel / argue,姐姐和哥哥争吵，所以姐姐很难过。,"jie3 jie he2 ge1 ge zheng1 chao3, suo3 yi3 jie3 jie hen3 nan2 guo4.","Elder sister quarrelled with elder brother, so elder sister was very upset."
+P2,p2u14,第十四课·我们和好了,p2u14w7,伤心,shang1 xin1,sad / heartbroken,小猫不见了，她很伤心。,"xiao3 mao1 bu4 jian4 le, ta1 hen3 shang1 xin1.",The kitten is missing and she is very sad.
+P2,p2u14,第十四课·我们和好了,p2u14w8,容易,rong2 yi4,easy,这件事很容易做。,zhe4 jian4 shi4 hen3 rong2 yi4 zuo4.,This thing is very easy to do.
+P2,p2u14,第十四课·我们和好了,p2u14w9,亮晶晶,liang4 jing1 jing1,glittering / sparkling,小女孩有一双亮晶晶的眼睛。,xiao3 nv3 hai2 you3 yi4 shuang1 liang4 jing1 jing1 de yan3 jing.,The little girl has a pair of sparkling eyes.
+P2,p2u14,第十四课·我们和好了,p2u14w10,彩虹,cai3 hong2,rainbow,下雨后，天上出现一道彩虹。,"xia4 yu3 hou4, tian1 shang4 chu1 xian4 yi1 dao4 cai3 hong2.","After the rain, a rainbow appeared in the sky."
+P2,p2u14,第十四课·我们和好了,p2u14w11,粗,cu1,thick / rough,这根树枝很粗。,zhe4 gen1 shu4 zhi1 hen3 cu1.,This tree branch is very thick.
+P2,p2u14,第十四课·我们和好了,p2u14w12,细,xi4,thin / fine,这根线很细。,zhe4 gen1 xian4 hen3 xi4.,This thread is very thin.
+P2,p2u14,第十四课·我们和好了,p2u14w13,弄破,nong4 po4,tear / damage,我不小心把书本弄破了。,wo3 bu4 xiao3 xin1 ba3 shu1 ben3 nong4 po4 le.,I accidentally tore the book.
+P2,p2u14,第十四课·我们和好了,p2u14w14,撞倒,zhuang4 dao3,knock down,他跑得太快，撞倒了我。,"ta1 pao3 de tai4 kuai4, zhuang4 dao3 le wo3.",He ran too fast and knocked me down.
+P2,p2u14,第十四课·我们和好了,p2u14w15,能,neng2,can / be able to,我们能解决这个问题。,wo3 men neng2 jie3 jue2 zhe4 ge wen4 ti2.,We are able to solve this problem.
+P2,p2u14,第十四课·我们和好了,p2u14w16,一道,yi2 dao4,a beam / streak of,天空出现一道彩虹。,tian1 kong1 chu1 xian4 yi2 dao4 cai3 hong2.,A rainbow appeared in the sky.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w1,茄子,qie2 zi,eggplant / brinjal,茄子是紫色的。,qie2 zi shi4 zi3 se4 de.,The eggplant is purple.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w2,番茄,fan1 qie2,tomato,番茄又红又圆。,fan1 qie2 you4 hong2 you4 yuan2.,The tomato is red and round.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w3,豆芽,dou4 ya2,bean sprouts,炒面里有豆芽。,chao3 mian4 li3 you3 dou4 ya2.,There are bean sprouts in the fried noodles.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w4,玉米,yu4 mi3,corn,我喜欢吃玉米。,wo3 xi3 huan1 chi1 yu4 mi3.,I like to eat corn.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w5,伯伯,bo2 bo,uncle (father's elder brother),伯伯有一个农场。,bo2 bo you3 yi1 ge nong2 chang3.,Uncle has a farm.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w6,萝卜,luo2 bo,radish / carrot,兔子喜欢吃萝卜。,tu4 zi xi3 huan1 chi1 luo2 bo.,Rabbits like to eat carrots.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w7,摘,zhai1,pick / pluck,我摘了一朵花。,wo3 zhai1 le yi1 duo3 hua1.,I picked a flower.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w8,挖,wa1,dig,小狗在地上挖了一个洞。,xiao3 gou3 zai4 di4 shang4 wa1 le yi2 ge dong4.,The puppy dug a hole in the ground.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w9,果实,guo3 shi2,fruit / fruit of a plant,树上结了很多果实。,shu4 shang4 jie1 le hen3 duo1 guo3 shi2.,The tree bore many fruits.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w10,紫,zi3,purple,我最喜欢的颜色是紫色。,wo3 zui4 xi3 huan1 de yan2 se4 shi4 zi3 se4.,My favourite colour is purple.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w11,扁豆,bian3 dou4,string beans / flat beans,扁豆是扁扁的，很好吃。,"bian3 dou4 shi4 bian3 bian3 de, hen3 hao3 chi1.",String beans are flat and delicious.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w12,比,bi3,compare / than,哥哥长得比我高。,ge1 ge zhang3 de bi3 wo3 gao1.,Elder brother is taller than me.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w13,煮,zhu3,cook / boil,妈妈煮了玉米汤。,ma1 ma zhu3 le yu4 mi3 tang1.,Mum cooked corn soup.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w14,小老鼠,xiao3 lao3 shu3,little mouse,小老鼠偷吃了萝卜。,xiao3 lao3 shu3 tou1 chi1 le luo2 bo.,The little mouse stole and ate the radish.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w15,或者,huo4 zhe3,or / perhaps,你想吃玉米或者豆芽？,ni3 xiang3 chi1 yu4 mi3 huo4 zhe3 dou4 ya2?,Do you want to eat corn or bean sprouts?
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w16,小猪,xiao3 zhu1,little pig,农场里有几只小猪。,nong2 chang3 li3 you3 ji3 zhi1 xiao3 zhu1.,There are several little pigs on the farm.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w17,拔,ba2,pull out / uproot,我帮伯伯拔萝卜。,wo3 bang1 bo2 bo ba2 luo2 bo.,I helped uncle pull out the radishes.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w18,考,kao3,exam / test,老师要考我昨天刚学的字怎么读。,lao3 shi1 yao4 kao3 wo3 zuo2 tian1 gang1 xue2 de zi4 zen3 me du2.,The teacher wants to test me on how to read the characters I just learnt yesterday.
+P2,p2u15,第十五课·我爱吃蔬菜,p2u15w19,根,gen1,root; (measure word for long thin things),萝卜是根，不是果实。,"luo2 bo shi4 gen1, bu2 shi4 guo3 shi2.","A radish is a root, not a fruit."
+P2,p2u16,第十六课·飞进书的世界,p2u16w1,保持,bao3 chi2,maintain / keep,上课时，我们要保持安静。,"shang4 ke4 shi2, wo3 men yao4 bao3 chi2 an1 jing4.","During class, we must maintain silence."
+P2,p2u16,第十六课·飞进书的世界,p2u16w2,安静,an1 jing4,quiet / silent,我们在图书馆里要保持安静。,wo3 men zai4 tu2 shu1 guan3 li3 yao4 bao3 chi2 an1 jing4.,We must keep quiet in the library.
+P2,p2u16,第十六课·飞进书的世界,p2u16w3,绘本,hui4 ben3,picture book,老师常常给我们读绘本。,lao3 shi1 chang2 chang2 gei3 wo3 men du2 hui4 ben3.,The teacher often reads picture books to us.
+P2,p2u16,第十六课·飞进书的世界,p2u16w4,有趣,you3 qu4,interesting / fun,这本书很有趣。,zhe4 ben3 shu1 hen3 you3 qu4.,This book is very interesting.
+P2,p2u16,第十六课·飞进书的世界,p2u16w5,借,jie4,borrow,我在图书馆借了一本书。,wo3 zai4 tu2 shu1 guan3 jie4 le yi1 ben3 shu1.,I borrowed a book from the library.
+P2,p2u16,第十六课·飞进书的世界,p2u16w6,英语,ying1 yu3,English,我会说英语和华语。,wo3 hui4 shuo1 ying1 yu3 he2 hua2 yu3.,I can speak English and Mandarin.
+P2,p2u16,第十六课·飞进书的世界,p2u16w7,书架,shu1 jia4,bookshelf,书架上有很多书。,shu1 jia4 shang4 you3 hen3 duo1 shu1.,There are many books on the bookshelf.
+P2,p2u16,第十六课·飞进书的世界,p2u16w8,答案,da2 an4,answer,我想了很久才想到答案。,wo3 xiang3 le hen3 jiu3 cai2 xiang3 dao4 da2 an4.,I thought for a long time before coming up with the answer.
+P2,p2u16,第十六课·飞进书的世界,p2u16w9,开始,kai1 shi3,start / begin,老师一开始讲故事，同学们就安静了下来。,"lao3 shi1 yi1 kai1 shi3 jiang3 gu4 shi, tong2 xue2 men jiu4 an1 jing4 le xia4 lai2.","As soon as the teacher started telling a story, the classmates quietened down."
+P2,p2u16,第十六课·飞进书的世界,p2u16w10,知道,zhi1 dao4,know,我知道这道问题的答案。,wo3 zhi1 dao4 zhe4 dao4 wen4 ti2 de da2 an4.,I know the answer to this question.
+P2,p2u16,第十六课·飞进书的世界,p2u16w11,次,ci4,time(s) (occurrences),我读了这本书三次。,wo3 du2 le zhe4 ben3 shu1 san1 ci4.,I read this book three times.
+P2,p2u16,第十六课·飞进书的世界,p2u16w12,遍,bian4,time(s) (all the way through),老师把故事讲了两遍。,lao3 shi1 ba3 gu4 shi4 jiang3 le liang3 bian4.,The teacher told the story twice all the way through.
+P2,p2u16,第十六课·飞进书的世界,p2u16w13,箱子,xiang1 zi,box / chest,图书馆里有一个大箱子。,tu2 shu1 guan3 li3 you3 yi1 ge da4 xiang1 zi.,There is a big box in the library.
+P2,p2u16,第十六课·飞进书的世界,p2u16w14,盒子,he2 zi,small box / case,我把书签放在盒子里。,wo3 ba3 shu1 qian1 fang4 zai4 he2 zi li3.,I put the bookmark in the box.
+P2,p2u16,第十六课·飞进书的世界,p2u16w15,附近,fu4 jin4,nearby / in the vicinity,图书馆就在学校附近。,tu2 shu1 guan3 jiu4 zai4 xue2 xiao4 fu4 jin4.,The library is near the school.
+P2,p2u16,第十六课·飞进书的世界,p2u16w16,满,man3,full,书架上放满了书。,shu1 jia4 shang4 fang4 man3 le shu1.,The bookshelf is filled with books.
+P2,p2u16,第十六课·飞进书的世界,p2u16w17,各种各样,ge4 zhong3 ge4 yang4,all kinds / varieties,玩具店里有各种各样的玩具。,wan2 ju4 dian4 li3 you3 ge4 zhong3 ge4 yang4 de wan2 ju4.,The toy shop has all kinds of toys.
+P2,p2u16,第十六课·飞进书的世界,p2u16w18,时候,shi2 hou,time / moment / when,我们看书的时候要保持安静。,wo3 men kan4 shu1 de shi2 hou yao4 bao3 chi2 an1 jing4.,We must keep quiet when reading.
+P2,p2u16,第十六课·飞进书的世界,p2u16w19,指,zhi3,point at / finger,老师指着桌子上的书本，叫我过去拿。,"lao3 shi1 zhi3 zhe zhuo1 zi shang4 de shu1 ben3, jiao4 wo3 guo4 qu4 na2.",The teacher pointed at the books on the table and asked me to go and get them.
+P2,p2u17,第十七课·夜市真热闹,p2u17w1,逛,guang4,stroll / browse,我们去逛夜市。,wo3 men qu4 guang4 ye4 shi4.,We go to stroll around the night market.
+P2,p2u17,第十七课·夜市真热闹,p2u17w2,夜市,ye4 shi4,night market,夜市里有很多好吃的食物。,ye4 shi4 li3 you3 hen3 duo1 hao3 chi1 de shi2 wu4.,There are many delicious foods at the night market.
+P2,p2u17,第十七课·夜市真热闹,p2u17w3,烤香肠,kao3 xiang1 chang2,roasted sausages,我买了烤香肠来吃。,wo3 mai3 le kao3 xiang1 chang2 lai2 chi1.,I bought roasted sausages to eat.
+P2,p2u17,第十七课·夜市真热闹,p2u17w4,炸鸡翅,zha2 ji1 chi4,fried chicken wings,我喜欢吃炸鸡翅。,wo3 xi3 huan1 chi1 zha2 ji1 chi4.,I like to eat fried chicken wings.
+P2,p2u17,第十七课·夜市真热闹,p2u17w5,碰碰车,peng4 peng4 che1,bumper car,我喜欢玩碰碰车。,wo3 xi3 huan1 wan2 peng4 peng4 che1.,I like to ride the bumper cars.
+P2,p2u17,第十七课·夜市真热闹,p2u17w6,饮料,yin3 liao4,drinks / beverages,你要喝什么饮料？,ni3 yao4 he1 shen2 me yin3 liao4?,What drink would you like?
+P2,p2u17,第十七课·夜市真热闹,p2u17w7,风筝,feng1 zheng,kite,我在公园里放风筝。,wo3 zai4 gong1 yuan2 li3 fang4 feng1 zheng.,I fly a kite in the park.
+P2,p2u17,第十七课·夜市真热闹,p2u17w8,热闹,re4 nao,lively / bustling,夜市里人很多，非常热闹。,"ye4 shi4 li3 ren2 hen3 duo1, fei1 chang2 re4 nao.",The night market has many people and is very lively.
+P2,p2u17,第十七课·夜市真热闹,p2u17w9,摊位,tan1 wei4,stall,夜市里有很多摊位。,ye4 shi4 li3 you3 hen3 duo1 tan1 wei4.,There are many stalls at the night market.
+P2,p2u17,第十七课·夜市真热闹,p2u17w10,套圈圈,tao4 quan1 quan1,ring toss game,我喜欢玩套圈圈的游戏。,wo3 xi3 huan1 wan2 tao4 quan1 quan1 de you2 xi4.,I like to play the ring toss game.
+P2,p2u17,第十七课·夜市真热闹,p2u17w11,射,she4,shoot,我在夜市玩了射气球的游戏。,wo3 zai4 ye4 shi4 wan2 le she4 qi4 qiu2 de you2 xi4.,I played the balloon shooting game at the night market.
+P2,p2u17,第十七课·夜市真热闹,p2u17w12,踢,ti1,kick,我喜欢和朋友一起踢足球。,wo3 xi3 huan1 he2 peng2 you3 yi4 qi3 ti1 zu2 qiu2.,I like to play football with my friends.
+P2,p2u17,第十七课·夜市真热闹,p2u17w13,但是,dan4 shi4,but / however,我想出门玩，但是妈妈不让我去。,"wo3 xiang3 chu1 men2 wan2, dan4 shi4 ma1 ma bu4 rang4 wo3 qu4.","I wanted to go out to play, but mum would not let me go."
+P2,p2u17,第十七课·夜市真热闹,p2u17w14,一阵阵,yi2 zhen4 zhen4,wave after wave / whiffs of,一阵阵香味从摊位飘来。,yi1 zhen4 zhen4 xiang1 wei4 cong2 tan1 wei4 piao1 lai2.,Wave after wave of fragrance wafted from the stalls.
+P2,p2u17,第十七课·夜市真热闹,p2u17w15,引,yin3,attract / draw,香味引来了很多顾客。,xiang1 wei4 yin3 lai2 le hen3 duo1 gu4 ke4.,The fragrance attracted many customers.
+P2,p2u17,第十七课·夜市真热闹,p2u17w16,一群群,yi4 qun2 qun2,group after group,一群群的学生跑到操场玩游戏。,yi1 qun2 qun2 de xue2 sheng1 pao3 dao4 cao1 chang3 wan2 you2 xi4.,Groups of students ran to the playground to play games.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w1,餐馆,can1 guan3,restaurant,我们去餐馆吃饭。,wo3 men qu4 can1 guan3 chi1 fan4.,We go to the restaurant to eat.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w2,电影院,dian4 ying3 yuan4,cinema,我们去电影院看电影。,wo3 men qu4 dian4 ying3 yuan4 kan4 dian4 ying3.,We go to the cinema to watch a movie.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w3,植物园,zhi2 wu4 yuan2,Botanic Garden,植物园里有很多花草树木。,zhi2 wu4 yuan2 li3 you3 hen3 duo1 hua1 cao3 shu4 mu4.,There are many plants in the Botanic Garden.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w4,东海岸公园,dong1 hai3 an4 gong1 yuan2,East Coast Park,我们去东海岸公园野餐。,wo3 men qu4 dong1 hai3 an4 gong1 yuan2 ye3 can1.,We go to East Coast Park for a picnic.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w5,参观,can1 guan1,visit / tour,老师带我们去参观博物馆。,lao3 shi1 dai4 wo3 men qu4 can1 guan1 bo2 wu4 guan3.,The teacher brought us to visit the museum.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w6,游泳,you2 yong3,swimming,我在海边游泳。,wo3 zai4 hai3 bian1 you2 yong3.,I swim at the beach.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w7,贝壳,bei4 ke2,shell,我在海边捡贝壳。,wo3 zai4 hai3 bian1 jian3 bei4 ke2.,I collect shells at the beach.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w8,野餐,ye3 can1,picnic,我们在公园里野餐。,wo3 men zai4 gong1 yuan2 li3 ye3 can1.,We have a picnic in the park.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w9,城市,cheng2 shi4,city,新加坡是一个美丽的城市。,xin1 jia1 po1 shi4 yi1 ge mei3 li4 de cheng2 shi4.,Singapore is a beautiful city.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w10,玩泥沙,wan2 ni2 sha1,play with sand / mud,我和哥哥喜欢在海边玩泥沙。,wo3 he2 ge1 ge xi3 huan1 zai4 hai3 bian1 wan2 ni2 sha1.,My elder brother and I like to play in the sand at the beach.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w11,捡,jian3,pick up / collect,我在海边捡了很多贝壳。,wo3 zai4 hai3 bian1 jian3 le hen3 duo1 bei4 ke2.,I collected many shells at the beach.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w12,市区,shi4 qu1,city area / downtown,市区有很多餐馆和商店。,shi4 qu1 you3 hen3 duo1 can1 guan3 he2 shang1 dian4.,There are many restaurants and shops in the city area.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w13,到处,dao4 chu4,everywhere / all over,这个地方到处都有美丽的花草树木。,zhe4 ge di4 fang1 dao4 chu4 dou1 you3 mei3 li4 de hua1 cao3 shu4 mu4.,"This place is full of beautiful flowers, plants and trees everywhere."
+P2,p2u18,第十八课·新加坡真好玩,p2u18w14,街道,jie1 dao4,street / road,新加坡的街道很干净。,xin1 jia1 po1 de jie1 dao4 hen3 gan1 jing4.,Singapore's streets are very clean.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w15,整齐,zheng3 qi2,neat / orderly,教室里的桌椅排得很整齐。,jiao4 shi4 li3 de zhuo1 yi3 pai2 de hen3 zheng3 qi2.,The desks and chairs in the classroom are arranged very neatly.
+P2,p2u18,第十八课·新加坡真好玩,p2u18w16,离开,li2 kai1,leave / depart,我下午两点离开学校。,wo3 xia4 wu3 liang3 dian3 li2 kai1 xue2 xiao4.,I leave school at two o'clock in the afternoon.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w1,浇花,jiao1 hua1,water plants,我每天给花浇水。,wo3 mei3 tian1 gei3 hua1 jiao1 shui3.,I water the flowers every day.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w2,马桶,ma3 tong3,toilet bowl,我帮妈妈刷马桶。,wo3 bang1 ma1 ma shua1 ma3 tong3.,I help mum scrub the toilet.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w3,厕所,ce4 suo3,toilet,我们要保持厕所干净。,wo3 men yao4 bao3 chi2 ce4 suo3 gan1 jing4.,We must keep the toilet clean.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w4,珍惜,zhen1 xi1,cherish / treasure,我们要珍惜水源。,wo3 men yao4 zhen1 xi1 shui3 yuan2.,We must cherish our water supply.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w5,节约,jie2 yue1,conserve / save,我们要节约用水。,wo3 men yao4 jie2 yue1 yong4 shui3.,We must conserve water.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w6,浪费,lang4 fei4,waste,我们不要浪费食物。,wo3 men bu4 yao4 lang4 fei4 shi2 wu4.,We must not waste food.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w7,连忙,lian2 mang2,immediately / at once,看到妈妈拿着很多袋子，小明连忙跑上前去帮她。,"kan4 dao4 ma1 ma na2 zhe hen3 duo1 dai4 zi, Xiao3 Ming2 lian2 mang2 pao3 shang4 qian2 qu4 bang1 ta1.","Seeing mum carrying many bags, Xiao Ming immediately ran forward to help her."
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w8,口渴,kou3 ke3,thirsty,弟弟口渴了，想喝水。,"di4 di kou3 ke3 le, xiang3 he1 shui3.",Little brother is thirsty and wants to drink water.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w9,低,di1,low,妹妹知道错了，低下头向妈妈说对不起。,"mei4 mei zhi1 dao4 cuo4 le, di1 xia4 tou2 xiang4 ma1 ma shuo1 dui4 bu4 qi3.",Younger sister knew she was wrong and bowed her head to apologise to mum.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w10,告诉,gao4 su4,tell / inform,妈妈告诉我要节约用水。,ma1 ma gao4 su4 wo3 yao4 jie2 yue1 yong4 shui3.,Mum told me to conserve water.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w11,滴,di1,drip / drop,我们要珍惜每一滴水。,wo3 men yao4 zhen1 xi1 mei3 yi4 di1 shui3.,We must cherish every drop of water.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w12,流,liu2,flow / run,妹妹忘了关水龙头，水不停地流。,"mei4 mei wang4 le guan1 shui3 long2 tou2, shui3 bu4 ting2 de liu2.","Younger sister forgot to turn off the tap, and water kept flowing."
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w13,线,xian4,line / thread,我用尺画一条线。,wo3 yong4 chi3 hua4 yi4 tiao2 xian4.,I use a ruler to draw a line.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w14,断,duan4,break / cut off,我的尺断了。,wo3 de chi3 duan4 le.,My ruler broke.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w15,猜,cai1,guess,老师要我们猜一猜盒子里装了什么。,lao3 shi1 yao4 wo3 men cai1 yi1 cai1 he2 zi li3 zhuang1 le shen2 me.,The teacher asked us to guess what was inside the box.
+P2,p2u19,第十九课·我们的生活少不了水,p2u19w16,摇,yao2,shake / rock,小狗向我摇了摇尾巴。,xiao3 gou3 xiang4 wo3 yao2 le yao2 wei3 ba.,The puppy wagged its tail at me.
+P3,p3u1,第一课·美丽的愿望,p3u1w1,龙争虎斗,long2 zheng1 hu3 dou4,fierce competition,比赛时，同学们龙争虎斗，都想得第一。,"bi3 sai4 shi2, tong2 xue2 men long2 zheng1 hu3 dou4, dou1 xiang3 de2 di4 yi1.","During the competition, classmates competed fiercely, all wanting first place."
+P3,p3u1,第一课·美丽的愿望,p3u1w2,你追我赶,ni3 zhui1 wo3 gan3,"friendly competition (you chase, I catch up)",同学们在比赛中你追我赶，谁也不让谁。,"tong2 xue2 men zai4 bi3 sai4 zhong1 ni3 zhui1 wo3 gan3, shui2 ye3 bu4 rang4 shui2.","Classmates chased each other in the competition, neither giving way to the other."
+P3,p3u1,第一课·美丽的愿望,p3u1w3,马到成功,ma3 dao4 cheng2 gong1,immediate success,哥哥要参加比赛，我祝他马到成功。,"ge1 ge yao4 can1 jia1 bi3 sai4, wo3 zhu4 ta1 ma3 dao4 cheng2 gong1.","Elder brother is joining a competition, so I wish him immediate success."
+P3,p3u1,第一课·美丽的愿望,p3u1w4,科学,ke1 xue2,science,我最喜欢上科学课。,wo3 zui4 xi3 huan1 shang4 ke1 xue2 ke4.,I like science class the most.
+P3,p3u1,第一课·美丽的愿望,p3u1w5,将来,jiang1 lai2,in the future,我希望将来成为一名医生。,wo3 xi1 wang4 jiang1 lai2 cheng2 wei2 yi1 ming2 yi1 sheng1.,I hope to become a doctor in the future.
+P3,p3u1,第一课·美丽的愿望,p3u1w6,当,dang1,to be / become,我长大后想当老师。,wo3 zhang3 da4 hou4 xiang3 dang1 lao3 shi1.,I want to become a teacher when I grow up.
+P3,p3u1,第一课·美丽的愿望,p3u1w7,司机,si1 ji1,driver,校车司机每天开车送我们上学。,xiao4 che1 si1 ji1 mei3 tian1 kai1 che1 song4 wo3 men shang4 xue2.,The school bus driver sends us to school every day.
+P3,p3u1,第一课·美丽的愿望,p3u1w8,希望,xi1 wang4,hope / wish,我希望长大后能成为一名医生。,wo3 xi1 wang4 zhang3 da4 hou4 neng2 cheng2 wei2 yi4 ming2 yi1 sheng1.,I hope to become a doctor when I grow up.
+P3,p3u1,第一课·美丽的愿望,p3u1w9,军人,jun1 ren2,soldier / military personnel,爸爸是一个军人，他保卫国家。,"ba4 ba shi4 yi2 ge jun1 ren2, ta1 bao3 wei4 guo2 jia1.",Dad is a soldier and he defends the country.
+P3,p3u1,第一课·美丽的愿望,p3u1w10,保卫,bao3 wei4,defend / protect,军人保卫国家的安全。,jun1 ren2 bao3 wei4 guo2 jia1 de an1 quan2.,Soldiers protect the country's safety.
+P3,p3u1,第一课·美丽的愿望,p3u1w11,练习,lian4 xi2,practice,他每天练习写字，所以字会越写越好。,"ta1 mei3 tian1 lian4 xi2 xie3 zi4, suo3 yi3 zi4 hui4 yue4 xie3 yue4 hao3.","He practises writing every day, so his handwriting keeps getting better."
+P3,p3u1,第一课·美丽的愿望,p3u1w12,努力,nu3 li4,work hard / put in effort,他努力学习，所以成绩进步了。,"ta1 nu3 li4 xue2 xi2, suo3 yi3 cheng2 ji4 jin4 bu4 le.","He studies hard, so his results have improved."
+P3,p3u1,第一课·美丽的愿望,p3u1w13,篇,pian1,(measure word for essays / articles),老师叫我们写一篇作文。,lao3 shi1 jiao4 wo3 men xie3 yi1 pian1 zuo4 wen2.,The teacher asked us to write an essay.
+P3,p3u1,第一课·美丽的愿望,p3u1w14,复习,fu4 xi2,revise / review,妈妈要我每天认真复习。,ma1 ma yao4 wo3 mei3 tian1 ren4 zhen1 fu4 xi2.,Mum wants me to revise carefully every day.
+P3,p3u1,第一课·美丽的愿望,p3u1w15,交,jiao1,hand in / submit,我把功课交给老师。,wo3 ba3 gong1 ke4 jiao1 gei3 lao3 shi1.,I handed my homework to the teacher.
+P3,p3u1,第一课·美丽的愿望,p3u1w16,举手,ju3 shou3,raise hand,我举手回答问题。,wo3 ju3 shou3 hui2 da2 wen4 ti2.,I raise my hand to answer the question.
+P3,p3u1,第一课·美丽的愿望,p3u1w17,翻,fan1,turn over / flip,老师要我们翻到课本的第十页。,lao3 shi1 yao4 wo3 men fan1 dao4 ke4 ben3 de di4 shi2 ye4.,The teacher asked us to turn to page ten of the textbook.
+P3,p3u1,第一课·美丽的愿望,p3u1w18,成为,cheng2 wei2,become,他努力学习，终于成为了一名科学家。,"ta1 nu3 li4 xue2 xi2, zhong1 yu2 cheng2 wei2 le yi1 ming2 ke1 xue2 jia1.",He studied hard and finally became a scientist.
+P3,p3u1,第一课·美丽的愿望,p3u1w19,就,jiu4,then / right away,只要努力，你就能成功。,"zhi3 yao4 nu3 li4, ni3 jiu4 neng2 cheng2 gong1.","As long as you work hard, you can succeed."
+P3,p3u1,第一课·美丽的愿望,p3u1w20,讲,jiang3,speak / explain,老师讲话时，我们认真听。,"lao3 shi1 jiang3 hua4 shi2, wo3 men ren4 zhen1 ting1.","When the teacher speaks, we listen carefully."
+P3,p3u1,第一课·美丽的愿望,p3u1w21,课文,ke4 wen2,lesson text,这篇课文很有趣。,zhe4 pian1 ke4 wen2 hen3 you3 qu4.,This lesson text is very interesting.
+P3,p3u1,第一课·美丽的愿望,p3u1w22,做,zuo4,do / make,我每天做功课。,wo3 mei3 tian1 zuo4 gong1 ke4.,I do my homework every day.
+P3,p3u1,第一课·美丽的愿望,p3u1w23,第一,di4 yi1,first / number one,他在比赛中得了第一名。,ta1 zai4 bi3 sai4 zhong1 de2 le di4 yi1 ming2.,He came in first place in the competition.
+P3,p3u1,第一课·美丽的愿望,p3u1w24,件,jian4,(measure word for clothes / matters),妈妈买了一件新衣服。,ma1 ma mai3 le yi1 jian4 xin1 yi1 fu.,Mum bought a new piece of clothing.
+P3,p3u1,第一课·美丽的愿望,p3u1w25,读,du2,read aloud,老师给我们读故事。,lao3 shi1 gei3 wo3 men du2 gu4 shi4.,The teacher reads stories to us.
+P3,p3u2,第二课·我的朋友和家人,p3u2w1,陈,chen2,Chen (surname),他姓陈。,ta1 xing4 chen2.,His surname is Chen.
+P3,p3u2,第二课·我的朋友和家人,p3u2w2,胡,hu2,Hu (surname),他姓胡。,ta1 xing4 hu2.,His surname is Hu.
+P3,p3u2,第二课·我的朋友和家人,p3u2w3,李,li3,Li (surname),他姓李。,ta1 xing4 li3.,His surname is Li.
+P3,p3u2,第二课·我的朋友和家人,p3u2w4,吴,wu2,Wu (surname),他姓吴。,ta1 xing4 wu2.,His surname is Wu.
+P3,p3u2,第二课·我的朋友和家人,p3u2w5,言,yan2,speech / word,他的一言一行都很有礼貌。,ta1 de yi1 yan2 yi1 xing2 dou1 hen3 you3 li3 mao4.,His every word and action is very polite.
+P3,p3u2,第二课·我的朋友和家人,p3u2w6,姓,xing4,surname / family name,你姓什么？,ni3 xing4 shen2 me?,What is your surname?
+P3,p3u2,第二课·我的朋友和家人,p3u2w7,名,ming2,given name,请写上你的姓名。,qing3 xie3 shang4 ni3 de xing4 ming2.,Please write your full name.
+P3,p3u2,第二课·我的朋友和家人,p3u2w8,胖,pang4,fat / chubby,哥哥长得很胖，因为他贪吃又不爱运动。,"ge1 ge zhang3 de hen3 pang4, yin1 wei4 ta1 tan1 chi1 you4 bu4 ai4 yun4 dong4.",Elder brother is very chubby because he loves to eat and does not like to exercise.
+P3,p3u2,第二课·我的朋友和家人,p3u2w9,瘦,shou4,thin / slim,他生病后瘦了很多。,ta1 sheng1 bing4 hou4 shou4 le hen3 duo1.,He lost a lot of weight after being sick.
+P3,p3u2,第二课·我的朋友和家人,p3u2w10,矮,ai3,short (height),弟弟比我矮。,di4 di bi3 wo3 ai3.,My younger brother is shorter than me.
+P3,p3u2,第二课·我的朋友和家人,p3u2w11,意思,yi4 si,meaning / interesting,我不明白这个词的意思，便请老师再说一遍。,"wo3 bu4 ming2 bai2 zhe4 ge ci2 de yi4 si, bian4 qing3 lao3 shi1 zai4 shuo1 yi1 bian4.","I didn't understand the meaning of this word, so I asked the teacher to say it again."
+P3,p3u2,第二课·我的朋友和家人,p3u2w12,姑妈,gu1 ma1,paternal aunt (father's sister),姑妈从中国来看我们。,gu1 ma1 cong2 zhong1 guo2 lai2 kan4 wo3 men.,Auntie came from China to visit us.
+P3,p3u2,第二课·我的朋友和家人,p3u2w13,谈天,tan2 tian1,chat / have a talk,我喜欢和朋友谈天。,wo3 xi3 huan1 he2 peng2 you3 tan2 tian1.,I like chatting with friends.
+P3,p3u2,第二课·我的朋友和家人,p3u2w14,问题,wen4 ti2,question / problem,我有不明白的问题，就会问老师。,"wo3 you3 bu4 ming2 bai2 de wen4 ti2, jiu4 hui4 wen4 lao3 shi1.","When I have questions I don't understand, I will ask the teacher."
+P3,p3u2,第二课·我的朋友和家人,p3u2w15,后退,hou4 tui4,step back / retreat,老师请同学们后退一步。,lao3 shi1 qing3 tong2 xue2 men hou4 tui4 yi1 bu4.,The teacher asked the students to step back one step.
+P3,p3u2,第二课·我的朋友和家人,p3u2w16,相信,xiang1 xin4,believe / trust,我相信只要努力，就能成功。,"wo3 xiang1 xin4 zhi3 yao4 nu3 li4, jiu4 neng2 cheng2 gong1.","I believe that as long as you work hard, you can succeed."
+P3,p3u2,第二课·我的朋友和家人,p3u2w17,双,shuang1,pair / double,我有一双新鞋。,wo3 you3 yi1 shuang1 xin1 xie2.,I have a new pair of shoes.
+P3,p3u2,第二课·我的朋友和家人,p3u2w18,帮手,bang1 shou3,helper / assistant,我是妈妈的好帮手，常常帮她做家务。,"wo3 shi4 ma1 ma de hao3 bang1 shou3, chang2 chang2 bang1 ta1 zuo4 jia1 wu4.",I am Mum's good helper and often help her with housework.
+P3,p3u2,第二课·我的朋友和家人,p3u2w19,聪明,cong1 ming2,clever / smart,她很聪明，不一会儿就想到问题的答案。,"ta1 hen3 cong1 ming2, bu4 yi1 hui4 er2 jiu4 xiang3 dao4 wen4 ti2 de da2 an4.",She is very clever and figured out the answer to the question in no time.
+P3,p3u2,第二课·我的朋友和家人,p3u2w20,因为,yin1 wei4,because,我喜欢小美，因为她很关心朋友。,"wo3 xi3 huan1 xiao3 mei3, yin1 wei4 ta1 hen3 guan1 xin1 peng2 you3.",I like Xiao Mei because she cares a lot about her friends.
+P3,p3u2,第二课·我的朋友和家人,p3u2w21,语言,yu3 yan2,language,世界上有很多种不同的语言。,shi4 jie4 shang4 you3 hen3 duo1 zhong3 bu4 tong2 de yu3 yan2.,There are many different languages in the world.
+P3,p3u2,第二课·我的朋友和家人,p3u2w22,一些,yi1 xie1,some / a few,我有一些问题想问老师。,wo3 you3 yi1 xie1 wen4 ti2 xiang3 wen4 lao3 shi1.,I have some questions to ask the teacher.
+P3,p3u2,第二课·我的朋友和家人,p3u2w23,奇怪,qi2 guai4,strange / odd,家里突然来了客人，我感到很奇怪。,"jia1 li3 tu1 ran2 lai2 le ke4 ren2, wo3 gan3 dao4 hen3 qi2 guai4.","A guest suddenly came to the house, and I felt very puzzled."
+P3,p3u2,第二课·我的朋友和家人,p3u2w24,一定,yi1 ding4,definitely / certainly,我一定要努力学好华文。,wo3 yi1 ding4 yao4 nu3 li4 xue2 hao3 hua2 wen2.,I must definitely study Chinese well.
+P3,p3u2,第二课·我的朋友和家人,p3u2w25,梦想成真,meng4 xiang3 cheng2 zhen1,dreams come true,姐姐想当舞蹈员，我们都希望她梦想成真。,"jie3 jie xiang3 dang1 wu3 dao3 yuan2, wo3 men dou1 xi1 wang4 ta1 meng4 xiang3 cheng2 zhen1.","Elder sister wants to be a dancer, and we all hope her dreams come true."
+P3,p3u3,第三课·我的好伙伴,p3u3w1,陪,pei2,accompany / keep company,妈妈陪我去看医生。,ma1 ma pei2 wo3 qu4 kan4 yi1 sheng1.,Mum accompanied me to see the doctor.
+P3,p3u3,第三课·我的好伙伴,p3u3w2,装,zhuang1,pretend / pack,他把水果装进袋子里。,ta1 ba3 shui3 guo3 zhuang1 jin4 dai4 zi li3.,He packed the fruit into the bag.
+P3,p3u3,第三课·我的好伙伴,p3u3w3,辆,liang4,(measure word for vehicles),停车场里停了很多辆车。,ting2 che1 chang3 li3 ting2 le hen3 duo1 liang4 che1.,There are many cars parked in the car park.
+P3,p3u3,第三课·我的好伙伴,p3u3w4,床单,chuang2 dan1,bed sheet,妈妈把床单洗干净了。,ma1 ma ba3 chuang2 dan1 xi3 gan1 jing4 le.,Mum washed the bed sheet clean.
+P3,p3u3,第三课·我的好伙伴,p3u3w5,超人,chao1 ren2,Superman / superhero,铅笔盒上有一个超人的图案。,qian1 bi3 he2 shang4 you3 yi1 ge chao1 ren2 de tu2 an4.,There is a Superman picture on the pencil case.
+P3,p3u3,第三课·我的好伙伴,p3u3w6,按,an4,press / push (a button),我帮邻居按电梯按钮。,wo3 bang1 lin2 ju1 an4 dian4 ti1 an4 niu3.,I help my neighbour press the lift button.
+P3,p3u3,第三课·我的好伙伴,p3u3w7,盖子,gai4 zi,lid / cover,我的水壶的盖子不见了。,wo3 de shui3 hu2 de gai4 zi bu4 jian4 le.,The lid of my water bottle is missing.
+P3,p3u3,第三课·我的好伙伴,p3u3w8,吸管,xi1 guan3,drinking straw,我用吸管喝水。,wo3 yong4 xi1 guan3 he1 shui3.,I drink water with a straw.
+P3,p3u3,第三课·我的好伙伴,p3u3w9,弹,tan2,flick / spring,我按下按钮，吸管就会弹起来。,"wo3 an4 xia4 an4 niu3, xi1 guan3 jiu4 hui4 tan2 qi3 lai2.","When I press the button, the straw springs up."
+P3,p3u3,第三课·我的好伙伴,p3u3w10,闹钟,nao4 zhong1,alarm clock,我每天靠闹钟起床。,wo3 mei3 tian1 kao4 nao4 zhong1 qi3 chuang2.,I rely on the alarm clock to wake up every day.
+P3,p3u3,第三课·我的好伙伴,p3u3w11,背着,bei1 zhe,carrying on the back,他背着书包去上学。,ta1 bei1 zhe shu1 bao1 qu4 shang4 xue2.,He carries his school bag on his back to school.
+P3,p3u3,第三课·我的好伙伴,p3u3w12,粉红,fen3 hong2,pink,妹妹最喜欢粉红色。,mei4 mei zui4 xi3 huan1 fen3 hong2 se4.,Younger sister likes pink the most.
+P3,p3u3,第三课·我的好伙伴,p3u3w13,形状,xing2 zhuang4,shape / form,这块饼干的形状很特别。,zhe4 kuai4 bing3 gan1 de xing2 zhuang4 hen3 te4 bie2.,The shape of this biscuit is very special.
+P3,p3u3,第三课·我的好伙伴,p3u3w14,准时,zhun3 shi2,on time / punctual,我每天准时上学。,wo3 mei3 tian1 zhun3 shi2 shang4 xue2.,I go to school on time every day.
+P3,p3u3,第三课·我的好伙伴,p3u3w15,改掉,gai3 diao4,get rid of (a bad habit),我要改掉迟到的坏习惯。,wo3 yao4 gai3 diao4 chi2 dao4 de huai4 xi2 guan4.,I want to get rid of the bad habit of being late.
+P3,p3u3,第三课·我的好伙伴,p3u3w16,迟到,chi2 dao4,be late / arrive late,今天我迟到了，所以被老师骂了一顿。,"jin1 tian1 wo3 chi2 dao4 le, suo3 yi3 bei4 lao3 shi1 ma4 le yi1 dun4.","I was late today, so I was scolded by the teacher."
+P3,p3u3,第三课·我的好伙伴,p3u3w17,习惯,xi2 guan4,habit / custom,每天刷牙是一个好习惯。,mei3 tian1 shua1 ya2 shi4 yi1 ge hao3 xi2 guan4.,Brushing teeth every day is a good habit.
+P3,p3u3,第三课·我的好伙伴,p3u3w18,喝,he1,drink,老师说运动后要多喝水。,lao3 shi1 shuo1 yun4 dong4 hou4 yao4 duo1 he1 shui3.,The teacher said to drink more water after exercising.
+P3,p3u3,第三课·我的好伙伴,p3u3w19,蓝色,lan2 se4,blue,他穿了一件蓝色的衬衫。,ta1 chuan1 le yi1 jian4 lan2 se4 de chen4 shan1.,He is wearing a blue shirt.
+P3,p3u3,第三课·我的好伙伴,p3u3w20,伙伴,huo3 ban4,partner / companion,我和好伙伴一起做功课。,wo3 he2 hao3 huo3 ban4 yi4 qi3 zuo4 gong1 ke4.,I do homework together with my good partner.
+P3,p3u3,第三课·我的好伙伴,p3u3w21,手表,shou3 biao3,wristwatch,爸爸送了我一块新手表。,ba4 ba song4 le wo3 yi1 kuai4 xin1 shou3 biao3.,Dad gave me a new wristwatch.
+P3,p3u3,第三课·我的好伙伴,p3u3w22,响,xiang3,ring / sound,闹钟响了，我该起床了。,"nao4 zhong1 xiang3 le, wo3 gai1 qi3 chuang2 le.","The alarm rang, it is time for me to get up."
+P3,p3u3,第三课·我的好伙伴,p3u3w23,睡觉,shui4 jiao4,sleep / go to sleep,晚上十点，我就上床睡觉了。,"wan3 shang4 shi2 dian3, wo3 jiu4 shang4 chuang2 shui4 jiao4 le.","At ten at night, I go to bed and sleep."
+P3,p3u3,第三课·我的好伙伴,p3u3w24,名字,ming2 zi,name,我的名字叫小美。,wo3 de ming2 zi jiao4 xiao3 mei3.,My name is Xiao Mei.
+P3,p3u3,第三课·我的好伙伴,p3u3w25,真,zhen1,really / truly,大家一起玩游戏，真开心！,"da4 jia1 yi4 qi3 wan2 you2 xi4, zhen1 kai1 xin1!",Everyone played games together — it was really fun!
+P3,p3u4,第四课·奇妙的变化,p3u4w1,内,nei4,inside / within,天气太热了，我们还是留在屋内。,"tian1 qi4 tai4 re4 le, wo3 men hai2 shi4 liu2 zai4 wu1 nei4.","The weather is too hot, we might as well stay indoors."
+P3,p3u4,第四课·奇妙的变化,p3u4w2,入,ru4,enter / go into,同学们进入教室后，都回到各自的座位。,"tong2 xue2 men jin4 ru4 jiao4 shi4 hou4, dou1 hui2 dao4 ge4 zi4 de zuo4 wei4.","After the students entered the classroom, they all returned to their own seats."
+P3,p3u4,第四课·奇妙的变化,p3u4w3,由,you2,from / by / through,这条道路由窄变宽。,zhe4 tiao2 dao4 lu4 you2 zhai3 bian4 kuan1.,This road has changed from narrow to wide.
+P3,p3u4,第四课·奇妙的变化,p3u4w4,浅,qian3,shallow (depth) / light (colour),河水很浅，小孩子可以在里面玩。,"he2 shui3 hen3 qian3, xiao3 hai2 zi ke3 yi3 zai4 li3 mian4 wan2.",The river is very shallow and children can play in it.
+P3,p3u4,第四课·奇妙的变化,p3u4w5,深,shen1,deep / dark (colour),这条河很深，大家还是不要下水游泳。,"zhe4 tiao2 he2 hen3 shen1, da4 jia1 hai2 shi4 bu4 yao4 xia4 shui3 you2 yong3.","This river is very deep, it is best that everyone not go swimming in it."
+P3,p3u4,第四课·奇妙的变化,p3u4w6,窄,zhai3,narrow,这条小路太窄，两个人不能并排走。,"zhe4 tiao2 xiao3 lu4 tai4 zhai3, liang3 ge ren2 bu4 neng2 bing4 pai2 zou3.",This path is too narrow for two people to walk side by side.
+P3,p3u4,第四课·奇妙的变化,p3u4w7,宽,kuan1,wide / broad,这条马路很宽，可以让很多车通过。,"zhe4 tiao2 ma3 lu4 hen3 kuan1, ke3 yi3 rang4 hen3 duo1 che1 tong1 guo4.",This road is very wide and allows many cars to pass.
+P3,p3u4,第四课·奇妙的变化,p3u4w8,变化,bian4 hua4,change / transformation,季节的变化让大自然变得很美丽。,ji4 jie2 de bian4 hua4 rang4 da4 zi4 ran2 bian4 de hen3 mei3 li4.,The change of seasons makes nature very beautiful.
+P3,p3u4,第四课·奇妙的变化,p3u4w9,越,yue4,the more... the more...,天气越来越热了。,tian1 qi4 yue4 lai2 yue4 re4 le.,The weather is getting hotter and hotter.
+P3,p3u4,第四课·奇妙的变化,p3u4w10,幼苗,you4 miao2,seedling / young plant sprout,浇水后，幼苗慢慢长大了。,"jiao1 shui3 hou4, you4 miao2 man4 man4 zhang3 da4 le.","After watering, the seedlings slowly grew."
+P3,p3u4,第四课·奇妙的变化,p3u4w11,干死,gan1 si3,wither and die (from dryness),植物没有水会干死。,zhi2 wu4 mei2 you3 shui3 hui4 gan1 si3.,Plants will wither and die without water.
+P3,p3u4,第四课·奇妙的变化,p3u4w12,摆动,bai3 dong4,swing / sway,风吹来，树枝摆动起来。,"feng1 chui1 lai2, shu4 zhi1 bai3 dong4 qi3 lai2.","When the wind blows, the branches sway."
+P3,p3u4,第四课·奇妙的变化,p3u4w13,后腿,hou4 tui3,hind legs,青蛙的后腿很强壮。,qing1 wa1 de hou4 tui3 hen3 qiang2 zhuang4.,The frog's hind legs are very strong.
+P3,p3u4,第四课·奇妙的变化,p3u4w14,嘴巴,zui3 ba,mouth,河马的嘴巴很大。,he2 ma3 de zui3 ba hen3 da4.,The hippo's mouth is very big.
+P3,p3u4,第四课·奇妙的变化,p3u4w15,喊,han3,shout / call out,小明大喊救命，大家听到后马上跑了过去。,"xiao3 ming2 da4 han3 jiu4 ming4, da4 jia1 ting1 dao4 hou4 ma3 shang4 pao3 le guo4 qu4.",Xiao Ming shouted for help and everyone ran over immediately after hearing him.
+P3,p3u4,第四课·奇妙的变化,p3u4w16,披,pi1,drape over / wear loosely,她披着一件外套走进来。,ta1 pi1 zhe yi1 jian4 wai4 tao4 zou3 jin4 lai2.,She walked in wearing a coat draped over her shoulders.
+P3,p3u4,第四课·奇妙的变化,p3u4w17,露,lu4,expose / reveal,她的上衣很短，露出了她的肚皮。,"ta1 de shang4 yi1 hen3 duan3, lu4 chu1 le ta1 de du4 pi2.",Her top is very short and her belly is showing.
+P3,p3u4,第四课·奇妙的变化,p3u4w18,肚皮,du4 pi2,belly / stomach,青蛙的肚皮是白色的。,qing1 wa1 de du4 pi2 shi4 bai2 se4 de.,The frog's belly is white.
+P3,p3u4,第四课·奇妙的变化,p3u4w19,变,bian4,change / transform,毛毛虫变成了漂亮的蝴蝶。,mao2 mao2 chong2 bian4 cheng2 le piao4 liang de hu2 die2.,The caterpillar transformed into a beautiful butterfly.
+P3,p3u4,第四课·奇妙的变化,p3u4w20,短,duan3,short (length / time),这把尺很短。,zhe4 ba3 chi3 hen3 duan3.,This ruler is very short.
+P3,p3u4,第四课·奇妙的变化,p3u4w21,绿豆,lv4 dou4,mung bean,妈妈煮了绿豆汤。,ma1 ma zhu3 le lv4 dou4 tang1.,Mum cooked mung bean soup.
+P3,p3u4,第四课·奇妙的变化,p3u4w22,细细,xi4 xi4,thin and fine / carefully,树上长着细细的树枝。,shu4 shang4 zhang3 zhe xi4 xi4 de shu4 zhi1.,There are thin branches growing on the tree.
+P3,p3u4,第四课·奇妙的变化,p3u4w23,根,gen1,root / (measure word for long thin things),大树用根吸水。,da4 shu4 yong4 gen1 xi1 shui3.,Trees absorb water through their roots.
+P3,p3u4,第四课·奇妙的变化,p3u4w24,条,tiao2,(measure word for long/slender things),河里有很多条鱼。,he2 li3 you3 hen3 duo1 tiao2 yu2.,There are many fish in the river.
+P3,p3u4,第四课·奇妙的变化,p3u4w25,哪里,na3 li3,where,你住在哪里？,ni3 zhu4 zai4 na3 li3?,Where do you live?
+P3,p3u4,第四课·奇妙的变化,p3u4w26,找,zhao3,look for / find,我到处找我的钱包。,wo3 dao4 chu4 zhao3 wo3 de qian2 bao1.,I looked everywhere for my wallet.
+P3,p3u4,第四课·奇妙的变化,p3u4w27,孩子,hai2 zi,child / kid,有很多孩子在公园里玩耍。,you3 hen3 duo1 hai2 zi zai4 gong1 yuan2 li3 wan2 shua3.,There are many children playing in the park.
+P3,p3u4,第四课·奇妙的变化,p3u4w28,已经,yi3 jing1,already,我已经做完功课了。,wo3 yi3 jing1 zuo4 wan2 gong1 ke4 le.,I have already finished my homework.
+P3,p3u5,第五课·难忘的一天,p3u5w1,电脑展,dian4 nao3 zhan3,computer exhibition,爸爸带我去参观电脑展。,ba4 ba dai4 wo3 qu4 can1 guan1 dian4 nao3 zhan3.,Dad brought me to visit the computer exhibition.
+P3,p3u5,第五课·难忘的一天,p3u5w2,旅游展,lv3 you2 zhan3,travel fair / exhibition,参观了旅游展后，我们一家人决定去中国旅游。,"can1 guan1 le lv3 you2 zhan3 hou4, wo3 men yi4 jia1 ren2 jue2 ding4 qu4 zhong1 guo2 lv3 you2.","After visiting the travel fair, our family decided to travel to China."
+P3,p3u5,第五课·难忘的一天,p3u5w3,园艺展,yuan2 yi4 zhan3,horticulture / gardening exhibition,园艺展上有各种各样的植物。,yuan2 yi4 zhan3 shang4 you3 ge4 zhong3 ge4 yang4 de zhi2 wu4.,The horticulture exhibition has all kinds of plants.
+P3,p3u5,第五课·难忘的一天,p3u5w4,傍晚,bang4 wan3,evening / dusk,傍晚时，天空变成了橙色。,"bang4 wan3 shi2, tian1 kong1 bian4 cheng2 le cheng2 se4.","In the evening, the sky turned orange."
+P3,p3u5,第五课·难忘的一天,p3u5w5,报纸,bao4 zhi3,newspaper,爸爸每天早上读报纸。,ba4 ba mei3 tian1 zao3 shang4 du2 bao4 zhi3.,Dad reads the newspaper every morning.
+P3,p3u5,第五课·难忘的一天,p3u5w6,杂志,za2 zhi4,magazine,图书馆里有很多杂志。,tu2 shu1 guan3 li3 you3 hen3 duo1 za2 zhi4.,There are many magazines in the library.
+P3,p3u5,第五课·难忘的一天,p3u5w7,号,hao4,number / date / issue,我们会在六月十号那天出国。,wo3 men hui4 zai4 liu4 yue4 shi2 hao4 na4 tian1 chu1 guo2.,We will be going overseas on the tenth of June.
+P3,p3u5,第五课·难忘的一天,p3u5w8,刚刚,gang1 gang1,just now / just,我刚刚做完功课。,wo3 gang1 gang1 zuo4 wan2 gong1 ke4.,I just finished my homework.
+P3,p3u5,第五课·难忘的一天,p3u5w9,付了钱,fu4 le qian2,paid the money,我拿了水果后，就去付了钱。,"wo3 na2 le shui3 guo3 hou4, jiu4 qu4 fu4 le qian2.","After taking the fruit, I went to pay."
+P3,p3u5,第五课·难忘的一天,p3u5w10,束,shu4,bunch / bundle (measure word for flowers),妈妈收到了一束漂亮的鲜花。,ma1 ma shou1 dao4 le yi1 shu4 piao4 liang de xian1 hua1.,Mum received a beautiful bunch of fresh flowers.
+P3,p3u5,第五课·难忘的一天,p3u5w11,鲜花,xian1 hua1,fresh flowers,我送了一束鲜花给老师。,wo3 song4 le yi1 shu4 xian1 hua1 gei3 lao3 shi1.,I gave a bunch of fresh flowers to the teacher.
+P3,p3u5,第五课·难忘的一天,p3u5w12,提,ti2,carry (by hand) / mention,爸爸提着公事包出门了。,ba4 ba ti2 zhe gong1 shi4 bao1 chu1 men2 le.,Dad went out carrying his briefcase.
+P3,p3u5,第五课·难忘的一天,p3u5w13,准备,zhun3 bei4,prepare / get ready,妈妈正在准备晚餐。,ma1 ma zheng4 zai4 zhun3 bei4 wan3 can1.,Mum is preparing dinner.
+P3,p3u5,第五课·难忘的一天,p3u5w14,美食展,mei3 shi2 zhan3,food fair / exhibition,美食展上有各国的食物。,mei3 shi2 zhan3 shang4 you3 ge4 guo2 de shi2 wu4.,The food fair has food from many countries.
+P3,p3u5,第五课·难忘的一天,p3u5w15,多彩,duo1 cai3,colourful / full of colour,参加各种活动后，我的生活丰富多彩。,"can1 jia1 ge4 zhong3 huo2 dong4 hou4, wo3 de sheng1 huo2 feng1 fu4 duo1 cai3.","After joining various activities, my life became rich and colourful."
+P3,p3u5,第五课·难忘的一天,p3u5w16,或者,huo4 zhe3,or / either...or...,我想买些苹果或者橙子回家。,wo3 xiang3 mai3 xie1 ping2 guo3 huo4 zhe3 cheng2 zi hui2 jia1.,I want to buy some apples or oranges to bring home.
+P3,p3u5,第五课·难忘的一天,p3u5w17,扫地,sao3 di4,sweep the floor,我每天帮妈妈扫地。,wo3 mei3 tian1 bang1 ma1 ma sao3 di4.,I help mum sweep the floor every day.
+P3,p3u5,第五课·难忘的一天,p3u5w18,都,dou1,all / both,我们班的同学都很用功。,wo3 men ban1 de tong2 xue2 dou1 hen3 yong4 gong1.,All the students in our class are very hardworking.
+P3,p3u5,第五课·难忘的一天,p3u5w19,收到,shou1 dao4,receive / get,我收到了一份很特别的礼物。,wo3 shou1 dao4 le yi1 fen4 hen3 te4 bie2 de li3 wu4.,I received a very special gift.
+P3,p3u5,第五课·难忘的一天,p3u5w20,知道,zhi1 dao4,know / be aware of,我知道他住在哪里。,wo3 zhi1 dao4 ta1 zhu4 zai4 na3 li3.,I know where he lives.
+P3,p3u6,第六课·是我不好,p3u6w1,软,ruan3,soft,这个枕头很软，睡起来很舒服。,"zhe4 ge zhen3 tou2 hen3 ruan3, shui4 qi3 lai2 hen3 shu1 fu.",This pillow is very soft and comfortable to sleep on.
+P3,p3u6,第六课·是我不好,p3u6w2,硬,ying4,hard / firm,这块面包放了太久，已经变硬了。,"zhe4 kuai4 mian4 bao1 fang4 le tai4 jiu3, yi3 jing1 bian4 ying4 le.",This bread has been left too long and has hardened.
+P3,p3u6,第六课·是我不好,p3u6w3,松,song1,loose / loosen,我的鞋带松了，要重新绑好。,"wo3 de xie2 dai4 song1 le, yao4 chong2 xin1 bang3 hao3.",My shoelace is loose and I need to retie it.
+P3,p3u6,第六课·是我不好,p3u6w4,紧,jin3,tight / tense,这条裤子太紧了，我穿起来不舒服。,"zhe4 tiao2 ku4 zi tai4 jin3 le, wo3 chuan1 qi3 lai2 bu4 shu1 fu.",These pants are too tight and uncomfortable to wear.
+P3,p3u6,第六课·是我不好,p3u6w5,失,shi1,lose / slip up,他一时失手，把杯子打碎了。,"ta1 yi1 shi2 shi1 shou3, ba3 bei1 zi da3 sui4 le.",He accidentally dropped and broke the cup.
+P3,p3u6,第六课·是我不好,p3u6w6,错误,cuo4 wu4,mistake / error,做错了不要紧，但你要从错误中学习。,"zuo4 cuo4 le bu4 yao4 jin3, dan4 ni3 yao4 cong2 cuo4 wu4 zhong1 xue2 xi2.",It does not matter if you make mistakes; but you should learn from them.
+P3,p3u6,第六课·是我不好,p3u6w7,扔,reng1,throw / toss / discard,我们不可以随手乱扔垃圾。,wo3 men bu4 ke3 yi3 sui2 shou3 luan4 reng1 la1 ji1.,We must not litter randomly.
+P3,p3u6,第六课·是我不好,p3u6w8,原谅,yuan2 liang4,forgive / pardon,我向他道歉，他原谅了我。,"wo3 xiang4 ta1 dao4 qian4, ta1 yuan2 liang4 le wo3.",I apologised to him and he forgave me.
+P3,p3u6,第六课·是我不好,p3u6w9,没关系,mei2 guan1 xi,it does not matter / never mind,我不小心撞到小明。小明对我说没关系，叫我以后多注意就好。,"wo3 bu4 xiao3 xin1 zhuang4 dao4 xiao3 ming2. xiao3 ming2 dui4 wo3 shuo1 mei2 guan1 xi, jiao4 wo3 yi3 hou4 duo1 zhu4 yi4 jiu4 hao3.",I accidentally bumped into Xiao Ming. Xiao Ming told me it was fine and asked me to be more careful in future.
+P3,p3u6,第六课·是我不好,p3u6w10,突然,tu1 ran2,suddenly / all of a sudden,突然下起大雨，我没有带伞，不能回家。,"tu1 ran2 xia4 qi3 da4 yu3, wo3 mei2 you3 dai4 san3, bu4 neng2 hui2 jia1.","It suddenly rained heavily and I did not bring an umbrella, so I could not go home."
+P3,p3u6,第六课·是我不好,p3u6w11,来不及,lai2 bu4 ji2,too late / not enough time,我跑得太慢，来不及上巴士。,"wo3 pao3 de tai4 man4, lai2 bu4 ji2 shang4 ba1 shi4.",I ran too slowly and could not make it onto the bus.
+P3,p3u6,第六课·是我不好,p3u6w12,理,li3,pay attention to / respond,我和小明吵了架后，他就不理我了。,"wo3 he2 xiao3 ming2 chao3 le jia4 hou4, ta1 jiu4 bu4 li3 wo3 le.","After I quarrelled with Xiao Ming, he stopped talking to me."
+P3,p3u6,第六课·是我不好,p3u6w13,比赛,bi3 sai4,competition / match,小明在歌唱比赛中得到了第一名。,xiao3 ming2 zai4 ge1 chang4 bi3 sai4 zhong1 de2 dao4 le di4 yi1 ming2.,Xiao Ming got first place in the singing competition.
+P3,p3u6,第六课·是我不好,p3u6w14,跌倒,die1 dao3,fall down / trip,她跑步时跌倒了，流了很多血。,"ta1 pao3 bu4 shi2 die1 dao3 le, liu2 le hen3 duo1 xue4.",She fell while running and bled a lot.
+P3,p3u6,第六课·是我不好,p3u6w15,受伤,shou4 shang1,get injured / be hurt,他打球时受伤了，我帮他擦药。,"ta1 da3 qiu2 shi2 shou4 shang1 le, wo3 bang1 ta1 ca1 yao4.",He got injured playing ball and I helped him apply medicine.
+P3,p3u6,第六课·是我不好,p3u6w16,立刻,li4 ke4,immediately / at once,看到同学跌倒了，小明立刻跑过去帮助他。,"kan4 dao4 tong2 xue2 die1 dao3 le, xiao3 ming2 li4 ke4 pao3 guo4 qu4 bang1 zhu4 ta1.","Seeing his classmate fall, Xiao Ming immediately ran over to help."
+P3,p3u6,第六课·是我不好,p3u6w17,应该,ying1 gai1,should / ought to,妹妹对妈妈没礼貌，她应该向妈妈道歉。,"mei4 mei dui4 ma1 ma mei2 li3 mao4, ta1 ying1 gai1 xiang4 ma1 ma dao4 qian4.",Younger sister was rude to Mum and she should apologise to Mum.
+P3,p3u6,第六课·是我不好,p3u6w18,错,cuo4,wrong / mistake,我知道自己做错了，便向妈妈说对不起。,"wo3 zhi1 dao4 zi4 ji3 zuo4 cuo4 le, bian4 xiang4 ma1 ma shuo1 dui4 bu4 qi3.","Knowing I had done wrong, I apologised to Mum."
+P3,p3u6,第六课·是我不好,p3u6w19,推,tui1,push,他把我推倒了，连一句对不起也没说。,"ta1 ba3 wo3 tui1 dao3 le, lian2 yi1 ju4 dui4 bu4 qi3 ye3 mei2 shuo1.",He pushed me down and did not even say sorry.
+P3,p3u6,第六课·是我不好,p3u6w20,弄破,nong4 po4,tear / damage by accident,我不小心弄破了同学的书。,wo3 bu4 xiao3 xin1 nong4 po4 le tong2 xue2 de shu1.,I accidentally tore my classmate's book.
+P3,p3u6,第六课·是我不好,p3u6w21,爬起来,pa2 qi3 lai2,get up / pick oneself up,她跌倒了，然后爬起来继续跑。,"ta1 die1 dao3 le, ran2 hou4 pa2 qi3 lai2 ji4 xu4 pao3.",She fell and then got up and continued running.
+P3,p3u6,第六课·是我不好,p3u6w22,怎么,zen3 me,how / why,你怎么这么粗心呢？,ni3 zen3 me zhe4 me cu1 xin1 ne?,How can you be so careless?
+P3,p3u6,第六课·是我不好,p3u6w23,扶,fu2,support / help someone up,老公公跌倒了，我把他扶起来。,"lao3 gong1 gong die1 dao3 le, wo3 ba3 ta1 fu2 qi3 lai2.",The old man fell down and I helped him up.
+P3,p3u6,第六课·是我不好,p3u6w24,不好意思,bu4 hao3 yi4 si,embarrassed / sorry / excuse me,他感到不好意思，脸红了起来。,"ta1 gan3 dao4 bu4 hao3 yi4 si, lian3 hong2 le qi3 lai2.",He felt embarrassed and his face turned red.
+P3,p3u6,第六课·是我不好,p3u6w25,谢谢,xie4 xie,thank you,小明教我做功课，我向他说谢谢。,"xiao3 ming2 jiao1 wo3 zuo4 gong1 ke4, wo3 xiang4 ta1 shuo1 xie4 xie.",Xiao Ming taught me to do homework and I thanked him.
+P3,p3u7,第七课·留张便条,p3u7w1,打碎,da3 sui4,smash / break into pieces,弟弟不小心把花瓶打碎了。,di4 di bu4 xiao3 xin1 ba3 hua1 ping2 da3 sui4 le.,Younger brother accidentally broke the vase.
+P3,p3u7,第七课·留张便条,p3u7w2,赔钱,pei2 qian2,pay compensation,我打碎了商店的杯子，需要赔钱。,"wo3 da3 sui4 le shang1 dian4 de bei1 zi, xu1 yao4 pei2 qian2.",I broke a cup in the shop and need to pay compensation.
+P3,p3u7,第七课·留张便条,p3u7w3,留,liu2,leave (behind) / stay,妈妈出门了，留我一个人在家。,"ma1 ma chu1 men2 le, liu2 wo3 yi1 ge ren2 zai4 jia1.",Mum went out and left me alone at home.
+P3,p3u7,第七课·留张便条,p3u7w4,便条,bian4 tiao2,note / short written message,妈妈留了一张便条给我。,ma1 ma liu2 le yi1 zhang1 bian4 tiao2 gei3 wo3.,Mum left a note for me.
+P3,p3u7,第七课·留张便条,p3u7w5,花盆,hua1 pen2,flower pot,阳台上摆着几个花盆。,yang2 tai2 shang4 bai3 zhe ji3 ge hua1 pen2.,There are several flower pots on the balcony.
+P3,p3u7,第七课·留张便条,p3u7w6,道歉,dao4 qian4,apologise,你做错了事，一定要道歉。,"ni3 zuo4 cuo4 le shi4, yi1 ding4 yao4 dao4 qian4.","If you do something wrong, you must apologise."
+P3,p3u7,第七课·留张便条,p3u7w7,食堂,shi2 tang2,canteen / cafeteria,我们每天在食堂吃午饭。,wo3 men mei3 tian1 zai4 shi2 tang2 chi1 wu3 fan4.,We eat lunch in the canteen every day.
+P3,p3u7,第七课·留张便条,p3u7w8,溜走,liu1 zou3,sneak away / slip away,他做错了事，悄悄溜走了。,"ta1 zuo4 cuo4 le shi4, qiao3 qiao3 liu1 zou3 le.",He did something wrong and quietly slipped away.
+P3,p3u7,第七课·留张便条,p3u7w9,踩断,cai3 duan4,step on and break,他不小心踩断了一根树枝。,ta1 bu4 xiao3 xin1 cai3 duan4 le yi1 gen1 shu4 zhi1.,He accidentally stepped on and broke a branch.
+P3,p3u7,第七课·留张便条,p3u7w10,眼镜,yan3 jing4,glasses / spectacles,爷爷找不到他的眼镜。,ye2 ye zhao3 bu4 dao4 ta1 de yan3 jing4.,Grandfather cannot find his glasses.
+P3,p3u7,第七课·留张便条,p3u7w11,休息,xiu1 xi,rest / take a break,爸爸生病了，在家休息。,"ba4 ba sheng1 bing4 le, zai4 jia1 xiu1 xi.",Dad is sick and resting at home.
+P3,p3u7,第七课·留张便条,p3u7w12,电视,dian4 shi4,television / TV,妈妈让我每天看一小时的电视。,ma1 ma rang4 wo3 mei3 tian1 kan4 yi1 xiao3 shi2 de dian4 shi4.,Mum lets me watch TV for one hour every day.
+P3,p3u7,第七课·留张便条,p3u7w13,脱,tuo1,take off (clothes) / remove,妈妈要我们进门前先脱鞋。,ma1 ma yao4 wo3 men jin4 men2 qian2 xian1 tuo1 xie2.,Mum wants us to take off our shoes before entering.
+P3,p3u7,第七课·留张便条,p3u7w14,搬动,ban1 dong4,move (something heavy),爸爸在搬动桌子时把弟弟吵醒了。,ba4 ba zai4 ban1 dong4 zhuo1 zi shi2 ba3 di4 di chao3 xing3 le.,Dad woke younger brother up while moving the table.
+P3,p3u7,第七课·留张便条,p3u7w15,地板,di4 ban3,floor / floorboard,妈妈把地板打扫得干干净净的。,ma1 ma ba3 di4 ban3 da3 sao3 de gan1 gan1 jing4 jing4 de.,Mum swept the floor until it was spotlessly clean.
+P3,p3u7,第七课·留张便条,p3u7w16,灵机一动,ling2 ji1 yi1 dong4,have a sudden inspiration,他灵机一动，想到了一个好办法。,"ta1 ling2 ji1 yi1 dong4, xiang3 dao4 le yi1 ge hao3 ban4 fa3.",He had a sudden inspiration and thought of a good solution.
+P3,p3u7,第七课·留张便条,p3u7w17,张,zhang1,(measure word for flat things),老师分给每个同学一张白纸。,lao3 shi1 fen1 gei3 mei3 ge tong2 xue2 yi1 zhang1 bai2 zhi3.,The teacher gave each student a piece of white paper.
+P3,p3u7,第七课·留张便条,p3u7w18,病,bing4,sick / illness,她病了，不能来上学。,"ta1 bing4 le, bu4 neng2 lai2 shang4 xue2.",She is sick and cannot come to school.
+P3,p3u7,第七课·留张便条,p3u7w19,轻轻,qing1 qing1,gently / softly,我轻轻地关上门，不想吵醒正在睡觉的弟弟。,"wo3 qing1 qing1 de guan1 shang4 men2, bu4 xiang3 chao3 xing3 zheng4 zai4 shui4 jiao4 de di4 di.",I gently closed the door so as not to wake my brother who was sleeping.
+P3,p3u7,第七课·留张便条,p3u7w20,走路,zou3 lu4,walk / go on foot,地板很湿，老师叫我们走路时要小心，不要滑倒。,"di4 ban3 hen3 shi1, lao3 shi1 jiao4 wo3 men zou3 lu4 shi2 yao4 xiao3 xin1, bu4 yao4 hua2 dao3.","The floor is wet, so the teacher told us to be careful when walking and not to slip."
+P3,p3u7,第七课·留张便条,p3u7w21,事情,shi4 qing,matter / thing / affair,老师要我做的事，我一定用心完成。,"lao3 shi1 yao4 wo3 zuo4 de shi4, wo3 yi1 ding4 yong4 xin1 wan2 cheng2.","Whatever the teacher asks me to do, I will complete it with care."
+P3,p3u7,第七课·留张便条,p3u7w22,轻手轻脚,qing1 shou3 qing1 jiao3,gently / with light steps / tiptoe,他轻手轻脚地走进房间，不想吵醒妈妈。,"ta1 qing1 shou3 qing1 jiao3 de zou3 jin4 fang2 jian1, bu4 xiang3 chao3 xing3 ma1 ma.","He tiptoed into the room, not wanting to wake mum."
+P3,p3u8,第八课·我真能干,p3u8w1,需要,xu1 yao4,need / require,做贺卡需要纸和彩色笔。,zuo4 he4 ka3 xu1 yao4 zhi3 he2 cai3 se4 bi3.,Making a greeting card requires paper and colour pencils.
+P3,p3u8,第八课·我真能干,p3u8w2,贺卡,he4 ka3,greeting card,我亲手做了一张贺卡送给老师。,wo3 qin1 shou3 zuo4 le yi1 zhang1 he4 ka3 song4 gei3 lao3 shi1.,I made a greeting card by hand to give to the teacher.
+P3,p3u8,第八课·我真能干,p3u8w3,部分,bu4 fen4,part / portion,这份作业，我只是做了一部分，其他的还没完成。,"zhe4 fen4 zuo4 ye4, wo3 zhi3 shi4 zuo4 le yi1 bu4 fen4, qi2 ta1 de hai2 mei2 wan2 cheng2.",I have only done part of this homework; the rest is not done yet.
+P3,p3u8,第八课·我真能干,p3u8w4,涂上,tu2 shang4,apply / paint on / coat,我在贺卡上涂上了漂亮的颜色。,wo3 zai4 he4 ka3 shang4 tu2 shang4 le piao4 liang de yan2 se4.,I applied beautiful colours onto the greeting card.
+P3,p3u8,第八课·我真能干,p3u8w5,洞,dong4,hole / opening,我在纸上剪了一个洞。,wo3 zai4 zhi3 shang4 jian3 le yi1 ge dong4.,I cut a hole in the paper.
+P3,p3u8,第八课·我真能干,p3u8w6,吊,diao4,hang / suspend,吊在门口的灯笼很漂亮。,diao4 zai4 men2 kou3 de deng1 long2 hen3 piao4 liang.,The lantern hanging at the entrance is very beautiful.
+P3,p3u8,第八课·我真能干,p3u8w7,灯笼,deng1 long2,lantern,中秋节时，我们提着灯笼。,"zhong1 qiu1 jie2 shi2, wo3 men ti2 zhe deng1 long2.","During the Mid-Autumn Festival, we carry lanterns."
+P3,p3u8,第八课·我真能干,p3u8w8,挂,gua4,hang / put up,妈妈把画挂在墙上。,ma1 ma ba3 hua4 gua4 zai4 qiang2 shang4.,Mum hung the painting on the wall.
+P3,p3u8,第八课·我真能干,p3u8w9,裙子,qun2 zi,skirt / dress,她穿着一件粉红色的裙子。,ta1 chuan1 zhe yi1 jian4 fen3 hong2 se4 de qun2 zi.,She is wearing a pink skirt.
+P3,p3u8,第八课·我真能干,p3u8w10,裤子,ku4 zi,trousers / pants,爸爸买了一条新裤子。,ba4 ba mai3 le yi1 tiao2 xin1 ku4 zi.,Dad bought a new pair of trousers.
+P3,p3u8,第八课·我真能干,p3u8w11,请求,qing3 qiu2,request / ask for,我请求妈妈买一个新书包给我。,wo3 qing3 qiu2 ma1 ma mai3 yi1 ge xin1 shu1 bao1 gei3 wo3.,I asked Mum to buy a new school bag for me.
+P3,p3u8,第八课·我真能干,p3u8w12,比较,bi3 jiao4,compare / relatively,小明比小华大两岁，他也长得比较高。,"xiao3 ming2 bi3 xiao3 hua2 da4 liang3 sui4, ta1 ye3 zhang3 de bi3 jiao4 gao1.",Xiao Ming is two years older than Xiao Hua and is also relatively taller.
+P3,p3u8,第八课·我真能干,p3u8w13,晒,shai4,dry in the sun / sunbathe,妈妈把被子晒在阳台上。,ma1 ma ba3 bei4 zi shai4 zai4 yang2 tai2 shang4.,Mum dried the clothes on the balcony.
+P3,p3u8,第八课·我真能干,p3u8w14,歪,wai1,crooked / slanted / tilted,他挂在墙上的画歪了。,ta1 gua4 zai4 qiang2 shang4 de hua4 wai1 le.,The painting he hung on the wall is crooked.
+P3,p3u8,第八课·我真能干,p3u8w15,乱,luan4,messy / chaotic / disorderly,他的房间很乱，妈妈要他整理。,"ta1 de fang2 jian1 hen3 luan4, ma1 ma yao4 ta1 zheng3 li3.",His room is very messy and Mum wants him to tidy it.
+P3,p3u8,第八课·我真能干,p3u8w16,累,lei4,tired / exhausted,做了那么多家务，妈妈觉得累了。,"zuo4 le na4 me duo1 jia1 wu4, ma1 ma jue2 de lei4 le.","After doing so many household chores, Mum feels tired."
+P3,p3u8,第八课·我真能干,p3u8w17,满头大汗,man3 tou2 da4 han4,dripping with sweat,他跑完步，满头大汗。,"ta1 pao3 wan2 bu4, man3 tou2 da4 han4.","After his run, he was dripping with sweat."
+P3,p3u8,第八课·我真能干,p3u8w18,塞,sai1,stuff / cram / plug,小明把玩具塞进口袋里。,xiao3 ming2 ba3 wan2 ju4 sai1 jin4 kou3 dai4 li3.,Xiao Ming stuffed the toy into his pocket.
+P3,p3u8,第八课·我真能干,p3u8w19,接着,jie1 zhe,then / following / continue,我先吃饭，接着做功课。,"wo3 xian1 chi1 fan4, jie1 zhe zuo4 gong1 ke4.","I eat first, then do my homework."
+P3,p3u8,第八课·我真能干,p3u8w20,穿,chuan1,wear / put on,妈妈穿着一件绿色的上衣。,ma1 ma chuan1 zhe yi1 jian4 lv4 se4 de shang4 yi1.,Mum is wearing a green top.
+P3,p3u8,第八课·我真能干,p3u8w21,然后,ran2 hou4,then / after that,我先做功课，然后才去玩耍。,"wo3 xian1 zuo4 gong1 ke4, ran2 hou4 cai2 qu4 wan2 shua3.","I do my homework first, then I go and play."
+P3,p3u8,第八课·我真能干,p3u8w22,阳台,yang2 tai2,balcony / terrace,阳台上放了几盆花。,yang2 tai2 shang4 fang4 le ji3 pen2 hua1.,There are a few pots of flowers on the balcony.
+P3,p3u8,第八课·我真能干,p3u8w23,客厅,ke4 ting1,living room / lounge,全家人在客厅里看电视。,quan2 jia1 ren2 zai4 ke4 ting1 li3 kan4 dian4 shi4.,The whole family watches TV in the living room.
+P3,p3u8,第八课·我真能干,p3u8w24,衣服,yi1 fu,clothes / clothing,今天很冷，所以我要穿厚一点的衣服。,"jin1 tian1 hen3 leng3, suo3 yi3 wo3 yao4 chuan1 hou4 yi1 dian3 de yi1 fu.","Today is very cold, so I need to wear thicker clothes."
+P3,p3u8,第八课·我真能干,p3u8w25,开始,kai1 shi3,start / begin,演出开始了，观众都安静了下来。,"yan3 chu1 kai1 shi3 le, guan1 zhong4 dou1 an1 jing4 le xia4 lai2.",The performance started and the audience all quietened down.
+P3,p3u8,第八课·我真能干,p3u8w26,让,rang4,let / allow / make,老师让我上厕所。,lao3 shi1 rang4 wo3 shang4 ce4 suo3.,The teacher allowed me to go to the toilet.
+P3,p3u8,第八课·我真能干,p3u8w27,重,zhong4,heavy / weighty,这个盒子很重，我搬不动。,"zhe4 ge he2 zi hen3 zhong4, wo3 ban1 bu4 dong4.",This box is very heavy and I cannot move it.
+P3,p3u9,第九课·我有办法,p3u9w1,小熊,xiao3 xiong2,little bear,小熊掉进了坑里。,xiao3 xiong2 diao4 jin4 le keng1 li3.,The little bear fell into a pit.
+P3,p3u9,第九课·我有办法,p3u9w2,坑,keng1,pit / hole in the ground,路上有一个坑，走路要小心。,"lu4 shang4 you3 yi1 ge keng1, zou3 lu4 yao4 xiao3 xin1.","There is a pit on the road, be careful when walking."
+P3,p3u9,第九课·我有办法,p3u9w3,鼻子,bi2 zi,nose,大象的鼻子长长的。,da4 xiang4 de bi2 zi chang2 chang2 de.,The elephant has a very long trunk.
+P3,p3u9,第九课·我有办法,p3u9w4,救,jiu4,rescue / save,小猴子想出了好办法来救小熊。,xiao3 hou2 zi xiang3 chu1 le hao3 ban4 fa3 lai2 jiu4 xiao3 xiong2.,The little monkey thought of a good way to rescue the little bear.
+P3,p3u9,第九课·我有办法,p3u9w5,小猴子,xiao3 hou2 zi,little monkey,小猴子很聪明，想出了好办法。,"xiao3 hou2 zi hen3 cong1 ming2, xiang3 chu1 le hao3 ban4 fa3.",The little monkey is very clever and thought of a good solution.
+P3,p3u9,第九课·我有办法,p3u9w6,竹竿,zhu2 gan1,bamboo pole,竹竿又长又直。,zhu2 gan1 you4 chang2 you4 zhi2.,Bamboo poles are long and straight.
+P3,p3u9,第九课·我有办法,p3u9w7,篮子,lan2 zi,basket,我用篮子装水果。,wo3 yong4 lan2 zi zhuang1 shui3 guo3.,I use a basket to hold fruit.
+P3,p3u9,第九课·我有办法,p3u9w8,喷,pen1,spray / spurt,消防员用水管喷水灭火。,xiao1 fang2 yuan2 yong4 shui3 guan3 pen1 shui3 mie4 huo3.,The firefighter used a hose to spray water to put out the fire.
+P3,p3u9,第九课·我有办法,p3u9w9,升,sheng1,rise / go up,热气球慢慢升上天空。,re4 qi4 qiu2 man4 man4 sheng1 shang4 tian1 kong1.,The hot air balloon slowly rose into the sky.
+P3,p3u9,第九课·我有办法,p3u9w10,称,cheng1,weigh / name / call,老师要我们称一下我们的体重。,lao3 shi1 yao4 wo3 men cheng1 yi1 xia4 wo3 men de ti3 zhong4.,The teacher asked us to weigh ourselves.
+P3,p3u9,第九课·我有办法,p3u9w11,官,guan1,government official,他是一名大官。,ta1 shi4 yi1 ming2 da4 guan1.,He is a high-ranking official.
+P3,p3u9,第九课·我有办法,p3u9w12,墙,qiang2,wall,学校的墙上贴着很多图画。,xue2 xiao4 de qiang2 shang4 tie1 zhe hen3 duo1 tu2 hua4.,There are many pictures on the school wall.
+P3,p3u9,第九课·我有办法,p3u9w13,下沉,xia4 chen2,sink / go down,石头扔进水里就会下沉。,shi2 tou2 reng1 jin4 shui3 li3 jiu4 hui4 xia4 chen2.,Stones sink when thrown into water.
+P3,p3u9,第九课·我有办法,p3u9w14,重量,zhong4 liang4,weight,这个行李箱的重量是三公斤。,zhe4 ge xing2 li3 xiang1 de zhong4 liang4 shi4 san1 gong1 jin1.,The weight of this suitcase is three kilograms.
+P3,p3u9,第九课·我有办法,p3u9w15,夸,kua1,praise / compliment,他帮爸妈做家务，爸妈夸他很懂事。,"ta1 bang1 ba4 ma1 zuo4 jia1 wu4, ba4 ma1 kua1 ta1 hen3 dong3 shi4.",He helps his parents with housework and they praise him for being sensible.
+P3,p3u9,第九课·我有办法,p3u9w16,神童,shen2 tong2,child prodigy / gifted child,他四岁就会弹钢琴，大家叫他神童。,"ta1 si4 sui4 jiu4 hui4 tan2 gang1 qin2, da4 jia1 jiao4 ta1 shen2 tong2.",He could play piano at four years old; everyone calls him a child prodigy.
+P3,p3u9,第九课·我有办法,p3u9w17,倒进,dao4 jin4,pour into,他把水倒进了洞里。,ta1 ba3 shui3 dao4 jin4 le dong4 li3.,He poured water into the hole.
+P3,p3u9,第九课·我有办法,p3u9w18,河,he2,river,这条河很长。,zhe4 tiao2 he2 hen3 chang2.,This river is very long.
+P3,p3u9,第九课·我有办法,p3u9w19,满,man3,full / filled,水桶装满了水，提起来很重。,"shui3 tong3 zhuang1 man3 le shui3, ti2 qi3 lai2 hen3 zhong4.",The bucket is full of water and heavy to carry.
+P3,p3u9,第九课·我有办法,p3u9w20,像,xiang4,resemble / be like,林叔叔和爸爸长得很像，大家还以为他们是兄弟。,"lin2 shu1 shu he2 ba4 ba zhang3 de hen3 xiang4, da4 jia1 hai2 yi3 wei2 ta1 men shi4 xiong1 di4.",Uncle Lin and Dad look very alike; everyone even thought they were brothers.
+P3,p3u9,第九课·我有办法,p3u9w21,谁,shei2,who / whoever,是谁想出办法帮助了小熊？,shi4 shei2 xiang3 chu1 ban4 fa3 bang1 zhu4 le xiao3 xiong2?,Who thought of a solution to help the little bear?
+P3,p3u9,第九课·我有办法,p3u9w22,回答,hui2 da2,answer / reply,老师问问题时，他总是第一个回答。,"lao3 shi1 wen4 wen4 ti2 shi2, ta1 zong3 shi4 di4 yi1 ge hui2 da2.","When the teacher asks questions, he is always the first to answer."
+P3,p3u9,第九课·我有办法,p3u9w23,拉,la1,pull / drag,大家一起拉绳子，把小熊拉上来。,"da4 jia1 yi4 qi3 la1 sheng2 zi, ba3 xiao3 xiong2 la1 shang4 lai2.",Everyone pulled the rope together to pull the little bear up.
+P3,p3u9,第九课·我有办法,p3u9w24,最后,zui4 hou4,finally / last / in the end,他想了好久，最后想出了一个好办法。,"ta1 xiang3 le hao3 jiu3, zui4 hou4 xiang3 chu1 le yi1 ge hao3 ban4 fa3.",He thought for a long time and finally came up with a good solution.
+P3,p3u10,第十课·爱护环境,p3u10w1,垃圾,la1 ji1,rubbish / garbage,我们不可以乱扔垃圾。,wo3 men bu4 ke3 yi3 luan4 reng1 la1 ji1.,We must not litter carelessly.
+P3,p3u10,第十课·爱护环境,p3u10w2,蚊子,wen2 zi,mosquito,我被蚊子咬了好几口。,wo3 bei4 wen2 zi yao3 le hao3 ji3 kou3.,I was bitten by mosquitoes several times.
+P3,p3u10,第十课·爱护环境,p3u10w3,乌鸦,wu1 ya1,crow,我看见一只乌鸦站在树上。,wo3 kan4 jian4 yi4 zhi3 wu1 ya1 zhan4 zai4 shu4 shang4.,I saw a crow standing in a tree.
+P3,p3u10,第十课·爱护环境,p3u10w4,随地,sui2 di4,anywhere / carelessly,我们不可以随地吐痰。,wo3 men bu4 ke3 yi3 sui2 di4 tu3 tan2.,We must not spit anywhere.
+P3,p3u10,第十课·爱护环境,p3u10w5,吐痰,tu3 tan2,to spit phlegm,他随地吐痰，污染了环境。,"ta1 sui2 di4 tu3 tan2, wu1 ran3 le huan2 jing4.",He spat on the ground and polluted the environment.
+P3,p3u10,第十课·爱护环境,p3u10w6,环境,huan2 jing4,environment,我们要保护环境。,wo3 men yao4 bao3 hu4 huan2 jing4.,We must protect the environment.
+P3,p3u10,第十课·爱护环境,p3u10w7,厨房,chu2 fang2,kitchen,妈妈在厨房里做饭。,ma1 ma zai4 chu2 fang2 li3 zuo4 fan4.,Mum is cooking in the kitchen.
+P3,p3u10,第十课·爱护环境,p3u10w8,脏,zang1,dirty,弟弟的上衣很脏。,di4 di de shang4 yi1 hen3 zang1.,Little brother's top is very dirty.
+P3,p3u10,第十课·爱护环境,p3u10w9,衣橱,yi1 chu2,wardrobe,我把衣服放进衣橱里。,wo3 ba3 yi1 fu fang4 jin4 yi1 chu2 li3.,I put my clothes into the wardrobe.
+P3,p3u10,第十课·爱护环境,p3u10w10,仔细,zi3 xi4,careful / thorough,他仔细地检查作业。,ta1 zi3 xi4 de jian3 cha2 zuo4 ye4.,He checks his homework carefully.
+P3,p3u10,第十课·爱护环境,p3u10w11,招手,zhao1 shou,to wave,爸爸向我招手。,ba4 ba xiang4 wo3 zhao1 shou.,Dad waved at me.
+P3,p3u10,第十课·爱护环境,p3u10w12,决定,jue2 ding4,to decide,我们决定去公园玩。,wo3 men jue2 ding4 qu4 gong1 yuan2 wan2.,We decided to go to the park.
+P3,p3u10,第十课·爱护环境,p3u10w13,吃惊,chi1 jing1,surprised / shocked,我看见矮小的小明跑得那么快，感到很吃惊。,"wo3 kan4 jian4 ai3 xiao3 de xiao3 ming2 pao3 de na4 me kuai4, gan3 dao4 hen3 chi1 jing1.",I was very surprised to see the small Xiao Ming run so fast.
+P3,p3u10,第十课·爱护环境,p3u10w14,缩,suo1,to shrink / retract,乌龟把头缩进壳里。,wu1 gui1 ba3 tou2 suo1 jin4 ke2 li3.,The tortoise pulled its head into its shell.
+P3,p3u10,第十课·爱护环境,p3u10w15,扔,reng1,to throw / toss,我把垃圾扔进垃圾桶里。,wo3 ba3 la1 ji1 reng1 jin4 la1 ji1 tong3 li3.,I threw the rubbish into the rubbish bin.
+P3,p3u10,第十课·爱护环境,p3u10w16,收拾,shou1 shi,to tidy up,弟弟自己收拾玩具。,di4 di zi4 ji3 shou1 shi wan2 ju4.,Younger brother tidies up his toys by himself.
+P3,p3u10,第十课·爱护环境,p3u10w17,保持,bao3 chi,to maintain / keep,我们要保持环境整洁。,wo3 men yao4 bao3 chi huan2 jing4 zheng3 jie2.,We must keep the environment clean and tidy.
+P3,p3u10,第十课·爱护环境,p3u10w18,爱护,ai4 hu4,to cherish / protect,我们要爱护公物。,wo3 men yao4 ai4 hu4 gong1 wu4.,We must take care of public property.
+P3,p3u10,第十课·爱护环境,p3u10w19,啊,a,ah (exclamation particle),啊，这里真漂亮！,"a, zhe4 li3 zhen1 piao4 liang!","Ah, this place is so beautiful!"
+P3,p3u10,第十课·爱护环境,p3u10w20,漂亮,piao4 liang,beautiful / pretty,姐姐穿的裙子真漂亮。,jie3 jie chuan1 de qun2 zi zhen1 piao4 liang.,The skirt that elder sister is wearing is really beautiful.
+P3,p3u10,第十课·爱护环境,p3u10w21,不能,bu4 neng2,cannot / must not,上课时，我们不能大声讲话。,"shang4 ke4 shi2, wo3 men bu4 neng2 da4 sheng1 jiang3 hua4.","During class, we cannot talk loudly."
+P3,p3u10,第十课·爱护环境,p3u10w22,伸出,shen1 chu1,to stretch out,他伸出舌头让医生检查。,ta1 shen1 chu1 she2 tou2 rang4 yi1 sheng1 jian3 cha2.,He stuck out his tongue for the doctor to examine.
+P3,p3u10,第十课·爱护环境,p3u10w23,追上,zhui1 shang4,to catch up,弟弟跑得很快，但我还是追上了他。,"di4 di pao3 de hen3 kuai4, dan4 wo3 hai2 shi4 zhui1 shang4 le ta1.","My younger brother ran very fast, but I still caught up with him."
+P3,p3u10,第十课·爱护环境,p3u10w24,觉得,jue2 de,to feel / think,看到小明收到礼物时的样子，我觉得很开心。,"kan4 dao4 xiao3 ming2 shou1 dao4 li3 wu4 shi2 de yang4 zi, wo3 jue2 de hen3 kai1 xin1.","Seeing Xiao Ming's face when he received a gift, I felt very happy."
+P3,p3u11,第十一课·环保小天使,p3u11w1,环保袋,huan2 bao3 dai4,reusable / eco bag,妈妈去巴刹时带着环保袋。,ma1 ma qu4 ba1 sha1 shi2 dai4 zhe huan2 bao3 dai4.,Mum brings a reusable bag when she goes to the wet market.
+P3,p3u11,第十一课·环保小天使,p3u11w2,代替,dai4 ti4,to replace / substitute,我们可以用环保袋代替塑料袋。,wo3 men ke3 yi3 yong4 huan2 bao3 dai4 dai4 ti4 su4 liao4 dai4.,We can use a reusable bag to replace plastic bags.
+P3,p3u11,第十一课·环保小天使,p3u11w3,塑料袋,su4 liao4 dai4,plastic bag,我们要保护环境，不应该使用太多塑料袋。,"wo3 men yao4 bao3 hu4 huan2 jing4, bu4 ying1 gai1 shi3 yong4 tai4 duo1 su4 liao4 dai4.",We must protect the environment and should not use too many plastic bags.
+P3,p3u11,第十一课·环保小天使,p3u11w4,巴刹,ba1 sha1,wet market,奶奶每个星期天去巴刹买菜。,nai3 nai mei3 ge xing1 qi1 tian1 qu4 ba1 sha1 mai3 cai4.,Grandma goes to the wet market every Sunday to buy vegetables.
+P3,p3u11,第十一课·环保小天使,p3u11w5,使用,shi3 yong4,to use,我们要减少使用塑料袋。,wo3 men yao4 jian3 shao3 shi3 yong4 su4 liao4 dai4.,We should reduce the use of plastic bags.
+P3,p3u11,第十一课·环保小天使,p3u11w6,废物,fei4 wu4,waste material,我们可以利用废物做手工。,wo3 men ke3 yi3 li4 yong4 fei4 wu4 zuo4 shou3 gong1.,We can use waste materials to make handicrafts.
+P3,p3u11,第十一课·环保小天使,p3u11w7,瓶子,ping2 zi,bottle,我把瓶子放进回收箱里。,wo3 ba3 ping2 zi fang4 jin4 hui2 shou1 xiang1 li3.,I put the bottle into the recycling bin.
+P3,p3u11,第十一课·环保小天使,p3u11w8,并排,bing4 pai2,side by side,同学们并排坐在操场上。,tong2 xue2 men bing4 pai2 zuo4 zai4 cao1 chang3 shang4.,Classmates sit side by side on the field.
+P3,p3u11,第十一课·环保小天使,p3u11w9,海洋,hai3 yang2,ocean,我们不可以把垃圾扔进海洋里。,wo3 men bu4 ke3 yi3 ba3 la1 ji1 reng1 jin4 hai3 yang2 li3.,We must not throw rubbish into the ocean.
+P3,p3u11,第十一课·环保小天使,p3u11w10,日用品,ri4 yong4 pin3,daily necessities,妈妈去超市买日用品。,ma1 ma qu4 chao1 shi4 mai3 ri4 yong4 pin3.,Mum goes to the supermarket to buy daily necessities.
+P3,p3u11,第十一课·环保小天使,p3u11w11,人人有责,ren2 ren2 you3 ze2,everyone's responsibility,保护环境，人人有责。,"bao3 hu4 huan2 jing4, ren2 ren2 you3 ze2.",Protecting the environment is everyone's responsibility.
+P3,p3u11,第十一课·环保小天使,p3u11w12,责任,ze2 ren4,responsibility,我们有责任保护环境。,wo3 men you3 ze2 ren4 bao3 hu4 huan2 jing4.,We have a responsibility to protect the environment.
+P3,p3u11,第十一课·环保小天使,p3u11w13,如果,ru2 guo3,if,如果大家都爱护环境，地球会更美丽。,"ru2 guo3 da4 jia1 dou1 ai4 hu4 huan2 jing4, di4 qiu2 hui4 geng4 mei3 li4.","If everyone takes care of the environment, the Earth will be more beautiful."
+P3,p3u11,第十一课·环保小天使,p3u11w14,尽,jin4,to the utmost / exhaust,我们要尽力保护环境。,wo3 men yao4 jin4 li4 bao3 hu4 huan2 jing4.,We must do our best to protect the environment.
+P3,p3u11,第十一课·环保小天使,p3u11w15,份,fen4,portion / share,老师给每人一份作业。,lao3 shi1 gei3 mei3 ren2 yi4 fen4 zuo4 ye4.,The teacher gives each person one set of homework.
+P3,p3u11,第十一课·环保小天使,p3u11w16,组屋,zu3 wu1,HDB flat,我住在组屋。,wo3 zhu4 zai4 zu3 wu1.,I live in an HDB flat.
+P3,p3u11,第十一课·环保小天使,p3u11w17,停车场,ting2 che1 chang3,car park,爸爸把车停在停车场。,ba4 ba ba3 che1 ting2 zai4 ting2 che1 chang3.,Dad parks the car in the car park.
+P3,p3u11,第十一课·环保小天使,p3u11w18,辆,liang4,(measure word for vehicles),停车场停了很多辆车。,ting2 che1 chang3 ting2 le hen3 duo1 liang4 che1.,There are many cars parked in the car park.
+P3,p3u11,第十一课·环保小天使,p3u11w19,一直,yi4 zhi2,continuously / always,我一直努力学习华文。,wo3 yi4 zhi2 nu3 li4 xue2 xi2 hua2 wen2.,I have always worked hard at studying Chinese.
+P3,p3u11,第十一课·环保小天使,p3u11w20,所以,suo3 yi3,therefore / so,因为下雨了，所以我们不能出去玩。,"yin1 wei4 xia4 yu3 le, suo3 yi3 wo3 men bu4 neng2 chu1 qu4 wan2.","Because it is raining, we cannot go out to play."
+P3,p3u11,第十一课·环保小天使,p3u11w21,纸,zhi3,paper,我用纸折了一架纸飞机。,wo3 yong4 zhi3 zhe2 le yi4 jia4 zhi3 fei1 ji1.,I folded a paper aeroplane using paper.
+P3,p3u11,第十一课·环保小天使,p3u11w22,吧,ba,(suggestion particle),我们一起去图书馆吧。,wo3 men yi4 qi3 qu4 tu2 shu1 guan3 ba.,Let us go to the library together.
+P3,p3u11,第十一课·环保小天使,p3u11w23,认为,ren4 wei2,to think / consider,我认为他那样跟老师说话很没礼貌。,wo3 ren4 wei2 ta1 na4 yang4 gen1 lao3 shi1 shuo1 hua4 hen3 mei2 li3 mao4.,I think it is very rude of him to speak to the teacher that way.
+P3,p3u12,第十二课·我爱新加坡,p3u12w1,设计,she4 ji4,to design,姐姐设计的裙子真漂亮。,jie3 jie she4 ji4 de qun2 zi zhen1 piao4 liang.,The dress that elder sister designed is really beautiful.
+P3,p3u12,第十二课·我爱新加坡,p3u12w2,国旗,guo2 qi2,national flag,国庆日快到了，很多地方都挂起了国旗。,"guo2 qing4 ri4 kuai4 dao4 le, hen3 duo1 di4 fang1 dou1 gua4 qi3 le guo2 qi2.",National Day is approaching and many places have put up the national flag.
+P3,p3u12,第十二课·我爱新加坡,p3u12w3,颗,ke1,(measure word for small round things),天上有很多颗星星。,tian1 shang4 you3 hen3 duo1 ke1 xing1 xing.,There are many stars in the sky.
+P3,p3u12,第十二课·我爱新加坡,p3u12w4,世界,shi4 jie4,world,我想到世界各地游玩。,wo3 xiang3 dao4 shi4 jie4 ge4 di4 you2 wan2.,I want to travel to different parts of the world.
+P3,p3u12,第十二课·我爱新加坡,p3u12w5,种族,zhong3 zu2,race / ethnic group,新加坡有四大种族。,xin1 jia1 po1 you3 si4 da4 zhong3 zu2.,Singapore has four main ethnic groups.
+P3,p3u12,第十二课·我爱新加坡,p3u12w6,印度人,yin4 du4 ren2,Indian person,我的好朋友是印度人。,wo3 de hao3 peng2 you3 shi4 yin4 du4 ren2.,My good friend is Indian.
+P3,p3u12,第十二课·我爱新加坡,p3u12w7,文件夹,wen2 jian4 jia1,folder / file,老师把作业放进文件夹里。,lao3 shi1 ba3 zuo4 ye4 fang4 jin4 wen2 jian4 jia1 li3.,The teacher puts the homework into the folder.
+P3,p3u12,第十二课·我爱新加坡,p3u12w8,其中,qi2 zhong1,among / within,班上有很多同学，其中我最喜欢和小明玩。,"ban1 shang4 you3 hen3 duo1 tong2 xue2, qi2 zhong1 wo3 zui4 xi3 huan1 he2 xiao3 ming2 wan2.",There are many classmates in the class; among them I like playing with Xiao Ming the most.
+P3,p3u12,第十二课·我爱新加坡,p3u12w9,竖起,shu4 qi3,to hold up / raise,老师竖起大拇指，夸奖我做得好。,"lao3 shi1 shu4 qi3 da4 mu3 zhi3, kua1 jiang3 wo3 zuo4 de hao3.",The teacher gave a thumbs up and praised me for doing well.
+P3,p3u12,第十二课·我爱新加坡,p3u12w10,大拇指,da4 mu3 zhi3,thumb,爸爸竖起大拇指，称赞我很懂事。,"ba4 ba shu4 qi3 da4 mu3 zhi3, cheng1 zan4 wo3 hen3 dong3 shi4.",Dad gave a thumbs up and praised me for being sensible.
+P3,p3u12,第十二课·我爱新加坡,p3u12w11,谜语,mi2 yu3,riddle,老师出了一个谜语，让我们猜。,"lao3 shi1 chu1 le yi4 ge mi2 yu3, rang4 wo3 men cai1.",The teacher gave a riddle for us to guess.
+P3,p3u12,第十二课·我爱新加坡,p3u12w12,合唱团,he2 chang4 tuan2,choir,姐姐参加了学校的合唱团。,jie3 jie can1 jia1 le xue2 xiao4 de he2 chang4 tuan2.,Elder sister joined the school choir.
+P3,p3u12,第十二课·我爱新加坡,p3u12w13,兴奋,xing1 fen4,excited,我们一起参加比赛，十分兴奋。,"wo3 men yi4 qi3 can1 jia1 bi3 sai4, shi2 fen1 xing1 fen4.",We joined the competition together and were very excited.
+P3,p3u12,第十二课·我爱新加坡,p3u12w14,亮晶晶,liang4 jing1 jing1,sparkling / glittering,天上的星星亮晶晶的。,tian1 shang4 de xing1 xing liang4 jing1 jing1 de.,The stars in the sky are sparkling.
+P3,p3u12,第十二课·我爱新加坡,p3u12w15,新加坡,xin1 jia1 po1,Singapore,我住在新加坡。,wo3 zhu4 zai4 xin1 jia1 po1.,I live in Singapore.
+P3,p3u12,第十二课·我爱新加坡,p3u12w16,华人,hua2 ren2,Chinese person,我是华人，会说华语。,"wo3 shi4 hua2 ren2, hui4 shuo1 hua2 yu3.",I am Chinese and can speak Mandarin.
+P3,p3u12,第十二课·我爱新加坡,p3u12w17,国庆日,guo2 qing4 ri4,National Day,我们在国庆日那天去看烟花。,wo3 men zai4 guo2 qing4 ri4 na4 tian1 qu4 kan4 yan1 hua1.,We went to watch fireworks on National Day.
+P3,p3u12,第十二课·我爱新加坡,p3u12w18,礼物,li3 wu4,gift / present,妈妈送我一份生日礼物。,ma1 ma song4 wo3 yi4 fen4 sheng1 ri4 li3 wu4.,Mum gave me a birthday present.
+P3,p3u12,第十二课·我爱新加坡,p3u12w19,唱,chang4,to sing,我们一起唱歌。,wo3 men yi4 qi3 chang4 ge1.,We sing together.
+P3,p3u12,第十二课·我爱新加坡,p3u12w20,国歌,guo2 ge1,national anthem,上学时，我们每一天都会唱国歌。,"shang4 xue2 shi2, wo3 men mei3 yi4 tian1 dou1 hui4 chang4 guo2 ge1.","When in school, we sing the national anthem every day."
+P3,p3u12,第十二课·我爱新加坡,p3u12w21,呢,ne,(question particle),你喜欢吃什么呢？,ni3 xi3 huan1 chi1 shen2 me ne?,What do you like to eat?
+P3,p3u13,第十三课·寻路大挑战,p3u13w1,养着,yǎng zhe,keeping (as a pet),姐姐养着一条金鱼。,jie3 jie yang3 zhe yi4 tiao2 jin1 yu2.,Elder sister keeps a goldfish.
+P3,p3u13,第十三课·寻路大挑战,p3u13w2,虾,xiā,prawn / shrimp,妈妈买了很多虾回来。,ma1 ma mai3 le hen3 duo1 xia1 hui2 lai2.,Mum bought a lot of prawns.
+P3,p3u13,第十三课·寻路大挑战,p3u13w3,森林,sēn lín,forest,森林里有很多动物。,sen1 lin2 li3 you3 hen3 duo1 dong4 wu4.,There are many animals in the forest.
+P3,p3u13,第十三课·寻路大挑战,p3u13w4,桥,qiáo,bridge,我们走过一座桥。,wo3 men zou3 guo4 yi4 zuo4 qiao2.,We walked across a bridge.
+P3,p3u13,第十三课·寻路大挑战,p3u13w5,沿着,yán zhe,along,我们沿着小路走回家。,wo3 men yan2 zhe xiao3 lu4 zou3 hui2 jia1.,We walked home along the small path.
+P3,p3u13,第十三课·寻路大挑战,p3u13w6,沙滩,shā tān,beach,我们在沙滩上捡贝壳。,wo3 men zai4 sha1 tan1 shang4 jian3 bei4 ke2.,We collected shells on the beach.
+P3,p3u13,第十三课·寻路大挑战,p3u13w7,棵,kē,(measure word for trees),公园里有一棵大树。,gong1 yuan2 li3 you3 yi4 ke1 da4 shu4.,There is a big tree in the park.
+P3,p3u13,第十三课·寻路大挑战,p3u13w8,地图,dì tú,map,爸爸拿出地图看路。,ba4 ba na2 chu1 di4 tu2 kan4 lu4.,Dad took out the map to check the route.
+P3,p3u13,第十三课·寻路大挑战,p3u13w9,指定,zhǐ dìng,to designate / assign,老师指定我当组长。,lao3 shi1 zhi3 ding4 wo3 dang1 zu3 zhang3.,The teacher assigned me as group leader.
+P3,p3u13,第十三课·寻路大挑战,p3u13w10,急忙,jí máng,hurriedly,他在半路上发现忘了带钱包，急忙跑回家。,"ta1 zai4 ban4 lu4 shang4 fa1 xian4 wang4 le dai4 qian2 bao1, ji2 mang2 pao3 hui2 jia1.",He realised halfway that he forgot his wallet and hurried home.
+P3,p3u13,第十三课·寻路大挑战,p3u13w11,漂亮,piào liang,beautiful / pretty,妹妹穿了一件漂亮的裙子。,mei4 mei chuan1 le yi4 jian4 piao4 liang de qun2 zi.,Younger sister wore a beautiful dress.
+P3,p3u13,第十三课·寻路大挑战,p3u13w12,虽然,suī rán,although,虽然下着雨，我们还是决定出门。,"sui1 ran2 xia4 zhe yu3, wo3 men hai2 shi4 jue2 ding4 chu1 men2.","Although it was raining, we still decided to go out."
+P3,p3u13,第十三课·寻路大挑战,p3u13w13,但是,dàn shì,but / however,我想去朋友的家，但是妈妈不让我去。,"wo3 xiang3 qu4 peng2 you3 de jia1, dan4 shi4 ma1 ma bu4 rang4 wo3 qu4.","I wanted to go to my friend's house, but Mum did not allow me to."
+P3,p3u13,第十三课·寻路大挑战,p3u13w14,湖,hú,lake,公园里有一个大湖。,gong1 yuan2 li3 you3 yi4 ge da4 hu2.,There is a big lake in the park.
+P3,p3u13,第十三课·寻路大挑战,p3u13w15,狐狸,hú li,fox,狐狸是种聪明的动物。,hu2 li hu4 shi4 zhong3 cong1 ming2 de dong4 wu4.,The fox is a clever animal.
+P3,p3u13,第十三课·寻路大挑战,p3u13w16,狼,láng,wolf,森林里住着很多只狼。,sen1 lin2 li3 zhu4 zhe hen3 duo1 zhi1 lang2.,Many wolves live in the forest.
+P3,p3u13,第十三课·寻路大挑战,p3u13w17,猩猩,xīng xing,orangutan / gorilla,动物园里有两只猩猩。,dong4 wu4 yuan2 li3 you3 liang3 zhi1 xing1 xing.,There are two orangutans in the zoo.
+P3,p3u13,第十三课·寻路大挑战,p3u13w18,信封,xìn fēng,envelope,爸爸把信放进一个信封里。,ba4 ba ba3 xin4 fang4 jin4 yi1 ge xin4 feng1 li3.,Dad put the letter into an envelope.
+P3,p3u13,第十三课·寻路大挑战,p3u13w19,必须,bì xū,must / have to,我们必须准时上学。,wo3 men bi4 xu1 zhun3 shi2 shang4 xue2.,We must go to school on time.
+P3,p3u13,第十三课·寻路大挑战,p3u13w20,讨论,tǎo lùn,to discuss,同学们一起讨论这个问题。,tong2 xue2 men yi4 qi3 tao3 lun4 zhe4 ge wen4 ti2.,The classmates discussed this problem together.
+P3,p3u13,第十三课·寻路大挑战,p3u13w21,带领,dài lǐng,to lead,老师带领我们参观博物馆。,lao3 shi1 dai4 ling3 wo3 men can1 guan1 bo2 wu4 guan3.,The teacher led us to visit the museum.
+P3,p3u13,第十三课·寻路大挑战,p3u13w22,任务,rèn wu,task / mission,我们已经完成了今天的任务。,wo3 men yi3 jing1 wan2 cheng2 le jin1 tian1 de ren4 wu.,We have already completed today's task.
+P3,p3u13,第十三课·寻路大挑战,p3u13w23,仍然,réng rán,still / nevertheless,他生病了，仍然来上学。,"ta1 sheng1 bing4 le, reng2 ran2 lai2 shang4 xue2.",He was sick but still came to school.
+P3,p3u14,第十四课·奇妙的动物,p3u14w1,假,jia3,fake / false,奶奶的牙齿都掉光了，所以她戴假牙。,"nai3 nai de ya2 chi3 dou1 diao4 guang1 le, suo3 yi3 ta1 dai4 jia3 ya2.","Grandma's teeth all fell out, so she wears dentures."
+P3,p3u14,第十四课·奇妙的动物,p3u14w2,强,qiang2,strong,这一次的比赛，对手很强。,"zhe4 yi2 ci4 de bi3 sai4, dui4 shou3 hen3 qiang2.","In this competition, the opponent is very strong."
+P3,p3u14,第十四课·奇妙的动物,p3u14w3,弱,ruo4,weak,他生病后身体变得很弱。,ta1 sheng1 bing4 hou4 shen1 ti3 bian4 de hen3 ruo4.,His body became very weak after being sick.
+P3,p3u14,第十四课·奇妙的动物,p3u14w4,吞,tun1,swallow,蛇一口吞了青蛙。,she2 yi4 kou3 tun1 le qing1 wa1.,The snake swallowed the frog in one gulp.
+P3,p3u14,第十四课·奇妙的动物,p3u14w5,慢,man4,slow,乌龟爬得很慢。,wu1 gui1 pa2 de hen3 man4.,The tortoise crawls very slowly.
+P3,p3u14,第十四课·奇妙的动物,p3u14w6,懒,lan3,lazy,他很懒，总是不做功课。,"ta1 hen3 lan3, zong3 shi4 bu4 zuo4 gong1 ke4.",He is very lazy and never does his homework.
+P3,p3u14,第十四课·奇妙的动物,p3u14w7,咸,xian2,salty,这汤太咸了，需要加点水！,"zhe4 tang1 tai4 xian2 le, xu1 yao4 jia1 dian3 shui3!",This soup is too salty and needs more water!
+P3,p3u14,第十四课·奇妙的动物,p3u14w8,淡,dan4,bland / light,这汤味道太淡了，难怪弟弟不喝。,"zhe4 tang1 wei4 dao4 tai4 dan4 le, nan2 guai4 di4 di bu4 he1.","This soup is too bland, no wonder younger brother does not drink it."
+P3,p3u14,第十四课·奇妙的动物,p3u14w9,滑滑,hua2 hua2,smooth and slippery,小猫的毛发摸起来滑滑的。,xiao3 mao1 de mao2 fa4 mo1 qi3 lai2 hua2 hua2 de.,The kitten's fur feels smooth when touched.
+P3,p3u14,第十四课·奇妙的动物,p3u14w10,灰色,hui1 se4,grey,大象是灰色的。,da4 xiang4 shi4 hui1 se4 de.,Elephants are grey.
+P3,p3u14,第十四课·奇妙的动物,p3u14w11,散步,san4 bu4,take a walk,爷爷每天早上去公园散步。,ye2 ye mei3 tian1 zao3 shang4 qu4 gong1 yuan2 san4 bu4.,Grandpa goes to the park for a walk every morning.
+P3,p3u14,第十四课·奇妙的动物,p3u14w12,玩耍,wan2 shua3,play,小朋友们在公园里玩耍。,xiao3 peng2 you3 men zai4 gong1 yuan2 li3 wan2 shua3.,The children are playing in the park.
+P3,p3u14,第十四课·奇妙的动物,p3u14w13,笨重,ben4 zhong4,heavy and clumsy,大象的身体笨重，走路很慢。,"da4 xiang4 de shen1 ti3 ben4 zhong4, zou3 lu4 hen3 man4.","The elephant's body is heavy and clumsy, so it walks slowly."
+P3,p3u14,第十四课·奇妙的动物,p3u14w14,打滚,da3 gun3,roll about,猪喜欢在泥里打滚。,zhu1 xi3 huan1 zai4 ni2 li3 da3 gun3.,Pigs like to roll about in mud.
+P3,p3u14,第十四课·奇妙的动物,p3u14w15,咬断,yao3 duan4,bite off,老鼠咬断了绳子。,lao3 shu3 yao3 duan4 le sheng2 zi.,The mouse bit through the rope.
+P3,p3u14,第十四课·奇妙的动物,p3u14w16,够,gou4,enough,这些食物够我们吃了。,zhe4 xie1 shi2 wu4 gou4 wo3 men chi1 le.,These food are enough for us to eat.
+P3,p3u14,第十四课·奇妙的动物,p3u14w17,躺,tang3,lie down,他累了，躺在床上休息。,"ta1 lei4 le, tang3 zai4 chuang2 shang4 xiu1 xi.",He was tired and lay on the bed to rest.
+P3,p3u14,第十四课·奇妙的动物,p3u14w18,苦,ku3,bitter,黑咖啡很苦，我不喜欢喝。,"hei1 ka1 fei1 hen3 ku3, wo3 bu4 xi3 huan1 he1.",Black coffee is very bitter and I do not like to drink it.
+P3,p3u14,第十四课·奇妙的动物,p3u14w19,眼睛,yan3 jing,eyes,猫的眼睛在黑暗中会发光。,mao1 de yan3 jing zai4 hei1 an4 zhong1 hui4 fa1 guang1.,A cat's eyes glow in the dark.
+P3,p3u14,第十四课·奇妙的动物,p3u14w20,饿,e4,hungry,我肚子好饿，想快点吃饭。,"wo3 du4 zi hao3 e4, xiang3 kuai4 dian3 chi1 fan4.",I am very hungry and want to eat soon.
+P3,p3u14,第十四课·奇妙的动物,p3u14w21,吃饱,chi1 bao3,eat until full,我吃饱了，不想再吃了。,"wo3 chi1 bao3 le, bu4 xiang3 zai4 chi1 le.",I am full and do not want to eat anymore.
+P3,p3u14,第十四课·奇妙的动物,p3u14w22,胖胖,pang4 pang,plump / chubby,弟弟长得胖胖的，很可爱。,"di4 di zhang3 de pang4 pang de, hen3 ke3 ai4.",Younger brother is chubby and very cute.
+P3,p3u14,第十四课·奇妙的动物,p3u14w23,尾巴,wei3 ba,tail,小狗看到主人，高兴地摇尾巴。,"xiao3 gou3 kan4 dao4 zhu3 ren2, gao1 xing4 de yao2 wei3 ba.",The puppy wagged its tail happily when it saw its owner.
+P3,p3u14,第十四课·奇妙的动物,p3u14w24,圆圆,yuan2 yuan2,round,熊猫的脸圆圆的，很可爱。,"xiong2 mao1 de lian3 yuan2 yuan2 de, hen3 ke3 ai4.",The panda's face is round and very cute.
+P3,p3u15,第十五课·华文真有趣,p3u15w1,课室,ke4 shi4,classroom,我们在课室里上课。,wo3 men zai4 ke4 shi4 li3 shang4 ke4.,We have lessons in the classroom.
+P3,p3u15,第十五课·华文真有趣,p3u15w2,吓,xia4,frighten / scare,弟弟突然跳出来，把我吓了一跳。,"di4 di tu1 ran2 tiao4 chu1 lai2, ba3 wo3 xia4 le yi4 tiao4.",Younger brother suddenly jumped out and gave me a fright.
+P3,p3u15,第十五课·华文真有趣,p3u15w3,掉,diao4,fall / drop,我的铅笔掉在地上。,wo3 de qian1 bi3 diao4 zai4 di4 shang4.,My pencil dropped on the floor.
+P3,p3u15,第十五课·华文真有趣,p3u15w4,痛,tong4,pain / hurt,我不小心撞到了头，痛得哭了起来。,"wo3 bu4 xiao3 xin1 zhuang4 dao4 le tou2, tong4 de ku1 le qi3 lai2.",I accidentally bumped my head and cried from the pain.
+P3,p3u15,第十五课·华文真有趣,p3u15w5,冷汗,leng3 han4,cold sweat,他紧张得冷汗直流。,ta1 jin3 zhang1 de leng3 han4 zhi2 liu2.,He was so nervous that cold sweat streamed down.
+P3,p3u15,第十五课·华文真有趣,p3u15w6,不敢,bu4 gan3,dare not,我不敢一个人搭巴士回家。,wo3 bu4 gan3 yi4 ge ren2 da1 ba1 shi4 hui2 jia1.,I dare not take the bus home alone.
+P3,p3u15,第十五课·华文真有趣,p3u15w7,班,ban1,class,我们的班一共有四十个同学。,wo3 men de ban1 yi4 gong4 you3 si4 shi2 ge tong2 xue2.,Our class has forty students in total.
+P3,p3u15,第十五课·华文真有趣,p3u15w8,练习,lian4 xi2,practise,我每天练习跳舞。,wo3 mei3 tian1 lian4 xi2 tiao4 wu3.,I practise dancing every day.
+P3,p3u15,第十五课·华文真有趣,p3u15w9,简单,jian3 dan1,simple / easy,这道问题很简单，我一下子就做完了。,"zhe4 dao4 wen4 ti2 hen3 jian3 dan1, wo3 yi4 xia4 zi jiu4 zuo4 wan2 le.",This question is very simple and I finished it in no time.
+P3,p3u15,第十五课·华文真有趣,p3u15w10,桌,zhuo1,table / desk,妹妹把书本放在桌上。,mei4 mei ba3 shu1 ben3 fang4 zai4 zhuo1 shang4.,Younger sister put the books on the desk.
+P3,p3u15,第十五课·华文真有趣,p3u15w11,肚皮,du4 pi2,belly,弟弟吃饱后，喜欢摸一摸肚皮。,"di4 di chi1 bao3 hou4, xi3 huan1 mo1 yi4 mo1 du4 pi2.","After eating his fill, younger brother likes to rub his belly."
+P3,p3u15,第十五课·华文真有趣,p3u15w12,哈哈大笑,ha1 ha1 da4 xiao4,burst out laughing,他说了一个笑话，大家都哈哈大笑。,"ta1 shuo1 le yi4 ge xiao4 hua4, da4 jia1 dou1 ha1 ha1 da4 xiao4.",He told a joke and everyone burst out laughing.
+P3,p3u15,第十五课·华文真有趣,p3u15w13,闹笑话,nao4 xiao4 hua,make a fool of oneself,他说错了话，闹了个笑话。,"ta1 shuo1 cuo4 le hua4, nao4 le ge xiao4 hua.",He said the wrong thing and made a fool of himself.
+P3,p3u15,第十五课·华文真有趣,p3u15w14,小偷,xiao3 tou1,thief,警察抓住了小偷。,jing3 cha2 zhua1 zhu4 le xiao3 tou1.,The police caught the thief.
+P3,p3u15,第十五课·华文真有趣,p3u15w15,逃,tao2,escape / run away,小偷被警察发现，拔腿就逃。,"xiao3 tou1 bei4 jing3 cha2 fa1 xian4, ba2 tui3 jiu4 tao2.",The thief was spotted by the police and ran away immediately.
+P3,p3u15,第十五课·华文真有趣,p3u15w16,冒出,mao4 chu1,pop out / emerge,他一上台，就害怕得冒出冷汗。,"ta1 yi4 shang4 tai2, jiu4 hai4 pa4 de mao4 chu1 leng3 han4.","As soon as he got on stage, he broke out in a cold sweat from fear."
+P3,p3u15,第十五课·华文真有趣,p3u15w17,发抖,fa1 dou3,tremble / shiver,天气很冷，他冷得直发抖。,"tian1 qi4 hen3 leng3, ta1 leng3 de zhi2 fa1 dou3.",The weather is very cold and he kept shivering.
+P3,p3u15,第十五课·华文真有趣,p3u15w18,钻进,zuan1 jin4,squeeze / crawl into,老鼠钻进了洞里。,lao3 shu3 zuan1 jin4 le dong4 li3.,The mouse crawled into the hole.
+P3,p3u15,第十五课·华文真有趣,p3u15w19,怀里,huai2 li3,in one's arms,妹妹一看见妈妈，就立刻跑进她的怀里。,"mei4 mei yi4 kan4 jian4 ma1 ma, jiu4 li4 ke4 pao3 jin4 ta1 de huai2 li3.","As soon as younger sister saw Mum, she ran straight into her arms."
+P3,p3u15,第十五课·华文真有趣,p3u15w20,朱,zhu1,Zhu (surname),朱老师是我们的华文老师。,zhu1 lao3 shi1 shi4 wo3 men de hua2 wen2 lao3 shi1.,Teacher Zhu is our Chinese language teacher.
+P3,p3u15,第十五课·华文真有趣,p3u15w21,漫画,man4 hua4,comic / cartoon,我喜欢看漫画书。,wo3 xi3 huan1 kan4 man4 hua4 shu1.,I really enjoy reading comic books.
+P3,p3u15,第十五课·华文真有趣,p3u15w22,忍不住,ren3 bu4 zhu4,cannot help but,他说的笑话太好笑了，我忍不住大笑了起来。,"ta1 shuo1 de xiao4 hua4 tai4 hao3 xiao4 le, wo3 ren3 bu4 zhu4 da4 xiao4 le qi3 lai2.",The joke he told was so funny that I could not help but burst out laughing.
+P3,p3u15,第十五课·华文真有趣,p3u15w23,哎呀,ai1 ya1,oh no! / aiya!,哎呀，我忘了带功课！,"ai1 ya1, wo3 wang4 le dai4 gong1 ke4!","Oh no, I forgot to bring my homework!"
+P3,p3u16,第十六课·学习要认真,p3u16w1,有始无终,you3 shi3 wu2 zhong1,start but never finish (idiom),他做事有始无终，所以做什么事都不成功。,"ta1 zuo4 shi4 you3 shi3 wu2 zhong1, suo3 yi3 zuo4 shen2 me shi4 dou1 bu4 cheng2 gong1.","He never finishes what he starts, so he fails at everything he does."
+P3,p3u16,第十六课·学习要认真,p3u16w2,虎头蛇尾,hu3 tou2 she2 wei3,start strong but end weak (idiom),他做事总是虎头蛇尾，所以老板才不愿意把这么重要的事交给他。,"ta1 zuo4 shi4 zong3 shi4 hu3 tou2 she2 wei3, suo3 yi3 lao3 ban3 cai2 bu4 yuan4 yi4 ba3 zhe4 me zhong4 yao4 de shi4 jiao1 gei3 ta1.","He always starts strong but ends weak, so the boss does not want to give him important tasks."
+P3,p3u16,第十六课·学习要认真,p3u16w3,半途而废,ban4 tu2 er2 fei4,give up halfway (idiom),老师常常告诉我们做事要坚持到底，不能半途而废。,"lao3 shi1 chang2 chang2 gao4 su4 wo3 men zuo4 shi4 yao4 jian1 chi2 dao4 di3, bu4 neng2 ban4 tu2 er2 fei4.",The teacher often tells us to persevere and not give up halfway.
+P3,p3u16,第十六课·学习要认真,p3u16w4,勤学苦练,qin2 xue2 ku3 lian4,study and practise diligently (idiom),他勤学苦练，取得了好成绩。,"ta1 qin2 xue2 ku3 lian4, qu3 de2 le hao3 cheng2 ji4.",He studied and practised hard and achieved good results.
+P3,p3u16,第十六课·学习要认真,p3u16w5,俩,lia3,two (people),他俩是好朋友。,ta1 lia3 shi4 hao3 peng2 you3.,The two of them are good friends.
+P3,p3u16,第十六课·学习要认真,p3u16w6,滑轮,hua2 lun2,roller skates,我喜欢到公园溜滑轮。,wo3 xi3 huan1 dao4 gong1 yuan2 liu1 hua2 lun2.,I like to go roller skating in the park.
+P3,p3u16,第十六课·学习要认真,p3u16w7,钓鱼,diao4 yu2,fishing,爷爷喜欢去海边钓鱼。,ye2 ye xi3 huan1 qu4 hai3 bian1 diao4 yu2.,Grandpa likes to go fishing at the beach.
+P3,p3u16,第十六课·学习要认真,p3u16w8,数学,shu4 xue2,mathematics,我最喜欢上数学课。,wo3 zui4 xi3 huan1 shang4 shu4 xue2 ke4.,I like mathematics class the most.
+P3,p3u16,第十六课·学习要认真,p3u16w9,却,que4,but / yet / however,妈妈叫了哥哥好几次，哥哥却没有听见。,"ma1 ma jiao4 le ge1 ge hao3 ji3 ci4, ge1 ge que4 mei2 you3 ting1 jian4.",Mum called elder brother several times but he did not hear.
+P3,p3u16,第十六课·学习要认真,p3u16w10,念,nian4,read aloud / recite,老师叫我们大声念课文。,lao3 shi1 jiao4 wo3 men da4 sheng1 nian4 ke4 wen2.,The teacher asked us to read the text aloud.
+P3,p3u16,第十六课·学习要认真,p3u16w11,传,chuan2,pass / transmit,小明叫我把篮球传给他。,xiao3 ming2 jiao4 wo3 ba3 lan2 qiu2 chuan2 gei3 ta1.,Xiao Ming asked me to pass the basketball to him.
+P3,p3u16,第十六课·学习要认真,p3u16w12,感到,gan3 dao4,feel / sense,收到妈妈送给我的生日礼物，我感到很开心。,"shou1 dao4 ma1 ma song4 gei3 wo3 de sheng1 ri4 li3 wu4, wo3 gan3 dao4 hen3 kai1 xin1.","Receiving the birthday gift from Mum, I felt very happy."
+P3,p3u16,第十六课·学习要认真,p3u16w13,抬,tai2,lift / raise,他抬起头，看着老师。,"ta1 tai2 qi3 tou2, kan4 zhe lao3 shi1.",He lifted his head and looked at the teacher.
+P3,p3u16,第十六课·学习要认真,p3u16w14,终于,zhong1 yu2,finally / at last,经过几个月的练习，他终于学会了骑脚踏车。,"jing1 guo4 ji3 ge yue4 de lian4 xi2, ta1 zhong1 yu2 xue2 hui4 le qi2 jiao3 ta4 che1.","After months of practice, he finally learned to ride a bicycle."
+P3,p3u16,第十六课·学习要认真,p3u16w15,泡泡,pao4 pao,bubbles,弟弟喜欢吹泡泡。,di4 di xi3 huan1 chui1 pao4 pao.,Younger brother likes to blow bubbles.
+P3,p3u16,第十六课·学习要认真,p3u16w16,结果,jie2 guo3,result / outcome,他努力练习，结果在比赛中得到了冠军。,"ta1 nu3 li4 lian4 xi2, jie2 guo3 zai4 bi3 sai4 zhong1 de2 dao4 le guan4 jun1.",He practised hard and as a result won the championship.
+P3,p3u16,第十六课·学习要认真,p3u16w17,题,ti2,question / problem,这道题很难，我不会做。,"zhe4 dao4 ti2 hen3 nan2, wo3 bu4 hui4 zuo4.",This question is very difficult and I do not know how to do it.
+P3,p3u16,第十六课·学习要认真,p3u16w18,认识,ren4 shi,know / recognise,我参加舞蹈班后，认识了很多新朋友。,"wo3 can1 jia1 wu3 dao3 ban1 hou4, ren4 shi le hen3 duo1 xin1 peng2 you3.","After joining the dance class, I got to know many new friends."
+P3,p3u16,第十六课·学习要认真,p3u16w19,别人,bie2 ren2,other people,妈妈说那是别人的铅笔，不能乱拿。,"ma1 ma shuo1 na4 shi4 bie2 ren2 de qian1 bi3, bu4 neng2 luan4 na2.",Mum said that is someone else's pencil and we must not take it.
+P3,p3u16,第十六课·学习要认真,p3u16w20,低,di1,low / lower,他低下头，向老师说对不起。,"ta1 di1 xia4 tou2, xiang4 lao3 shi1 shuo1 dui4 bu4 qi3.",He lowered his head and apologised to the teacher.
+P3,p3u17,第十七课·好孩子,p3u17w1,农夫,nong2 fu1,farmer,农夫每天在田里工作。,nong2 fu1 mei3 tian1 zai4 tian2 li3 gong1 zuo4.,The farmer works in the field every day.
+P3,p3u17,第十七课·好孩子,p3u17w2,劳动,lao2 dong4,work / labour,爸爸喜欢劳动，经常帮忙做家务。,"ba4 ba xi3 huan1 lao2 dong4, jing1 chang2 bang1 mang2 zuo4 jia1 wu4.",Dad loves to work and often helps with household chores.
+P3,p3u17,第十七课·好孩子,p3u17w3,渔夫,yu2 fu1,fisherman,渔夫每天早上出海捕鱼。,yu2 fu1 mei3 tian1 zao3 shang4 chu1 hai3 bu3 yu2.,The fisherman goes out to sea to catch fish every morning.
+P3,p3u17,第十七课·好孩子,p3u17w4,神仙,shen2 xian1,deity / immortal,故事里的神仙会变法术。,gu4 shi4 li3 de shen2 xian1 hui4 bian4 fa3 shu4.,The deity in the story can perform magic.
+P3,p3u17,第十七课·好孩子,p3u17w5,捞出了,lao1 chu1 le,fish out / scoop out,他捞出了掉进河里的手机。,ta1 lao1 chu1 le diao4 jin4 he2 li3 de shou3 ji1.,He fished out the phone that had fallen into the river.
+P3,p3u17,第十七课·好孩子,p3u17w6,精灵,jing1 ling2,spirit / elf,故事里的精灵帮助了农夫。,gu4 shi4 li3 de jing1 ling2 bang1 zhu4 le nong2 fu1.,The elf in the story helped the farmer.
+P3,p3u17,第十七课·好孩子,p3u17w7,铁,tie3,iron,这把斧头是铁做的。,zhe4 ba3 fu3 tou2 shi4 tie3 zuo4 de.,This axe is made of iron.
+P3,p3u17,第十七课·好孩子,p3u17w8,银,yin2,silver,这条手链是银做的。,zhe4 tiao2 shou3 lian4 shi4 yin2 zuo4 de.,This bracelet is made of silver.
+P3,p3u17,第十七课·好孩子,p3u17w9,银牌,yin2 pai2,silver medal,他在比赛中得到了银牌。,ta1 zai4 bi3 sai4 zhong1 de2 dao4 le yin2 pai2.,He won a silver medal in the competition.
+P3,p3u17,第十七课·好孩子,p3u17w10,签名,qian1 ming2,sign / autograph,爸爸在文件上签名。,ba4 ba zai4 wen2 jian4 shang4 qian1 ming2.,Dad signed his name on the document.
+P3,p3u17,第十七课·好孩子,p3u17w11,万,wan4,ten thousand,这本书卖了一万本。,zhe4 ben3 shu1 mai4 le yi2 wan4 ben3.,This book sold ten thousand copies.
+P3,p3u17,第十七课·好孩子,p3u17w12,千,qian1,thousand,图书馆里有几千本书。,tu2 shu1 guan3 li3 you3 ji3 qian1 ben3 shu1.,There are thousands of books in the library.
+P3,p3u17,第十七课·好孩子,p3u17w13,减,jian3,subtract / reduce,十减三等于七。,shi2 jian3 san1 deng3 yu2 qi1.,Ten minus three equals seven.
+P3,p3u17,第十七课·好孩子,p3u17w14,算,suan4,calculate,我用计算器来算数学题。,wo3 yong4 ji4 suan4 qi4 lai2 suan4 shu4 xue2 ti2.,I use a calculator to work out maths problems.
+P3,p3u17,第十七课·好孩子,p3u17w15,检查,jian3 cha2,check / inspect,老师叫我们把答案检查一遍。,lao3 shi1 jiao4 wo3 men ba3 da2 an4 jian3 cha2 yi2 bian4.,The teacher asked us to check our answers once.
+P3,p3u17,第十七课·好孩子,p3u17w16,摘下了,zhai1 xia4 le,picked / plucked off,他从树上摘下了一个苹果。,ta1 cong2 shu4 shang4 zhai1 xia4 le yi2 ge ping2 guo3.,He picked an apple from the tree.
+P3,p3u17,第十七课·好孩子,p3u17w17,失去,shi1 qu4,lose,他失去了心爱的玩具，哭了起来。,"ta1 shi1 qu4 le xin1 ai4 de wan2 ju4, ku1 le qi3 lai2.",He lost his beloved toy and started to cry.
+P3,p3u17,第十七课·好孩子,p3u17w18,金,jin1,gold,他在比赛中赢得了金牌。,ta1 zai4 bi3 sai4 zhong1 ying2 de2 le jin1 pai2.,He won a gold medal in the competition.
+P3,p3u17,第十七课·好孩子,p3u17w19,等,deng3,wait,我在学校门口等妈妈来接我。,wo3 zai4 xue2 xiao4 men2 kou3 deng3 ma1 ma lai2 jie1 wo3.,I waited at the school gate for Mum to pick me up.
+P3,p3u17,第十七课·好孩子,p3u17w20,立刻,li4 ke4,immediately,他听到妈妈叫他，立刻跑过去。,"ta1 ting1 dao4 ma1 ma jiao4 ta1, li4 ke4 pao3 guo4 qu4.",He heard Mum call him and ran over immediately.
+P3,p3u17,第十七课·好孩子,p3u17w21,决定,jue2 ding4,decide / decision,我决定每天傍晚去公园跑步。,wo3 jue2 ding4 mei3 tian1 bang4 wan3 qu4 gong1 yuan2 pao3 bu4.,I decided to go jogging in the park every evening.
