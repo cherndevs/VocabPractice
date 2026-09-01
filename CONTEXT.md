@@ -15,7 +15,7 @@ A display toggle within a running session — Write, Read, or Peek. Switched fre
 _Avoid_: Session mode, tab
 
 **Write Mode**:
-The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count.
+The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count. The word stays hidden throughout — the writing happens on paper, not on screen. Grading is a separate step afterwards (see Offline Grading).
 _Avoid_: Test, test mode
 
 **Read Mode**:
@@ -35,12 +35,24 @@ The auto-detected, auto-generated romanization line shown below a word in Peek M
 _Avoid_: Translation, transliteration
 
 **AHGE Grading**:
-The self-report scale that replaces the old flat "I've Got This" flag with structured input to per-card mastery and interleaved queue construction. Implemented as a 2-point scale — "Oops" / "I've got this" (Again/Good under the hood, the FSRS-compatible reduction of the full 4-point Again/Hard/Good/Easy scale) — rather than 4 buttons, since the Hard/Easy distinction isn't a reliable self-judgment for young children and a noisy 4-point signal isn't actually richer than a clean 2-point one. The "I've got this" copy deliberately echoes the original mastery-marking phrase — same words, now backed by decay math instead of a flat flag. Read Mode uses it (no objective correctness signal exists there); Write Mode does not, since it has an objective correctness signal in principle, even though that signal isn't computed today (see Write Mode).
+The self-report scale that replaces the old flat "I've Got This" flag with structured input to per-card mastery and interleaved queue construction. Implemented as a 2-point scale — "Oops" / "I've got this" (Again/Good under the hood, the FSRS-compatible reduction of the full 4-point Again/Hard/Good/Easy scale) — rather than 4 buttons, since the Hard/Easy distinction isn't a reliable self-judgment for young children and a noisy 4-point signal isn't actually richer than a clean 2-point one. The "I've got this" copy deliberately echoes the original mastery-marking phrase — same words, now backed by decay math instead of a flat flag. Read Mode uses it as self-report by the learner. Write Mode uses the same two buttons, but as Offline Grading — a parent marking work the app can't see — not self-report.
 _Avoid_: Grade, rating, difficulty rating, Again/Hard/Good/Easy (as the shipped UI — that's the underlying algorithm's full scale, not what the user sees)
+
+**Offline Grading**:
+A parent marking a Spelling session's words right or wrong against what the child wrote on paper, using the same two AHGE buttons. It exists because the app has no handwriting recognition and would otherwise record nothing at all for Writing. A deliberate proxy: the grade comes from a person, not from the app checking the work, and is stored indistinguishably from any future recognition-derived grade.
+_Avoid_: Marking, self-grading (the learner isn't the one grading), parent review
+
+**Full Review**:
+A session that pulls every card in the relevant list regardless of due status, rather than only the cards the decay model considers due. Exists for comprehensive practice ahead of a school test, when the parent doesn't trust that the due filter has caught everything. Its grades feed the mastery model normally. Surfaced in the UI as **Revise all**.
+_Avoid_: Cram mode (Anki's analogous mode explicitly discards its results; this one doesn't), review all
 
 **Reading** (mastery composite):
 A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Read Mode currently updates recognition and pronunciation — both by self-report, until Read Aloud exists — and never comprehension.
 _Avoid_: Reading mastery, reading score (ambiguous with Read Mode)
+
+**Writing** (mastery composite):
+A per-card mastery score for producing a word in writing, fed by Offline Grading until handwriting recognition exists.
+_Avoid_: Writing mastery, spelling score
 
 ### Deferred
 
