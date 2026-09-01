@@ -37,6 +37,10 @@ Unlike Anki's analogous "cram mode" (which explicitly does not reschedule or aff
 
 **Session construction always loads the full Lesson card set**, not just the due subset — Lesson card counts are small enough that this costs nothing. "Refresher" vs "Full Review" is a filter predicate over that already-loaded set (due-only vs everything), not two different queries. This makes the mode switchable **mid-session**, not just a choice made before starting or at the end: the queue tracks which cards have already been shown this session regardless of mode, and up-next is always (candidate set for the current mode) minus (already shown) — so switching from Refresher to Full Review mid-session just appends the previously-filtered-out cards to what's left, without re-fetching or repeating anything already answered.
 
+## Superseded in part
+
+Session Type, and the separation of it from the in-session view toggle, are settled in [ADR-0008](0008-session-type-chosen-at-creation.md). Where this ADR says "mode" of Write/Read/Practice Talk, read Session Type for Practice Talk and Session View for Write/Read.
+
 ## Open / deferred
 
 Not settled — carried forward rather than silently assumed:
