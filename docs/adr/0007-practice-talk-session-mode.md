@@ -12,6 +12,8 @@ Mastery itself moves from a flat per-mode flag to a composite per skill:
 
 Read Mode's old "I've Got This" flag is replaced by Again/Hard/Good/Easy (AHGE) grading, which feeds the Reading composite and drives interleaved queue construction. Write Mode does not get AHGE self-report buttons: its correctness is objectively checkable in principle, so asking the user to also self-assess would be redundant friction — but since in-app handwriting recognition for Chinese isn't built yet, Write Mode currently contributes no mastery signal at all (matching today's shipped behavior); auto-derived grading is the target once that capability exists, not something designed further here.
 
+**Settled: Write Mode produces no mastery signal until handwriting recognition exists.** The alternatives were a human-marked correctness step (reveal the spelling after each word, user marks it against the paper) or AHGE self-report as in Read Mode. Both were rejected: the app would be recording a result it cannot itself verify, and a Writing score sourced from a parent's marking or a child's self-assessment is not the same measurement as one from recognition, so blending the two over time would make the score mean two different things. Writing mastery stays dark — visibly absent rather than filled with a weaker proxy — until the capability lands.
+
 Practice Talk has no button-press moment, so its evidence comes from a post-session pass over the conversation transcript, classifying each touched card into the same AHGE vocabulary (one grading system, not two parallel ones) — e.g. produced-correctly-unprompted ≈ Easy, flagged-confused ≈ Again, heard-without-confusion ≈ Good. The AI drawing on the Lesson's card set may still use ordinary connective/filler vocabulary beyond it; only card-mapped words are evidence.
 
 Beyond AHGE, a Practice Talk session also produces two additional outputs, persisted rather than shown once and discarded:
@@ -37,6 +39,14 @@ Unlike Anki's analogous "cram mode" (which explicitly does not reschedule or aff
 
 **Session construction always loads the full Lesson card set**, not just the due subset — Lesson card counts are small enough that this costs nothing. "Refresher" vs "Full Review" is a filter predicate over that already-loaded set (due-only vs everything), not two different queries. This makes the mode switchable **mid-session**, not just a choice made before starting or at the end: the queue tracks which cards have already been shown this session regardless of mode, and up-next is always (candidate set for the current mode) minus (already shown) — so switching from Refresher to Full Review mid-session just appends the previously-filtered-out cards to what's left, without re-fetching or repeating anything already answered.
 
+## Status: deferred
+
+Speaking sessions are deferred as an epic and are not being built. The type is not offered in the session-creation flow, and the three questions under "Open / deferred" below are parked with it rather than blocking spec work on Spelling and Reading.
+
+What survives the deferral and remains in force: the independence of a Lesson's writing and reading lists, the Reading mastery composite, AHGE grading in Read Mode, Full Review vs Refresher, and Lessons as structured catalog entries. What defers with it: Speaking sessions themselves, the Speaking mastery composite, Insight Notes, and Candidate Vocabulary / Bonus Words.
+
+This ADR calls the mode **Practice Talk** throughout. That name has since been collapsed into **Speaking**, the Session Type — they were two names for one thing, since the type has exactly one drill and no views.
+
 ## Superseded in part
 
 Session Type, and the separation of it from the in-session view toggle, are settled in [ADR-0008](0008-session-type-chosen-at-creation.md). Where this ADR says "mode" of Write/Read/Practice Talk, read Session Type for Practice Talk and Session View for Write/Read.
@@ -48,4 +58,3 @@ Not settled — carried forward rather than silently assumed:
 - Whether Practice Talk's confusion detection is explicit self-report only, or also inferred from response quality.
 - What "coverage" means for the coverage-based session-termination trigger (whole Lesson vs. currently-due subset).
 - Whether an approved candidate/Bonus card starts blank or seeded from the conversational evidence that surfaced it.
-- Whether Write Mode should produce any mastery signal at all before handwriting recognition exists (currently: no).

@@ -1,6 +1,6 @@
 # Session Type is chosen at creation and sits above the in-session view toggle
 
-A session now carries an explicit **Session Type** — Spelling, Reading, or Speaking — picked as the first step of the creation flow and fixed for that session's lifetime. This is a new concept, not a rename: the shipped `sessions` table has no mode column at all, and the existing Write/Read/Peek control is a `SessionViewMode` tab resolved per word and switched freely mid-session. The two coexist deliberately, so the glossary now separates **Session Type** (what the session is for) from **Session View** (how the current word is displayed).
+A session now carries an explicit **Session Type** — Spelling or Reading — picked as the first step of the creation flow and fixed for that session's lifetime. This is a new concept, not a rename: the shipped `sessions` table has no mode column at all, and the existing Write/Read/Peek control is a `SessionViewMode` tab resolved per word and switched freely mid-session. The two coexist deliberately, so the glossary now separates **Session Type** (what the session is for) from **Session View** (how the current word is displayed).
 
 The trigger was the creation flow needing to know, before capture, which of the Lesson's two independently-captured lists it is filling and which drill will run. ADR-0007 established that the writing and reading lists are not the same set of words; a session that hasn't declared its type cannot know which list it belongs to, which meant the question was being asked late and, at one point, twice.
 
@@ -9,9 +9,9 @@ Type and view are not the same shape of thing, so collapsing them would lose som
 - **Type** is a property of the session, decided once, and determines the source list and the drill.
 - **View** is a display toggle within a running session, per word, with no bearing on what the session is for. Peek in particular must remain switchable mid-drill — it exists precisely to check a Read Mode guess, and it already hides itself per word when the current word has no Pinyin Annotation.
 
-The three types are named for the skill practised — Spelling, Reading, Speaking — matching the mastery composites (Writing, Reading, Speaking) rather than the view names (Write, Read, Peek). The user-facing question is "what are we practising?", not "which screen do you want".
+Types are named for the skill practised — Spelling, Reading — matching the mastery composites (Writing, Reading) rather than the view names (Write, Read, Peek). The user-facing question is "what are we practising?", not "which screen do you want".
 
-Speaking is present in the creation flow but disabled, tagged "Soon".
+A third type, Speaking, is designed in ADR-0007 but deferred as an epic and **not offered in the creation flow at all** — not even disabled. A greyed-out "Soon" card was considered and rejected: it promises a date the project doesn't have, and the cost of adding a third card later is trivial next to the cost of it sitting there unexplained for months.
 
 ## Considered Options
 
@@ -31,4 +31,4 @@ Until it exists, Read Mode's pronunciation sub-signal continues to come from AHG
 
 - `sessions` needs a type column; it currently has none.
 - Which Session Views a session offers becomes a function of its type, rather than a fixed three-tab bar.
-- Practice Talk is a Speaking session's drill, not a stage inside a per-word session. An earlier design rendered it as a single-card mic-and-grade step alongside Read and Write, which was wrong on both counts — it is turn-based and multi-card. That drill was removed. What remains on the per-word screen is a bare placeholder, reachable only by setting the design canvas's `modality` knob to `speaking` — not a user-facing view. It exists so that knob has something honest to render while Practice Talk is unbuilt, and it should not be read as Speaking being a view within a per-word session.
+- Speaking is a session type of its own, not a stage inside a per-word session. (ADR-0007 calls it Practice Talk; the two names were collapsed into Speaking, since the type has exactly one drill.) An earlier design rendered it as a single-card mic-and-grade step alongside Read and Write, which was wrong on both counts — it is turn-based and multi-card. That drill was removed. What remains on the per-word screen is a bare placeholder, reachable only by setting the design canvas's `modality` knob to `speaking` — not a user-facing view. It exists so that knob has something honest to render while Speaking is unbuilt, and it should not be read as Speaking being a view within a per-word session.
