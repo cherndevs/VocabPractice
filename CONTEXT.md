@@ -60,5 +60,5 @@ The structured catalog a session's tag resolves to — the app's model of a real
 _Avoid_: Unit, tag (a Lesson is the structured entity a tag now resolves to, not a loose label)
 
 **Writing list / Reading list**:
-A Lesson's two independently-captured word lists. The writing list feeds Write Mode (spelling/dictation); the reading list feeds Read Mode and grounds Practice Talk. A word may appear in one, the other, or both — capturing it for one list does not add it to the other. Each is reviewed and confirmed separately at session-creation time (word text only for writing; word + meaning for reading, since Read Mode tests comprehension).
+A Lesson's two independently-captured word lists. The writing list feeds Write Mode (spelling/dictation); the reading list feeds Read Mode and grounds Practice Talk. A word may appear in one, the other, or both — capturing it for one list does not add it to the other. Each is reviewed and confirmed separately at session-creation time; both lists can carry a meaning per word (a spelling word benefits from a meaning too, not just a reading one), captured the same way regardless of which list it's for.
 _Avoid_: Card list, word bank (as if singular/shared across modes)
