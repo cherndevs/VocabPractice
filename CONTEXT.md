@@ -6,16 +6,28 @@ A mobile-first spelling practice app: users capture spelling worksheets via came
 
 ### Sessions
 
+**Session Type**:
+What a session practises, chosen up front at creation and fixed for that session's lifetime: **Spelling**, **Reading**, or **Speaking**. It determines which of the Lesson's lists the session draws from (writing list, reading list, reading list respectively) and which drill runs. Distinct from a Session View, which is a display toggle *within* a running session.
+_Avoid_: Session mode, mode (ambiguous with Session View and with the Refresher/Full Review filter)
+
+**Session View**:
+A display toggle within a running session — Write, Read, or Peek. Switched freely mid-session and resolved per word; it changes how the current word is presented, never what the session is for. Which views are offered follows from the Session Type.
+_Avoid_: Session mode, tab
+
 **Write Mode**:
-The session mode where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count.
+The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count.
 _Avoid_: Test, test mode
 
 **Read Mode**:
-The session mode where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. Session-scoped mastery marking ("I've Got This") happens here.
+The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. Session-scoped mastery marking ("I've Got This") happens here.
 _Avoid_: Practice, practice mode
 
+**Read Aloud**:
+The pronunciation check offered inside Read Mode: the user says the displayed word and the app assesses it, supplying the Reading composite's pronunciation sub-signal objectively instead of by self-report. Designed but not built — the app has no speech capture of any kind today, only text-to-speech.
+_Avoid_: Speech recognition, voice check, pronunciation test
+
 **Peek Mode**:
-The session mode where the word is displayed alongside its Pinyin Annotation and an audio playback button, for checking a Read Mode guess. Has no "I've Got This" marking of its own — mastery is only ever recorded from Read Mode. Hidden from the tab bar whenever the current word has no Pinyin Annotation (e.g. an English word in a mixed-language session).
+The Session View where the word is displayed alongside its Pinyin Annotation and an audio playback button, for checking a Read Mode guess. Has no "I've Got This" marking of its own — mastery is only ever recorded from Read Mode. Hidden from the tab bar whenever the current word has no Pinyin Annotation (e.g. an English word in a mixed-language session).
 _Avoid_: Test, test mode, Check mode
 
 **Pinyin Annotation**:
@@ -23,20 +35,20 @@ The auto-detected, auto-generated romanization line shown below a word in Peek M
 _Avoid_: Translation, transliteration
 
 **Practice Talk**:
-A session mode where the app and the user hold a multi-turn spoken conversation grounded in the current Lesson's topic and reading list. Coexists with Write Mode and Read Mode rather than replacing them. Ends on an AI-inferred natural stopping point, a turn cap, or coverage of due cards (exact coverage definition not yet settled). Produces no live "I've Got This"-style marking; instead a post-session pass classifies each touched card's evidence into Again/Hard/Good/Easy (see AHGE Grading), plus two additional outputs: persisted Insight Notes and Candidate Vocabulary. See [ADR-0007](docs/adr/0007-practice-talk-session-mode.md).
-_Avoid_: Speaking session, conversation mode, chat mode
+The drill a Speaking session runs: the app and the user hold a multi-turn spoken conversation grounded in the current Lesson's topic and reading list. Turn-based and multi-card rather than a per-word drill, so it has no Session Views of its own and never appears as a stage inside a Spelling or Reading session. Ends on an AI-inferred natural stopping point, a turn cap, or coverage of due cards (exact coverage definition not yet settled). Produces no live "I've Got This"-style marking; instead a post-session pass classifies each touched card's evidence into Again/Hard/Good/Easy (see AHGE Grading), plus two additional outputs: persisted Insight Notes and Candidate Vocabulary. See [ADR-0007](docs/adr/0007-practice-talk-session-mode.md).
+_Avoid_: Conversation mode, chat mode (a Speaking session is the session; Practice Talk is the drill it runs)
 
 **AHGE Grading**:
 The self-report scale that replaces the old flat "I've Got This" flag with structured input to per-card mastery and interleaved queue construction. Implemented as a 2-point scale — "Oops" / "I've got this" (Again/Good under the hood, the FSRS-compatible reduction of the full 4-point Again/Hard/Good/Easy scale) — rather than 4 buttons, since the Hard/Easy distinction isn't a reliable self-judgment for young children and a noisy 4-point signal isn't actually richer than a clean 2-point one. The "I've got this" copy deliberately echoes the original mastery-marking phrase — same words, now backed by decay math instead of a flat flag. Read Mode and Practice Talk use it (no objective correctness signal exists for either); Write Mode does not, since it has an objective correctness signal in principle, even though that signal isn't computed today (see Write Mode).
 _Avoid_: Grade, rating, difficulty rating, Again/Hard/Good/Easy (as the shipped UI — that's the underlying algorithm's full scale, not what the user sees)
 
 **Reading** (mastery composite):
-A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever mode actually tested it. Read Mode currently updates recognition and pronunciation, not comprehension.
+A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Read Mode currently updates recognition and pronunciation — both by self-report, until Read Aloud exists — and never comprehension.
 _Avoid_: Reading mastery, reading score (ambiguous with Read Mode)
 
 **Speaking** (mastery composite):
 A per-Lesson (not per-card) conversational-fluency score produced by Practice Talk sessions, tracked separately from any card's Reading or Writing mastery.
-_Avoid_: Speaking mastery, speaking score
+_Avoid_: Speaking mastery, speaking score (and note this is the score, not the Speaking Session Type that produces it)
 
 **Insight Notes**:
 Cross-cutting patterns surfaced from a Practice Talk transcript that a single card's AHGE grade can't capture (e.g. "consistently confuses X and Y"). Persisted per card/Lesson rather than shown once and discarded.
@@ -60,5 +72,5 @@ The structured catalog a session's tag resolves to — the app's model of a real
 _Avoid_: Unit, tag (a Lesson is the structured entity a tag now resolves to, not a loose label)
 
 **Writing list / Reading list**:
-A Lesson's two independently-captured word lists. The writing list feeds Write Mode (spelling/dictation); the reading list feeds Read Mode and grounds Practice Talk. A word may appear in one, the other, or both — capturing it for one list does not add it to the other. Each is reviewed and confirmed separately at session-creation time; both lists can carry a meaning per word (a spelling word benefits from a meaning too, not just a reading one), captured the same way regardless of which list it's for.
-_Avoid_: Card list, word bank (as if singular/shared across modes)
+A Lesson's two independently-captured word lists. The writing list is what a Spelling session draws from; the reading list is what Reading and Speaking sessions draw from. A word may appear in one, the other, or both — capturing it for one list does not add it to the other. Each is reviewed and confirmed separately at session-creation time; both lists can carry a meaning per word (a spelling word benefits from a meaning too, not just a reading one), captured the same way regardless of which list it's for.
+_Avoid_: Card list, word bank (as if singular/shared across Session Types)
