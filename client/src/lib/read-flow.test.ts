@@ -164,10 +164,21 @@ describe("Read Aloud word flow", () => {
 
   it("keeps what was heard on the flow, with the verdict, for debugging", () => {
     const missed = listenTo(startReadFlow(words("apple")), heard("able", "apple"));
-    expect(missed.lastAttempt).toEqual({ alternatives: ["able", "apple"], passed: false });
+    expect(missed.lastAttempt).toEqual({ alternatives: ["able", "apple"], confidences: undefined, passed: false, how: null });
     const passed = listenTo(missed, heard("apple"));
-    expect(passed.lastAttempt).toEqual({ alternatives: ["apple"], passed: true });
+    expect(passed.lastAttempt).toEqual({ alternatives: ["apple"], confidences: undefined, passed: true, how: "same-text" });
     expect(startListening(missed).lastAttempt).toBeNull();
+  });
+
+  it("records how a Chinese reading passed: same pinyin, not the same characters", () => {
+    const flow = listenTo(startReadFlow(words("弯曲")), heard("湾区"));
+    expect(flow.wordState).toEqual({ kind: "passed" });
+    expect(flow.lastAttempt?.how).toBe("same-pinyin");
+  });
+
+  it("keeps the recogniser's confidences for debugging", () => {
+    const flow = listenTo(startReadFlow(words("apple")), { kind: "heard", alternatives: ["apple"], confidences: [0.4] });
+    expect(flow.lastAttempt?.confidences).toEqual([0.4]);
   });
 
   it("fails after three misses, revealing the answer with only Oops open", () => {

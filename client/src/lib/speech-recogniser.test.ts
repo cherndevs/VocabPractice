@@ -59,8 +59,8 @@ describe("speech recogniser adapter", () => {
     const t = setup();
     t.begin();
     t.fake().onstart?.();
-    t.fake().onresult?.({ results: [[{ transcript: "two" }, { transcript: "too" }]] });
-    expect(t.events).toEqual([{ kind: "heard", alternatives: ["two", "too"] }]);
+    t.fake().onresult?.({ results: [[{ transcript: "two", confidence: 0.9 }, { transcript: "too", confidence: 0.2 }]] });
+    expect(t.events).toEqual([{ kind: "heard", alternatives: ["two", "too"], confidences: [0.9, 0.2] }]);
     expect(t.fake().aborted).toBe(true);
   });
 

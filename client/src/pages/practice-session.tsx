@@ -680,9 +680,15 @@ export default function PracticeSession() {
                   </div>
                   {/* Debug: what the app heard. Temporary, for checking Read Aloud by ear. */}
                   {readFlow.lastAttempt && (
-                    <div className="text-xs text-muted-foreground" data-testid="text-heard-debug">
-                      Heard: {readFlow.lastAttempt.alternatives.map((alt, i) => (i === 0 ? `[${alt}]` : alt)).join(" · ")}
-                      {" "}→ {readFlow.lastAttempt.passed ? "match" : "no match"}
+                    <div className="text-xs text-muted-foreground space-y-0.5" data-testid="text-heard-debug">
+                      <div>
+                        Judged: [{readFlow.lastAttempt.alternatives[0]}]
+                        {readFlow.lastAttempt.confidences ? ` (conf ${readFlow.lastAttempt.confidences[0].toFixed(2)})` : ""}
+                        {" "}→ {readFlow.lastAttempt.passed ? `match (${readFlow.lastAttempt.how === "same-pinyin" ? "same pinyin, different characters" : "same text"})` : "no match"}
+                      </div>
+                      {readFlow.lastAttempt.alternatives.length > 1 && (
+                        <div>Also heard, ignored: {readFlow.lastAttempt.alternatives.slice(1).join(" · ")}</div>
+                      )}
                     </div>
                   )}
                   {currentWordPinyin && readFlow.wordState.kind !== "passed" && readFlow.wordState.kind !== "failed" && (
