@@ -14,6 +14,9 @@ import {
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
 import type { Session } from "@shared/schema";
+
+// The list endpoint adds how many of a session's words have ever been graded.
+type SessionWithTested = Session & { testedCount: number };
 import { format } from "date-fns";
 
 function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
@@ -33,7 +36,7 @@ export default function Sessions() {
   const { subject, setSubject } = useActiveSubject();
   // Only the active Workspace's sessions are listed (ADR-0005). The list waits
   // for settings so it never flashes the wrong Workspace on startup.
-  const { data: sessions = [], isLoading: sessionsLoading } = useQuery<Session[]>({
+  const { data: sessions = [], isLoading: sessionsLoading } = useQuery<SessionWithTested[]>({
     queryKey: ["/api/sessions", { subject }],
     queryFn: async () => {
       const response = await fetch(`/api/sessions?subject=${subject}`);
@@ -84,7 +87,7 @@ export default function Sessions() {
     },
   });
 
-  const handleTogglePin = (e: React.MouseEvent, session: Session) => {
+  const handleTogglePin = (e: React.MouseEvent, session: SessionWithTested) => {
     e.preventDefault();
     e.stopPropagation();
     const nextPinnedAt = session.pinnedAt ? null : new Date().toISOString();
@@ -220,6 +223,9 @@ export default function Sessions() {
                           </span>
                           <span data-testid={`text-session-word-count-${session.id}`}>
                             {session.wordCount} Words
+                          </span>
+                          <span data-testid={`text-session-tested-${session.id}`}>
+                            {session.testedCount} / {session.wordCount} tested
                           </span>
                         </div>
                         <ChevronRight className="w-4 h-4" />

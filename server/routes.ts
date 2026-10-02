@@ -1,7 +1,16 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import type { IStorage } from "./storage";
-import { DEFAULT_SUBJECT, insertSessionSchema, insertSettingsSchema, subjectSchema } from "@shared/schema";
+import {
+  DEFAULT_SUBJECT,
+  gradeBatchSchema,
+  insertSessionSchema,
+  insertSettingsSchema,
+  skillSchema,
+  subjectSchema,
+} from "@shared/schema";
+import { applyGrades } from "./grades";
+import { needsReview } from "./scheduling";
 import {
   extractSpellingLists,
   ExtractionServiceError,
@@ -17,7 +26,16 @@ function withActiveSubject<T extends { activeSubject: string | null }>(settings:
   return { ...settings, activeSubject: settings.activeSubject ?? DEFAULT_SUBJECT };
 }
 
-export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
+export interface RouteOptions {
+  /** The server's clock; tests inject their own to move past due dates. */
+  now?: () => Date;
+}
+
+export async function registerRoutes(
+  app: Express,
+  storage: IStorage,
+  { now = () => new Date() }: RouteOptions = {},
+): Promise<Server> {
   // Spelling list extraction — relays a worksheet photo to Claude and returns
   // the sessions it reads off the page. Takes the image as raw bytes rather
   // than JSON so the global express.json() limit stays small for every other
@@ -62,7 +80,16 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
     }
     try {
       const sessions = await storage.getSessions(subject.data);
-      res.json(sessions);
+      // testedCount: words ever graded in the session's skill (any grade
+      // creates a review state), shared by every session holding that word.
+      const withTested = await Promise.all(
+        sessions.map(async (session) => {
+          const words = session.words.map((w) => w.trim());
+          const tested = await storage.getReviewStates(session.subject, session.sessionType, words);
+          return { ...session, testedCount: new Set(tested.map((s) => s.word)).size };
+        }),
+      );
+      res.json(withTested);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch sessions" });
     }
@@ -133,6 +160,47 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete session" });
+    }
+  });
+
+  // Grades: each is appended to the grade log and moves its word's review
+  // state through FSRS (ADR-0010). Safe to replay; the client's outbox relies on that.
+  app.post("/api/grades", async (req, res) => {
+    const parsed = gradeBatchSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid grades" });
+    }
+    try {
+      const states = await applyGrades(storage, parsed.data.grades, now());
+      res.json({ states });
+    } catch (error) {
+      console.error("Failed to save grades", error);
+      res.status(500).json({ message: "Failed to save grades" });
+    }
+  });
+
+  // Review state for the given words (comma-separated). A never-graded word
+  // comes back with state null and needsReview true.
+  app.get("/api/review-states", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    const skill = skillSchema.safeParse(req.query.skill);
+    if (!subject.success || !skill.success || typeof req.query.words !== "string") {
+      return res.status(400).json({ message: "subject, skill and words are required" });
+    }
+    try {
+      const words = Array.from(new Set(req.query.words.split(",").map((w) => w.trim()).filter(Boolean)));
+      const found = new Map(
+        (await storage.getReviewStates(subject.data, skill.data, words)).map((s) => [s.word, s]),
+      );
+      const at = now();
+      res.json(
+        words.map((word) => {
+          const state = found.get(word);
+          return { word, skill: skill.data, state: state ?? null, needsReview: needsReview(state ?? null, at) };
+        }),
+      );
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch review states" });
     }
   });
 
