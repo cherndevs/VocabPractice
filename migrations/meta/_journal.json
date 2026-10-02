@@ -22,6 +22,13 @@
       "when": 1790930149362,
       "tag": "0002_dashing_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790931259155,
+      "tag": "0003_bumpy_juggernaut",
+      "breakpoints": true
     }
   ]
 }

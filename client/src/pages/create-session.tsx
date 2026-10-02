@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Trash2, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, Pencil, Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,12 +23,36 @@ import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
 import { sanitizeExtractedCandidates, type ExtractedCandidate } from "@/lib/extraction-candidates";
-import type { InsertSession } from "@shared/schema";
+import type { InsertSession, SessionType } from "@shared/schema";
 
-type CreateSessionStep = "camera" | "selection" | "processing" | "edit-words" | "session-created";
+type CreateSessionStep = "type" | "camera" | "selection" | "processing" | "edit-words" | "session-created";
 
-function defaultSessionTitle(): string {
-  return `Spelling Session ${new Date().toLocaleDateString()}`;
+const SESSION_TYPE_OPTIONS: {
+  type: SessionType;
+  title: string;
+  description: string;
+  Icon: typeof Pencil;
+  iconClass: string;
+}[] = [
+  {
+    type: "spelling",
+    title: "Spelling",
+    description: "Practice writing words from dictation.",
+    Icon: Pencil,
+    iconClass: "bg-blue-500/10 text-blue-600",
+  },
+  {
+    type: "reading",
+    title: "Reading",
+    description: "Practice recognizing words and their meanings.",
+    Icon: BookOpen,
+    iconClass: "bg-purple-500/10 text-purple-600",
+  },
+];
+
+function defaultSessionTitle(type: SessionType): string {
+  const label = type === "reading" ? "Reading" : "Spelling";
+  return `${label} Session ${new Date().toLocaleDateString()}`;
 }
 
 /** Splits a candidate's `words`/`title` back into the two pieces of state the edit-words screen edits. */
@@ -42,7 +66,9 @@ export default function CreateSession() {
   // Sessions are filed under the active Workspace. The switcher isn't
   // reachable from this flow, so the Subject can't change while it runs.
   const { subject } = useActiveSubject();
-  const [currentStep, setCurrentStep] = useState<CreateSessionStep>("camera");
+  const [currentStep, setCurrentStep] = useState<CreateSessionStep>("type");
+  // Chosen at step 1 and applied to every session this run creates (ADR-0008).
+  const [sessionType, setSessionType] = useState<SessionType | null>(null);
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
 
@@ -81,7 +107,7 @@ export default function CreateSession() {
     try {
       const prepared = await prepareWorksheetImage(imageData);
       const raw = await extractSpellingLists(prepared);
-      const { candidates, isEmpty } = sanitizeExtractedCandidates(raw, defaultSessionTitle());
+      const { candidates, isEmpty } = sanitizeExtractedCandidates(raw, defaultSessionTitle(sessionType ?? "spelling"));
 
       if (isEmpty) {
         // Read fine, but nothing usable came back — ask before dropping the
@@ -211,7 +237,7 @@ export default function CreateSession() {
       return;
     }
 
-    if (!subject) {
+    if (!subject || !sessionType) {
       toast({
         title: "Still loading",
         description: "Your workspace hasn't loaded yet. Please try again in a moment.",
@@ -220,12 +246,13 @@ export default function CreateSession() {
       return;
     }
 
-    const title = sessionTitle.trim() || defaultSessionTitle();
+    const title = sessionTitle.trim() || defaultSessionTitle(sessionType);
 
     try {
       await createSessionMutation.mutateAsync({
         title,
         subject,
+        sessionType,
         words: filteredWords,
         wordCount: filteredWords.length,
         status: "new",
@@ -261,8 +288,10 @@ export default function CreateSession() {
   };
 
   const goBack = () => {
-    if (currentStep === "camera") {
+    if (currentStep === "type") {
       navigate("/sessions");
+    } else if (currentStep === "camera") {
+      setCurrentStep("type");
     } else if (currentStep === "selection") {
       setMultiCandidates([]);
       setSelected([]);
@@ -289,14 +318,16 @@ export default function CreateSession() {
 
   const getStepTitle = () => {
     switch (currentStep) {
-      case "camera":
+      case "type":
         return "Create New Session - Step 1";
-      case "selection":
+      case "camera":
         return "Create New Session - Step 2";
-      case "processing":
+      case "selection":
         return "Create New Session - Step 3";
+      case "processing":
+        return "Create New Session - Step 4";
       case "edit-words":
-        return "Create New Session - Step 4/5";
+        return "Create New Session - Step 5";
       case "session-created":
         return "Session Created!";
       default:
@@ -323,6 +354,54 @@ export default function CreateSession() {
       </div>
 
       {/* Step Content */}
+      {currentStep === "type" && (
+        <div className="px-4 py-6">
+          <h2 className="text-xl font-bold text-foreground mb-1">What are you creating?</h2>
+          <p className="text-sm text-muted-foreground mb-5">This decides which list the words go into.</p>
+          <div role="radiogroup" aria-label="Session type" className="space-y-3">
+            {SESSION_TYPE_OPTIONS.map(({ type, title, description, Icon, iconClass }) => {
+              const isSelected = sessionType === type;
+              return (
+                <button
+                  key={type}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setSessionType(type)}
+                  data-testid={`option-session-type-${type}`}
+                  className={`flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${
+                    isSelected ? "border-primary bg-primary/10" : "border-input bg-card"
+                  }`}
+                >
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${iconClass}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="flex-1">
+                    <span className="block font-semibold text-foreground">{title}</span>
+                    <span className="block text-xs text-muted-foreground">{description}</span>
+                  </span>
+                  <span
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                      isSelected ? "border-primary" : "border-input"
+                    }`}
+                  >
+                    {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <Button
+            className="mt-6 w-full"
+            disabled={!sessionType}
+            onClick={() => setCurrentStep("camera")}
+            data-testid="button-continue-session-type"
+          >
+            Continue
+          </Button>
+        </div>
+      )}
+
       {currentStep === "camera" && (
         <CameraCapture
           onImageCapture={handleImageCapture}

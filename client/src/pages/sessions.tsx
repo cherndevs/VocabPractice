@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Plus, ChevronRight, ChevronDown, Calendar, FileText, Pin } from "lucide-react";
+import { Plus, ChevronRight, ChevronDown, Calendar, FileText, Pin, Pencil, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -189,7 +189,12 @@ export default function Sessions() {
                   <Link href={`/practice/${session.id}`}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
+                        <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
+                          {session.sessionType === "reading" ? (
+                            <BookOpen className="w-4 h-4 shrink-0 text-purple-600" aria-label="Reading session" data-testid={`icon-session-type-${session.id}`} />
+                          ) : (
+                            <Pencil className="w-4 h-4 shrink-0 text-blue-600" aria-label="Spelling session" data-testid={`icon-session-type-${session.id}`} />
+                          )}
                           {session.title}
                         </h3>
                         <div className="flex items-center gap-2">

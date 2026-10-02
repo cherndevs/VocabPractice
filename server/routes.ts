@@ -95,16 +95,18 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
       const updates = { ...req.body } as any;
 
-      // A session's Subject is fixed at creation (ADR-0005).
-      if (Object.prototype.hasOwnProperty.call(updates, "subject")) {
+      // A session's Subject (ADR-0005) and Session Type (ADR-0008) are fixed
+      // at creation. Repeating the current value is harmless.
+      for (const [field, label] of [["subject", "subject"], ["sessionType", "session type"]] as const) {
+        if (!Object.prototype.hasOwnProperty.call(updates, field)) continue;
         const existing = await storage.getSession(req.params.id);
         if (!existing) {
           return res.status(404).json({ message: "Session not found" });
         }
-        if (updates.subject !== existing.subject) {
-          return res.status(400).json({ message: "A session's subject cannot be changed" });
+        if (updates[field] !== existing[field]) {
+          return res.status(400).json({ message: `A session's ${label} cannot be changed` });
         }
-        delete updates.subject;
+        delete updates[field];
       }
 
       if (Object.prototype.hasOwnProperty.call(updates, "pinnedAt")) {
