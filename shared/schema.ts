@@ -9,9 +9,18 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
+// A Subject is what the user is learning in a Workspace (ADR-0005, ADR-0006).
+// Stored as a key rather than an ISO language code so future subjects (e.g.
+// maths) can join without rework.
+export const SUBJECTS = ["chinese", "english"] as const;
+export type Subject = (typeof SUBJECTS)[number];
+export const DEFAULT_SUBJECT: Subject = "english";
+export const subjectSchema = z.enum(SUBJECTS);
+
 export const sessions = pgTable("sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
+  subject: text("subject").notNull().$type<Subject>(),
   words: jsonb("words").notNull().$type<string[]>(),
   status: text("status").notNull().default("new"), // new, in-progress, completed
   wordCount: integer("word_count").notNull(),
@@ -31,15 +40,21 @@ export const settings = pgTable("settings", {
   darkMode: boolean("dark_mode").default(false),
   dataSync: boolean("data_sync").default(false),
   enablePauseButton: boolean("enable_pause_button").default(true),
+  // null means "never chosen"; the API reports DEFAULT_SUBJECT in that case.
+  activeSubject: text("active_subject").$type<Subject>(),
 });
 
-export const insertSessionSchema = createInsertSchema(sessions).omit({
+export const insertSessionSchema = createInsertSchema(sessions, {
+  subject: subjectSchema,
+}).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertSettingsSchema = createInsertSchema(settings).omit({
+export const insertSettingsSchema = createInsertSchema(settings, {
+  activeSubject: subjectSchema.nullable(),
+}).omit({
   id: true,
 });
 

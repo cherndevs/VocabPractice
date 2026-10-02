@@ -52,9 +52,9 @@ Code architecture (high-level)
   - Entrypoint server/index.ts initializes Express, JSON middleware, API logging, error handler, and HTTP server
   - Development: setupVite (server/vite.ts) attaches Vite middlewares; serves transformed index.html with cache-busted main.tsx
   - Production: serveStatic (server/vite.ts) serves dist/public with an SPA fallback to index.html
-  - Routes (server/routes.ts): REST endpoints under /api
-    - Sessions: GET /api/sessions, GET /api/sessions/:id, POST /api/sessions, PUT /api/sessions/:id, DELETE /api/sessions/:id
-    - Settings: GET /api/settings, PUT /api/settings
+  - Routes (server/routes.ts): `registerRoutes(app, storage)` takes the storage instance, so tests mount the real routes over `MemStorage` (see server/test-harness.ts)
+    - Sessions: GET /api/sessions?subject= (subject required), GET /api/sessions/:id, POST /api/sessions (subject required), PUT /api/sessions/:id (subject immutable), DELETE /api/sessions/:id
+    - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts
 - Shared (shared/)
@@ -70,4 +70,4 @@ Build and tooling
 - Tailwind/PostCSS configured via tailwind.config.ts and postcss.config.js
 
 Testing and linting
-- Tests: `npm test` (vitest; files sit next to the code as `*.test.ts`). No linter is configured.
+- Tests: `npm test` (vitest; files sit next to the code as `*.test.ts`). Server tests drive the HTTP API via `startTestApi()` in server/test-harness.ts. No linter is configured.
