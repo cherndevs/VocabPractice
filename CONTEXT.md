@@ -15,19 +15,19 @@ A display toggle within a running session — Write, Read, or Peek. Switched fre
 _Avoid_: Session mode, tab
 
 **Write Mode**:
-The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count. The word stays hidden throughout — the writing happens on paper, not on screen. Grading is a separate step afterwards (see Offline Grading).
+The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count. The word stays hidden throughout — the writing happens on paper, not on screen. Grading is a separate step afterwards (see Offline Grading). Because grades only arrive once dictation is over, each word appears once per Spelling session; a missed word comes back in a later session.
 _Avoid_: Test, test mode
 
 **Read Mode**:
-The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. Session-scoped mastery marking ("I've Got This") happens here.
+The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. The learner grades each word here on the four-point AHGE scale, after a Read Aloud check. A word can come back later in the same session — after an "Oops", or while it is still new and hasn't yet been got right twice.
 _Avoid_: Practice, practice mode
 
 **Read Aloud**:
-The pronunciation check offered inside Read Mode: the user says the displayed word and the app assesses it, supplying the Reading composite's pronunciation sub-signal objectively instead of by self-report. Designed but not built — the app has no speech capture of any kind today, only text-to-speech.
+The pronunciation check inside Read Mode: the learner says the displayed word and the app checks what it heard. For a Chinese word it checks the syllables, tones included; a homophone counts as correct, since the check is on sound, not on which characters the app thinks were meant. For an English word it checks the word itself, accepting any spelling of the same sound. The learner's voice is used for the check and never kept; the first use says where the audio goes. The learner gets three tries; silence or an unheard attempt doesn't use one up. Passing unlocks the positive grades. A third miss reveals the Pinyin Annotation, exactly as Peek would, and leaves only "Oops". Where the check can't run at all — no microphone access, unsupported device, service unreachable — the session falls back to plain self-report rather than locking grading.
 _Avoid_: Speech recognition, voice check, pronunciation test
 
 **Peek Mode**:
-The Session View where the word is displayed alongside its Pinyin Annotation and an audio playback button, for checking a Read Mode guess. Has no "I've Got This" marking of its own — mastery is only ever recorded from Read Mode. Hidden from the tab bar whenever the current word has no Pinyin Annotation (e.g. an English word in a mixed-language session).
+The Session View where the word is displayed alongside its Pinyin Annotation and an audio playback button, for checking a Read Mode guess. Has no grading of its own, and peeking at a word locks out its positive grades: having seen the answer, the only honest grade left is "Oops". Hidden from the tab bar whenever the current word has no Pinyin Annotation (e.g. an English word in a mixed-language session).
 _Avoid_: Test, test mode, Check mode
 
 **Pinyin Annotation**:
@@ -35,28 +35,40 @@ The auto-detected, auto-generated romanization line shown below a word in Peek M
 _Avoid_: Translation, transliteration
 
 **AHGE Grading**:
-The self-report scale that replaces the old flat "I've Got This" flag with structured input to per-card mastery and interleaved queue construction. Implemented as a 2-point scale — "Oops" / "I've got this" (Again/Good under the hood, the FSRS-compatible reduction of the full 4-point Again/Hard/Good/Easy scale) — rather than 4 buttons, since the Hard/Easy distinction isn't a reliable self-judgment for young children and a noisy 4-point signal isn't actually richer than a clean 2-point one. The "I've got this" copy deliberately echoes the original mastery-marking phrase — same words, now backed by decay math instead of a flat flag. Read Mode uses it as self-report by the learner. Write Mode uses the same two buttons, but as Offline Grading — a parent marking work the app can't see — not self-report.
+The grading scale behind review scheduling, named for the Again/Hard/Good/Easy scale it maps onto. Read Mode uses all four, shown left to right as **Oops · Hard · OK · Easy** and self-reported by the learner, who is taught what each one means. "Oops" is always available; the three positive grades unlock only once Read Aloud has passed and lock again for good if the learner peeks. Write Mode uses two — Oops and a single positive — as Offline Grading: a parent marking paper can see right or wrong, but not how hard recall felt, so the finer grades would be guesses.
 _Avoid_: Grade, rating, difficulty rating, Again/Hard/Good/Easy (as the shipped UI — that's the underlying algorithm's full scale, not what the user sees)
 
 **Offline Grading**:
-A parent marking a Spelling session's words right or wrong against what the child wrote on paper, using the same two AHGE buttons. It exists because the app has no handwriting recognition and would otherwise record nothing at all for Writing. A deliberate proxy: the grade comes from a person, not from the app checking the work, and is stored indistinguishably from any future recognition-derived grade.
+A parent marking a Spelling session's words right or wrong against what the child wrote on paper, using the same two AHGE buttons. It exists because the app has no handwriting recognition and a Spelling session would otherwise record nothing at all. A deliberate proxy: the grade comes from a person, not from the app checking the work, and is stored indistinguishably from any future recognition-derived grade.
 _Avoid_: Marking, self-grading (the learner isn't the one grading), parent review
 
+**Review State**:
+What the app knows about how well a word is remembered in one skill, and when it will next need practice. Kept per word *per skill* — a word on both lists has a reading review state and a spelling review state, moving independently. Updated from every grade.
+_Avoid_: Mastery (parked — see Deferred), progress, score
+
+**Needs review**:
+A word whose review state says it is ready for practice again in that skill. What an ordinary session draws from.
+_Avoid_: Due (reserved for a Session's due date), overdue
+
+**Refresher**:
+A session made of the words that need review in one skill, across Lessons, rather than one Lesson's list. There is one per skill — a spelling refresher and a reading refresher — each offered on the Practice screen only when it has words. Never mixed, so a reading refresher can be done without a parent free to mark.
+_Avoid_: Quick Refresher as a single mixed session, review session
+
+**Due date**:
+The calendar date a Session is for — typically the day of the school test or homework it prepares for. Optional: set when the session is created, and changeable whenever it is edited, since tests move. The Practice screen's "This week" shows the session with the nearest future due date; a session without one never appears there. Unrelated to whether its words need review — moving a due date never changes review state.
+_Avoid_: Deadline, test date (the session may not be for a test)
+
+**Pinned**:
+A session the parent has marked to keep close at hand. Pinned sessions are listed first in the Library and also appear on the Practice screen, regardless of due date or whether their words need review. A session that is both pinned and the nearest due appears once, under "This week". Pinning and unpinning work the same from either screen.
+_Avoid_: Favourite, starred, bookmarked
+
 **Full Review**:
-A session that pulls every card in the relevant list regardless of due status, rather than only the cards the decay model considers due. Exists for comprehensive practice ahead of a school test, when the parent doesn't trust that the due filter has caught everything. Its grades feed the mastery model normally. Surfaced in the UI as **Revise all**.
+A session that pulls every word in the relevant list, rather than only the words that need review. Exists for comprehensive practice ahead of a school test, when the parent doesn't trust that "needs review" has caught everything. Its grades update review state like any other. Surfaced in the UI as **Revise all**.
 _Avoid_: Cram mode (Anki's analogous mode explicitly discards its results; this one doesn't), review all
-
-**Reading** (mastery composite):
-A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Read Mode currently updates recognition and pronunciation — both by self-report, until Read Aloud exists — and never comprehension.
-_Avoid_: Reading mastery, reading score (ambiguous with Read Mode)
-
-**Writing** (mastery composite):
-A per-card mastery score for producing a word in writing, fed by Offline Grading until handwriting recognition exists.
-_Avoid_: Writing mastery, spelling score
 
 ### Deferred
 
-Designed but not being built yet. Kept here because the decisions were made deliberately, not because the terms are in use.
+Designed but not being built yet. Kept here because the decisions were made deliberately, not because the terms are in use. The mastery composites are here for a different reason than Speaking: the drills that feed them are being built and do record grades — it is the scoring on top that is parked.
 
 **Speaking** (Session Type):
 A session type in which the app and the user hold a multi-turn spoken conversation grounded in the current Lesson's topic and reading list. Turn-based and multi-card rather than a per-word drill, so it has no Session Views and never appears as a stage inside a Spelling or Reading session. Deferred as an epic; not offered in the session-creation flow. See [ADR-0007](docs/adr/0007-practice-talk-session-mode.md), which calls it Practice Talk throughout.
@@ -64,6 +76,14 @@ _Avoid_: Practice Talk (the earlier name — Speaking session and Practice Talk 
 
 **Speaking** (mastery composite):
 A per-Lesson (not per-card) conversational-fluency score produced by Speaking sessions. Deferred with them — nothing else produces it.
+
+**Reading** (mastery composite):
+A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Parked, not reversed: nothing blends the sub-signals, nothing decays, and no score is computed or stored. Until then Read Mode's grade is **pronunciation only** — "I've got this" means the learner said the word correctly, self-reported until Read Aloud exists — recorded as the session's result and as history a later composite can consume. Recognition and comprehension have nothing producing them.
+_Avoid_: Reading mastery, reading score (ambiguous with Read Mode)
+
+**Writing** (mastery composite):
+A per-card mastery score for producing a word in writing, fed by Offline Grading until handwriting recognition exists. Parked alongside the Reading composite: Offline Grading still records the parent's right/wrong per word, but nothing computes a score from it.
+_Avoid_: Writing mastery, spelling score
 
 **Insight Notes**:
 Cross-cutting patterns surfaced from a Speaking session's transcript that a single card's grade can't capture (e.g. "consistently confuses X and Y"). Deferred with Speaking sessions.

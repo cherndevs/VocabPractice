@@ -21,6 +21,8 @@ A third type, Speaking, is designed in ADR-0007 but deferred as an epic and **no
 
 ## Read Aloud: designed, not wired
 
+_Superseded by ADR-0009: Read Aloud is now wired, in the browser, and gates Read Mode's positive grades. The section below records the state at the time._
+
 A Reading session's drill offers **Read Aloud** — the user says the displayed word, the app assesses the pronunciation. This exists in the design as a placeholder only: a mic affordance labelled "Soon" as the primary action, with "Stuck? Peek" demoted beneath it.
 
 It is unbuilt because the app has no speech capture of any kind. The only audio capability is text-to-speech (`speechSynthesis`, via `useSpeech`), which is one-directional; `getUserMedia` appears only in the camera hook. This is the same shape as ADR-0007's treatment of Write Mode handwriting recognition — UI present, signal not produced — and for the same reason: the drill's structure is decidable now, the capability is not.
