@@ -1,6 +1,6 @@
 import { pinyin } from "pinyin-pro";
 
-const CJK_CHAR = /[一-鿿]/;
+export const CJK_CHAR = /[一-鿿]/;
 const RUN_PATTERN = /[一-鿿]+|[^一-鿿]+/g;
 
 /**

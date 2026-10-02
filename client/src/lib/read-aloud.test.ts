@@ -34,6 +34,15 @@ describe("matchesReadAloud (Chinese)", () => {
     expect(matchesReadAloud("弯曲", ["完全", "万", "湾区"])).toBe(true);
   });
 
+  it("accepts any reading of a heard polyphonic character", () => {
+    // 长 can be cháng or zhǎng; 增长 needs zhǎng
+    expect(matchesReadAloud("增长", ["曾长"])).toBe(true);
+  });
+
+  it("fails when a heard character is not Chinese", () => {
+    expect(matchesReadAloud("长城", ["长c"])).toBe(false);
+  });
+
   it("fails on different length", () => {
     expect(matchesReadAloud("长城", ["长城墙"])).toBe(false);
     expect(matchesReadAloud("长城", ["长"])).toBe(false);
@@ -56,6 +65,12 @@ describe("matchesReadAloud (English)", () => {
   it("fails when no alternative matches", () => {
     expect(matchesReadAloud("two", ["too"])).toBe(false);
     expect(matchesReadAloud("apple", ["apples"])).toBe(false);
+  });
+
+  it("keeps internal whitespace and apostrophes significant", () => {
+    expect(matchesReadAloud("ice cream", ["icecream"])).toBe(false);
+    expect(matchesReadAloud("don't", ["dont"])).toBe(false);
+    expect(matchesReadAloud("ice cream", [" Ice cream! "])).toBe(true);
   });
 
   it("fails with no alternatives", () => {

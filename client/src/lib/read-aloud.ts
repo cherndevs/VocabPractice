@@ -1,8 +1,8 @@
 import { pinyin } from "pinyin-pro";
-import { getPinyinAnnotation } from "./pinyin";
+import { CJK_CHAR, getPinyinAnnotation } from "./pinyin";
 
-const CJK_CHAR = /[一-鿿]/;
 const NON_CJK = /[^一-鿿]/g;
+const SURROUNDING_NON_WORD = /^[\s!-/:-@\[-`{-~\u2000-\u206f\u3000-\u303f\uff00-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]+|[\s!-/:-@\[-`{-~\u2000-\u206f\u3000-\u303f\uff00-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]+$/g;
 const NON_WORD = /[\s!-/:-@\[-`{-~\u2000-\u206f\u3000-\u303f\uff00-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]/g;
 
 export type ReadAloudLang = "zh-CN" | "en-US";
@@ -28,7 +28,7 @@ function matchesEnglish(target: string, alternatives: string[]): boolean {
 }
 
 function normalizeEnglish(text: string): string {
-  return text.replace(NON_WORD, "").toLowerCase();
+  return text.trim().replace(SURROUNDING_NON_WORD, "").toLowerCase();
 }
 
 function matchesChinese(target: string, alternatives: string[]): boolean {
