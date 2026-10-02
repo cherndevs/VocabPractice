@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { gradeOutbox } from "@/lib/grade-sync";
-import { currentShowing, enabledGrades, gradeWord, peek, startReadFlow, type ReadFlow } from "@/lib/read-flow";
+import { currentShowing, gradeWord, isFinished, isGradeEnabled, isPeeked, peek, progress, startReadFlow, type ReadFlow } from "@/lib/read-flow";
 import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
 import type { Grade, Session, Settings } from "@shared/schema";
 
@@ -26,7 +26,7 @@ export default function PracticeSession() {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   // Reading sessions: the pure Read Mode flow owns the queue and per-word state.
-  const [readFlowState, setReadFlowState] = useState<ReadFlow | null>(null);
+  const [storedReadFlow, setReadFlowState] = useState<ReadFlow | null>(null);
   const [timeSpent, setTimeSpent] = useState(0);
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
@@ -132,9 +132,8 @@ export default function PracticeSession() {
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
   const isReading = session?.sessionType === "reading";
-  const readFlow = session && isReading ? (readFlowState ?? startReadFlow(session.words)) : null;
-  const readFlowDone = readFlow !== null && readFlow.queue.length === 0;
-  const showing = readFlow && !readFlowDone ? currentShowing(readFlow) : null;
+  const readFlow = session && isReading ? (storedReadFlow ?? startReadFlow(session.words)) : null;
+  const showing = readFlow && !isFinished(readFlow) ? currentShowing(readFlow) : null;
   const activeWord = showing ? showing.word : session?.words[currentWordIndex];
   const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
   const offeredViews = session ? viewsForSessionType(session.sessionType) : [];
@@ -447,9 +446,7 @@ export default function PracticeSession() {
     );
   }
 
-  const readDone = readFlow?.done ?? 0;
-  const readTotal = readFlow?.total ?? 0;
-  const progressPercentage = readTotal > 0 ? Math.floor((readDone / readTotal) * 100) : 0;
+  const readProgress = readFlow ? progress(readFlow) : { position: 0, total: 0, percent: 0 };
   const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
     { grade: "again", label: "Oops", tone: "text-destructive" },
     { grade: "hard", label: "Hard", tone: "text-amber-600" },
@@ -499,7 +496,7 @@ export default function PracticeSession() {
       {/* Read / Peek Mode Content */}
       {(mode === "read" || mode === "peek") && readFlow && (
         <div className="px-4 py-8">
-          {readFlowDone || !showing ? (
+          {!showing ? (
             <Card className="mb-8" data-testid="card-all-completed">
               <CardContent className="pt-6 text-center space-y-4">
                 <PartyPopper className="w-10 h-10 mx-auto text-primary" />
@@ -549,7 +546,7 @@ export default function PracticeSession() {
 
               {/* Progress Indicator: repeats are counted in */}
               <div className="text-sm text-muted-foreground mb-8" data-testid="text-progress">
-                {Math.min(readDone + 1, readTotal)}/{readTotal} words
+                {readProgress.position}/{readProgress.total} words
               </div>
 
               <div className="flex gap-2" data-testid="grade-row">
@@ -558,7 +555,7 @@ export default function PracticeSession() {
                     key={grade}
                     variant="outline"
                     className={`flex-1 h-11 font-semibold ${tone} disabled:opacity-40 disabled:cursor-not-allowed`}
-                    disabled={!enabledGrades(readFlow.wordState).includes(grade)}
+                    disabled={!isGradeEnabled(readFlow, grade)}
                     onClick={() => handleReadGrade(grade)}
                     data-testid={`button-grade-${grade}`}
                   >
@@ -566,7 +563,7 @@ export default function PracticeSession() {
                   </Button>
                 ))}
               </div>
-              {readFlow.wordState.kind === "peeked" && (
+              {isPeeked(readFlow) && (
                 <div className="text-xs text-muted-foreground mt-2" data-testid="text-grade-hint">
                   Answer shown, so only Oops is left.
                 </div>
@@ -591,10 +588,10 @@ export default function PracticeSession() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-muted-foreground">Progress:</span>
                   <span className="font-medium text-foreground" data-testid="text-progress-percentage">
-                    {progressPercentage}%
+                    {readProgress.percent}%
                   </span>
                 </div>
-                <Progress value={progressPercentage} className="w-full" />
+                <Progress value={readProgress.percent} className="w-full" />
               </div>
             </CardContent>
           </Card>

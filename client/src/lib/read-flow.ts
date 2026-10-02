@@ -35,14 +35,14 @@ export interface ReadFlow {
 }
 
 const ALL_GRADES: Grade[] = ["again", "hard", "good", "easy"];
-const RIGHT_TWICE = 2;
+const RIGHT_ANSWERS_TO_STOP_RETURNING = 2;
 const CARDS_BEFORE_RETURN = 3;
-const FRESH_SHOWING: WordState = { kind: "unavailable" };
+const STATE_OF_NEW_SHOWING: WordState = { kind: "unavailable" };
 
 export function startReadFlow(words: string[]): ReadFlow {
   return {
     queue: words.map((word) => ({ word, tryOnceMore: false })),
-    wordState: FRESH_SHOWING,
+    wordState: STATE_OF_NEW_SHOWING,
     rightCount: {},
     done: 0,
     total: words.length,
@@ -56,6 +56,28 @@ export function currentShowing(flow: ReadFlow): Showing {
 /** Oops is always open; the positive grades need Read Aloud passed or unavailable. */
 export function enabledGrades(state: WordState): Grade[] {
   return state.kind === "passed" || state.kind === "unavailable" ? ALL_GRADES : ["again"];
+}
+
+export function isGradeEnabled(flow: ReadFlow, grade: Grade): boolean {
+  return enabledGrades(flow.wordState).includes(grade);
+}
+
+export function isPeeked(flow: ReadFlow): boolean {
+  return flow.wordState.kind === "peeked";
+}
+
+export function isFinished(flow: ReadFlow): boolean {
+  return flow.queue.length === 0;
+}
+
+/** Position and size for "3/7 words" and the progress bar; repeats count. */
+export function progress(flow: ReadFlow): { position: number; total: number; percent: number } {
+  const { done, total } = flow;
+  return {
+    position: Math.min(done + 1, total),
+    total,
+    percent: total > 0 ? Math.floor((done / total) * 100) : 0,
+  };
 }
 
 /** Opening Peek locks the positive grades for this showing. */
@@ -78,7 +100,7 @@ export function gradeWord(
   }
   const [current, ...rest] = flow.queue;
   const rights = (flow.rightCount[current.word] ?? 0) + (grade === "again" ? 0 : 1);
-  const returns = grade === "again" || rights < RIGHT_TWICE;
+  const returns = grade === "again" || rights < RIGHT_ANSWERS_TO_STOP_RETURNING;
   const queue = [...rest];
   if (returns) {
     queue.splice(Math.min(CARDS_BEFORE_RETURN, queue.length), 0, { word: current.word, tryOnceMore: true });
@@ -86,7 +108,7 @@ export function gradeWord(
   return {
     flow: {
       queue,
-      wordState: FRESH_SHOWING,
+      wordState: STATE_OF_NEW_SHOWING,
       rightCount: { ...flow.rightCount, [current.word]: rights },
       done: flow.done + 1,
       total: flow.total + (returns ? 1 : 0),
