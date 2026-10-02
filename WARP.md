@@ -53,7 +53,7 @@ Code architecture (high-level)
   - Development: setupVite (server/vite.ts) attaches Vite middlewares; serves transformed index.html with cache-busted main.tsx
   - Production: serveStatic (server/vite.ts) serves dist/public with an SPA fallback to index.html
   - Routes (server/routes.ts): `registerRoutes(app, storage)` takes the storage instance, so tests mount the real routes over `MemStorage` (see server/test-harness.ts)
-    - Sessions: GET /api/sessions?subject= (subject required), GET /api/sessions/:id, POST /api/sessions (subject required), PUT /api/sessions/:id (subject immutable), DELETE /api/sessions/:id
+    - Sessions: GET /api/sessions?subject= (subject required), GET /api/sessions/:id, POST /api/sessions (subject and sessionType required), PUT /api/sessions/:id (subject and sessionType immutable), DELETE /api/sessions/:id
     - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts

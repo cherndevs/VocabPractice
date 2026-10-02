@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveSessionViewMode } from "./session-mode";
+import { initialViewMode, resolveSessionViewMode, viewsForSessionType } from "./session-mode";
 
 describe("resolveSessionViewMode", () => {
   it("keeps the current mode when the word has pinyin to peek at", () => {
@@ -15,5 +15,22 @@ describe("resolveSessionViewMode", () => {
   it("leaves write and read alone regardless of pinyin availability", () => {
     expect(resolveSessionViewMode("write", false)).toBe("write");
     expect(resolveSessionViewMode("read", false)).toBe("read");
+  });
+});
+
+describe("viewsForSessionType", () => {
+  it("offers only Write for a Spelling session", () => {
+    expect(viewsForSessionType("spelling")).toEqual(["write"]);
+  });
+
+  it("offers Read and Peek for a Reading session", () => {
+    expect(viewsForSessionType("reading")).toEqual(["read", "peek"]);
+  });
+});
+
+describe("initialViewMode", () => {
+  it("starts a Spelling session on Write and a Reading session on Read", () => {
+    expect(initialViewMode("spelling")).toBe("write");
+    expect(initialViewMode("reading")).toBe("read");
   });
 });

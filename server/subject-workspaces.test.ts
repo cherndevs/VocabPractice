@@ -14,6 +14,7 @@ const newSession = (overrides: Record<string, unknown> = {}) => ({
   words: ["apple", "pear"],
   wordCount: 2,
   subject: "english",
+  sessionType: "spelling",
   ...overrides,
 });
 

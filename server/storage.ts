@@ -87,6 +87,7 @@ export class MemStorage implements IStorage {
       id,
       title: insertSession.title,
       subject: insertSession.subject,
+      sessionType: insertSession.sessionType,
       words: insertSession.words as string[],
       status: insertSession.status || "new",
       wordCount: insertSession.wordCount,
@@ -175,6 +176,7 @@ class PgStorage implements IStorage {
       .values({
         title: insertSession.title,
         subject: insertSession.subject,
+        sessionType: insertSession.sessionType,
         words: insertSession.words as unknown as string[],
         status: insertSession.status ?? "new",
         wordCount: insertSession.wordCount,

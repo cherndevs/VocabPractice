@@ -21,14 +21,16 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
-import { resolveSessionViewMode, type SessionViewMode } from "@/lib/session-mode";
+import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
 import type { Session, Settings } from "@shared/schema";
 
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [mode, setMode] = useState<SessionViewMode>("write");
+  // The view the user picked; the view actually shown is derived below, since
+  // which views exist depends on the session's type (ADR-0008).
+  const [pickedMode, setMode] = useState<SessionViewMode | null>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   const [sessionSkipped, setSessionSkipped] = useState<Set<number>>(new Set());
@@ -134,9 +136,13 @@ export default function PracticeSession() {
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
   const currentWordPinyin = session ? getPinyinAnnotation(session.words[currentWordIndex]) : null;
-  useEffect(() => {
-    setMode((prev) => resolveSessionViewMode(prev, currentWordPinyin !== null));
-  }, [currentWordPinyin]);
+  const offeredViews = session ? viewsForSessionType(session.sessionType) : [];
+  const baseMode = session
+    ? pickedMode && offeredViews.includes(pickedMode)
+      ? pickedMode
+      : initialViewMode(session.sessionType)
+    : "write";
+  const mode = resolveSessionViewMode(baseMode, currentWordPinyin !== null);
 
   // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
   useEffect(() => {
@@ -497,16 +503,17 @@ export default function PracticeSession() {
           </div>
         </div>
 
-        {/* Mode Toggle */}
-        <Tabs value={mode} onValueChange={(value) => switchMode(value as SessionViewMode)} className="mt-4">
-          <TabsList className={`grid w-full ${currentWordPinyin ? "grid-cols-3" : "grid-cols-2"}`}>
-            <TabsTrigger value="write" data-testid="tab-write">Write</TabsTrigger>
-            <TabsTrigger value="read" data-testid="tab-read">Read</TabsTrigger>
-            {currentWordPinyin && (
-              <TabsTrigger value="peek" data-testid="tab-peek">Peek</TabsTrigger>
-            )}
-          </TabsList>
-        </Tabs>
+        {/* Mode Toggle: Spelling sessions have a single view, so no toggle */}
+        {offeredViews.length > 1 && (
+          <Tabs value={mode} onValueChange={(value) => switchMode(value as SessionViewMode)} className="mt-4">
+            <TabsList className={`grid w-full ${currentWordPinyin ? "grid-cols-2" : "grid-cols-1"}`}>
+              <TabsTrigger value="read" data-testid="tab-read">Read</TabsTrigger>
+              {currentWordPinyin && (
+                <TabsTrigger value="peek" data-testid="tab-peek">Peek</TabsTrigger>
+              )}
+            </TabsList>
+          </Tabs>
+        )}
       </div>
 
       {/* Read / Peek Mode Content */}

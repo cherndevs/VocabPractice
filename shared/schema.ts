@@ -17,10 +17,18 @@ export type Subject = (typeof SUBJECTS)[number];
 export const DEFAULT_SUBJECT: Subject = "english";
 export const subjectSchema = z.enum(SUBJECTS);
 
+// A Session Type says what a session is for, and so which skill it practises
+// (ADR-0008). Fixed at creation; the in-session Write/Read/Peek view is a
+// separate, freely-switched display choice.
+export const SESSION_TYPES = ["spelling", "reading"] as const;
+export type SessionType = (typeof SESSION_TYPES)[number];
+export const sessionTypeSchema = z.enum(SESSION_TYPES);
+
 export const sessions = pgTable("sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   subject: text("subject").notNull().$type<Subject>(),
+  sessionType: text("session_type").notNull().$type<SessionType>(),
   words: jsonb("words").notNull().$type<string[]>(),
   status: text("status").notNull().default("new"), // new, in-progress, completed
   wordCount: integer("word_count").notNull(),
@@ -46,6 +54,7 @@ export const settings = pgTable("settings", {
 
 export const insertSessionSchema = createInsertSchema(sessions, {
   subject: subjectSchema,
+  sessionType: sessionTypeSchema,
 }).omit({
   id: true,
   createdAt: true,
