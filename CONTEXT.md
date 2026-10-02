@@ -19,7 +19,7 @@ The Session View where a word is played aloud (dictation), hidden from view, and
 _Avoid_: Test, test mode
 
 **Read Mode**:
-The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. The learner grades each word here on the four-point AHGE scale, after a Read Aloud check. A word can come back later in the same session — after an "Oops", or while it is still new and hasn't yet been got right twice.
+The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. The learner grades each word here on the four-point AHGE scale, after a Read Aloud check. A word can come back later in the same session — after an "Oops", or while it is still new and hasn't yet been got right twice. A returning word is labelled "Try once more".
 _Avoid_: Practice, practice mode
 
 **Read Aloud**:
