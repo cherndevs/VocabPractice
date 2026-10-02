@@ -102,7 +102,7 @@ What the user is learning in a Workspace — the dimension workspaces are define
 _Avoid_: Language (as the dimension name)
 
 **Lesson**:
-The structured catalog a session's tag resolves to — the app's model of a real school unit/week's worth of syllabus content (e.g. "Unit 3: Going to the Market"). Created implicitly the first time a session is tagged with a new name, same authoring flow as tagging today, rather than through a separate management screen. Carries a writing (spelling) list and a reading list as independently-captured content — not the same set of words, since they typically come from different worksheets — plus a parent-written topic/theme description. A Session belongs to exactly one Lesson; a Refresher, which draws across Lessons, belongs to none.
+The structured catalog a session's tag resolves to — the app's model of a real school unit/week's worth of syllabus content (e.g. "Unit 3: Going to the Market"). Created implicitly the first time a session is tagged with a new name, same authoring flow as tagging today, rather than through a separate management screen. Carries a writing (spelling) list and a reading list as independently-captured content — not the same set of words, since they typically come from different worksheets — plus a parent-written topic/theme description. A Session belongs to at most one Lesson — tagging is optional; a Refresher, which draws across Lessons, belongs to none.
 _Avoid_: Unit, tag (a Lesson is the structured entity a tag now resolves to, not a loose label)
 
 **Writing list / Reading list**:
