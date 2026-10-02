@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Practice</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --popover: hsl(0, 0%, 100%);
+      --popover-foreground: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --accent: hsl(210, 40%, 96%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+      --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --success: hsl(142, 71%, 40%);
+      --warning: hsl(38, 92%, 46%);
+      --destructive: hsl(0, 72%, 51%);
+      --skill-writing: hsl(221.2, 83.2%, 53.3%);
+      --skill-writing-bg: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --skill-reading: hsl(262, 60%, 55%);
+      --skill-reading-bg: hsl(262, 60%, 55%, 0.1);
+      --skill-speaking: hsl(172, 66%, 38%);
+      --skill-speaking-bg: hsl(172, 66%, 38%, 0.1);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --popover: hsl(222.2, 84%, 4.9%);
+      --popover-foreground: hsl(210, 40%, 98%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --accent: hsl(217.2, 32.6%, 17.5%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+      --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+      --success: hsl(142, 60%, 48%);
+      --warning: hsl(38, 92%, 55%);
+      --destructive: hsl(0, 70%, 60%);
+      --skill-writing: hsl(217.2, 91.2%, 65%);
+      --skill-writing-bg: hsl(217.2, 91.2%, 65%, 0.16);
+      --skill-reading: hsl(262, 70%, 72%);
+      --skill-reading-bg: hsl(262, 70%, 72%, 0.16);
+      --skill-speaking: hsl(172, 55%, 55%);
+      --skill-speaking-bg: hsl(172, 55%, 55%, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    a { color: var(--primary); } a:hover { opacity: 0.85; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .switcher-trigger {
+      display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px 0 8px;
+      border: 1px solid var(--input); background: var(--background); border-radius: 6px;
+      font-size: 14px; font-weight: 500; color: var(--foreground); cursor: pointer;
+    }
+    .switcher-trigger:hover { background: var(--accent); }
+    .badge-circle {
+      width: 20px; height: 20px; border-radius: 9999px; background: var(--primary-tint); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .switcher-menu {
+      position: absolute; top: calc(100% + 4px); left: 0; min-width: 208px; background: var(--popover);
+      color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 4px; z-index: 20;
+    }
+    .switcher-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+    .switcher-item:hover { background: var(--accent); }
+    .switcher-item .label { flex: 1; color: var(--foreground); }
+    .switcher-item .check { color: var(--primary); }
+    .overlay { position: fixed; inset: 0; z-index: 10; }
+    .bottom-nav { flex-shrink: 0; display: flex; background: var(--card); border-top: 1px solid var(--border); }
+    .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; background: none; border: none; cursor: pointer; color: var(--muted-foreground); }
+    .nav-tab.active { color: var(--primary); }
+    .nav-tab .icon { width: 22px; height: 22px; }
+    .nav-tab .nav-label { font-size: 11px; font-weight: 500; }
+
+    .due-card { background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 18px; display: flex; align-items: center; gap: 14px; }
+    .refresher-icon {
+      width: 44px; height: 44px; border-radius: 10px; background: var(--primary-tint); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .refresher-title { font-size: 15px; font-weight: 700; color: var(--foreground); }
+    .due-sub { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+    .start-btn {
+      height: 38px; padding: 0 16px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); margin: 20px 0 8px; }
+    .deck-card { background: var(--card); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+    .deck-card + .deck-card { margin-top: 8px; }
+    .modality-icon {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modality-icon svg { width: 18px; height: 18px; }
+    .modality-icon.writing { background: var(--skill-writing-bg); color: var(--skill-writing); }
+    .modality-icon.reading { background: var(--skill-reading-bg); color: var(--skill-reading); }
+    .deck-info { flex: 1; min-width: 0; }
+    .deck-title { font-size: 14px; font-weight: 500; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .deck-meta { font-size: 11px; color: var(--muted-foreground); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .skill-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex-shrink: 0; }
+    .skill-ring svg { width: 26px; height: 26px; }
+    .skill-ring .track { stroke: var(--border); stroke-width: 3; fill: none; }
+    .skill-ring .fill { stroke-width: 3; fill: none; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 13px 13px; }
+    .skill-ring.state-fresh .fill { stroke: var(--success); }
+    .skill-ring.state-aging .fill { stroke: var(--warning); }
+    .skill-ring.state-due .fill { stroke: var(--destructive); }
+    .skill-ring.state-new .fill { stroke: var(--muted-foreground); }
+    .refreshers { display: flex; flex-direction: column; gap: 8px; }
+    .refresher-icon.writing { background: var(--skill-writing-bg); color: var(--skill-writing); }
+    .refresher-icon.reading { background: var(--skill-reading-bg); color: var(--skill-reading); }
+    .pin-btn {
+      width: 44px; height: 44px; margin: -10px -10px -10px 0; background: none; border: none; border-radius: 8px;
+      cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .pin-btn.pinned { color: var(--primary); }
+    .pin-btn:hover { background: var(--accent); }
+    .pin-btn svg { width: 16px; height: 16px; }
+    .none-line { font-size: 13px; color: var(--muted-foreground); padding: 4px 2px; }
+    .empty-state { text-align: center; padding: 32px 12px; }
+    .empty-state .big { font-size: 32px; }
+    .empty-state .msg { font-size: 14px; color: var(--muted-foreground); margin-top: 8px; }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden;">
+
+  <!-- Header -->
+  <div style="padding: 24px 16px 20px; background: var(--card); flex-shrink: 0;">
+    <div style="position: relative; margin-bottom: 14px;">
+      <button type="button" class="switcher-trigger" onClick="{{toggleOpen}}" aria-label="Switch workspace">
+        <span class="badge-circle">{{activeBadge}}</span>
+        <span>{{activeLabel}}</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted-foreground);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <sc-if value="{{open}}" hint-placeholder-val="{{false}}">
+        <div class="overlay" onClick="{{toggleOpen}}"></div>
+        <div class="switcher-menu">
+          <sc-for list="{{items}}" as="item" hint-placeholder-count="2">
+            <div class="switcher-item" onClick="{{item.pick}}">
+              <span class="badge-circle">{{item.badge}}</span>
+              <span class="label">{{item.label}}</span>
+              <sc-if value="{{item.isActive}}" hint-placeholder-val="{{false}}">
+                <svg class="icon check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display: flex; align-items: center; min-height: 40px;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: var(--foreground);">Practice</h1>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div style="padding: 16px; flex: 1; overflow-y: auto;">
+
+    <sc-if value="{{allCaughtUp}}" hint-placeholder-val="{{false}}">
+      <div class="due-card empty-state">
+        <div style="font-size: 16px; font-weight: 700;">All caught up for today</div>
+        <div class="msg">No words need review right now. Check back tomorrow, or browse the Library to get ahead.</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasDue}}" hint-placeholder-val="{{true}}">
+      <div class="refreshers">
+        <div class="due-card">
+          <div class="refresher-icon writing">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+          </div>
+          <div style="flex: 1;">
+            <div class="refresher-title">Spelling refresher</div>
+            <div class="due-sub">{{spellingDue}} words need review</div>
+          </div>
+          <button type="button" class="start-btn">Start</button>
+        </div>
+        <div class="due-card">
+          <div class="refresher-icon reading">
+            <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          </div>
+          <div style="flex: 1;">
+            <div class="refresher-title">Reading refresher</div>
+            <div class="due-sub">{{readingDue}} words need review</div>
+          </div>
+          <button type="button" class="start-btn">Start</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <div class="section-label">This week</div>
+    <sc-if value="{{hasThisWeek}}" hint-placeholder-val="{{true}}">
+        <div class="deck-card">
+          <div class="modality-icon {{thisWeek.modality}}">
+            <sc-if value="{{thisWeek.isWriting}}" hint-placeholder-val="{{true}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+            </sc-if>
+            <sc-if value="{{thisWeek.isReading}}" hint-placeholder-val="{{false}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </sc-if>
+          </div>
+          <div class="deck-info">
+            <div class="deck-title">{{thisWeek.name}}</div>
+            <div class="deck-meta">{{thisWeek.meta}}</div>
+          </div>
+          <div class="skill-ring {{thisWeek.ring.stateClass}}">
+            <svg viewBox="0 0 26 26">
+              <circle class="track" cx="13" cy="13" r="10"></circle>
+              <circle class="fill" cx="13" cy="13" r="10" style="stroke-dasharray: {{thisWeek.ring.dash}};"></circle>
+            </svg>
+          </div>
+          <button type="button" class="pin-btn {{thisWeek.pinCls}}" onClick="{{thisWeek.togglePin}}" aria-label="{{thisWeek.pinLabel}}">
+            <svg viewBox="0 0 24 24" fill="{{thisWeek.pinFill}}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+        </div>
+    </sc-if>
+    <sc-if value="{{noThisWeek}}" hint-placeholder-val="{{false}}">
+      <div class="none-line">No sessions with an upcoming due date.</div>
+    </sc-if>
+
+    <sc-if value="{{hasPinned}}" hint-placeholder-val="{{true}}">
+      <div class="section-label">Pinned</div>
+      <sc-for list="{{pinned}}" as="p" hint-placeholder-count="2">
+        <div class="deck-card">
+          <div class="modality-icon {{p.modality}}">
+            <sc-if value="{{p.isWriting}}" hint-placeholder-val="{{true}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+            </sc-if>
+            <sc-if value="{{p.isReading}}" hint-placeholder-val="{{false}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </sc-if>
+          </div>
+          <div class="deck-info">
+            <div class="deck-title">{{p.name}}</div>
+            <div class="deck-meta">{{p.meta}}</div>
+          </div>
+          <div class="skill-ring {{p.ring.stateClass}}">
+            <svg viewBox="0 0 26 26">
+              <circle class="track" cx="13" cy="13" r="10"></circle>
+              <circle class="fill" cx="13" cy="13" r="10" style="stroke-dasharray: {{p.ring.dash}};"></circle>
+            </svg>
+          </div>
+          <button type="button" class="pin-btn {{p.pinCls}}" onClick="{{p.togglePin}}" aria-label="{{p.pinLabel}}">
+            <svg viewBox="0 0 24 24" fill="{{p.pinFill}}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+        </div>
+      </sc-for>
+    </sc-if>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button type="button" class="nav-tab active">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      <span class="nav-label">Practice</span>
+    </button>
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <span class="nav-label">Library</span>
+    </button>
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+      <span class="nav-label">Progress</span>
+    </button>
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span class="nav-label">Settings</span>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"},"allCaughtUp":{"editor":"boolean","default":false,"section":"Preview states"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: false, subject: 'english', pins: { s1: true, s3: true, s4: true } };
+  }
+  toggleOpen() { this.setState({ open: !this.state.open }); }
+  togglePin(id) { this.setState({ pins: { ...this.state.pins, [id]: !this.state.pins[id] } }); }
+  selectSubject(key) { this.setState({ subject: key, open: false }); }
+
+  ring(pct, state) {
+    const c = 2 * Math.PI * 10;
+    const dash = ((pct / 100) * c).toFixed(1) + ' ' + c.toFixed(1);
+    return { dash, stateClass: 'state-' + state };
+  }
+
+  session(x) {
+    const pinned = !!this.state.pins[x.id];
+    return {
+      ...x,
+      isWriting: x.modality === 'writing',
+      isReading: x.modality === 'reading',
+      ring: this.ring(x.pct, x.state),
+      pinCls: pinned ? 'pinned' : '',
+      pinFill: pinned ? 'currentColor' : 'none',
+      pinLabel: pinned ? 'Unpin session' : 'Pin session',
+      togglePin: () => this.togglePin(x.id),
+    };
+  }
+
+  renderVals() {
+    const subjects = {
+      english: { key: 'english', label: 'English', badge: 'EN' },
+      chinese: { key: 'chinese', label: '中文 (Chinese)', badge: '中' },
+    };
+    const active = subjects[this.state.subject] || subjects.english;
+    const caughtUp = !!this.props.allCaughtUp;
+    // Sample sessions. dueOrder sorts future due dates (lower = sooner);
+    // null means no due date. This week shows only the soonest; a session
+    // that is also pinned appears there once, not again under Pinned.
+    const sessions = [
+      { id: 's1', name: 'P4 English — Spelling List 4', modality: 'writing', dueOrder: 1, meta: 'Due Thu 8 Oct · 12 words', pct: 74, state: 'aging' },
+      { id: 's2', name: 'P4 华文 — 生字表 5', modality: 'writing', dueOrder: 2, meta: 'Due Tue 13 Oct · 10 words', pct: 40, state: 'due' },
+      { id: 's3', name: '阅读 — Lesson 4', modality: 'reading', dueOrder: null, meta: 'No due date · 10 words', pct: 91, state: 'fresh' },
+      { id: 's4', name: 'Chengyu Practice', modality: 'writing', dueOrder: null, meta: 'No due date · 6 words', pct: 85, state: 'fresh' },
+    ];
+    const dated = sessions.filter((x) => x.dueOrder !== null).sort((a, b) => a.dueOrder - b.dueOrder);
+    const nearest = dated[0] || null;
+    const pinned = sessions
+      .filter((x) => this.state.pins[x.id] && (!nearest || x.id !== nearest.id))
+      .map((x) => this.session(x));
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      open: this.state.open,
+      activeLabel: active.label,
+      activeBadge: active.badge,
+      toggleOpen: () => this.toggleOpen(),
+      items: Object.values(subjects).map((s) => ({
+        ...s,
+        isActive: s.key === this.state.subject,
+        pick: () => this.selectSubject(s.key),
+      })),
+      allCaughtUp: caughtUp,
+      hasDue: !caughtUp,
+      spellingDue: 8,
+      readingDue: 5,
+      hasThisWeek: !!nearest,
+      noThisWeek: !nearest,
+      thisWeek: nearest ? this.session(nearest) : this.session(sessions[0]),
+      hasPinned: pinned.length > 0,
+      pinned,
+    };
+  }
+}
+</script>
+</body>
+</html>

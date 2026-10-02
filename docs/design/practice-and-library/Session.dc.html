@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Practice session</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --popover: hsl(0, 0%, 100%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --accent: hsl(210, 40%, 96%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+      --success: hsl(142, 71%, 40%);
+      --warning: hsl(38, 92%, 46%);
+      --destructive: hsl(0, 72%, 51%);
+      --warning-ink: hsl(32, 95%, 31%);
+      --success-ink: hsl(142, 72%, 27%);
+      --skill-writing: hsl(221.2, 83.2%, 53.3%);
+      --skill-writing-bg: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --skill-reading: hsl(262, 60%, 55%);
+      --skill-reading-bg: hsl(262, 60%, 55%, 0.1);
+      --skill-speaking: hsl(172, 66%, 38%);
+      --skill-speaking-bg: hsl(172, 66%, 38%, 0.1);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --popover: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --accent: hsl(217.2, 32.6%, 17.5%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+      --success: hsl(142, 60%, 48%);
+      --warning: hsl(38, 92%, 55%);
+      --destructive: hsl(0, 70%, 60%);
+      --warning-ink: hsl(38, 92%, 62%);
+      --success-ink: hsl(142, 60%, 58%);
+      --skill-writing: hsl(217.2, 91.2%, 65%);
+      --skill-writing-bg: hsl(217.2, 91.2%, 65%, 0.16);
+      --skill-reading: hsl(262, 70%, 72%);
+      --skill-reading-bg: hsl(262, 70%, 72%, 0.16);
+      --skill-speaking: hsl(172, 55%, 55%);
+      --skill-speaking-bg: hsl(172, 55%, 55%, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .close-btn { background: none; border: none; padding: 6px; cursor: pointer; color: var(--muted-foreground); display: flex; }
+    .progress-track { flex: 1; height: 6px; border-radius: 999px; background: var(--muted); overflow: hidden; margin: 0 12px; }
+    .progress-fill { height: 100%; background: var(--primary); border-radius: 999px; }
+    .progress-count { font-size: 12px; font-weight: 600; color: var(--muted-foreground); white-space: nowrap; }
+    .top-badges { display: flex; align-items: center; gap: 8px; margin: 16px auto 0; width: fit-content; }
+    .modality-tag {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+    }
+    .modality-tag.writing { background: var(--skill-writing-bg); color: var(--skill-writing); }
+    .modality-tag.reading { background: var(--skill-reading-bg); color: var(--skill-reading); }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; background: var(--muted); color: var(--muted-foreground);
+    }
+    .complete-title { font-size: 18px; font-weight: 700; color: var(--foreground); }
+    .stage {
+      background: var(--card); border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin: 16px; padding: 32px 20px; text-align: center; min-height: 260px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    }
+    .prompt { font-size: 13px; color: var(--muted-foreground); font-weight: 500; }
+    .headword { font-size: 40px; font-weight: 800; color: var(--foreground); }
+    .subword { font-size: 14px; color: var(--muted-foreground); }
+    .word-info { font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px; }
+    .write-controls { display: flex; align-items: center; justify-content: center; gap: 16px; }
+    .write-btn {
+      width: 60px; height: 60px; border-radius: 999px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .write-btn.outline { background: var(--card); border: 1.5px solid var(--border); color: var(--primary); }
+    .write-btn.filled { background: var(--primary); border: none; color: var(--primary-foreground); }
+    .write-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .primary-btn {
+      width: 100%; height: 46px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .secondary-btn {
+      width: 100%; height: 46px; border-radius: 8px; background: transparent; color: var(--foreground);
+      border: 1px solid var(--border); font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .flip-hint { font-size: 12px; color: var(--muted-foreground); }
+    .reveal-box { background: var(--muted); border-radius: 10px; padding: 12px 20px; font-size: 15px; color: var(--foreground); }
+    .mic-btn {
+      width: 64px; height: 64px; border-radius: 999px; background: var(--skill-reading); color: hsl(0, 0%, 100%); border: none;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .mic-btn.listening { animation: ra-pulse 1.1s ease-out infinite; }
+    .mic-btn:disabled { opacity: 0.55; cursor: default; }
+    @keyframes ra-pulse {
+      0% { box-shadow: 0 0 0 0 hsl(262 60% 55% / 0.45); }
+      100% { box-shadow: 0 0 0 18px hsl(262 60% 55% / 0); }
+    }
+    .pass-badge {
+      width: 64px; height: 64px; border-radius: 999px; background: hsl(142 71% 40% / 0.12); color: var(--success-ink);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ra-caption { font-size: 13px; font-weight: 600; color: var(--muted-foreground); min-height: 18px; text-align: center; }
+    .ra-caption.pass { color: var(--success-ink); }
+    .gate-hint { font-size: 12px; color: var(--muted-foreground); text-align: center; min-height: 16px; margin: 8px 16px 0; }
+    .sheet-scrim { position: absolute; inset: 0; background: hsl(222 47% 11% / 0.45); z-index: 30; }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--card);
+      border-radius: 16px 16px 0 0; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+    }
+    .sheet-title { font-size: 17px; font-weight: 700; color: var(--foreground); }
+    .sheet-body { margin: 0 0 4px; font-size: 14px; line-height: 1.45; color: var(--muted-foreground); }
+    .grade-row { display: flex; gap: 8px; padding: 0 16px; }
+    .grade-btn {
+      flex: 1; height: 46px; border-radius: 8px; border: 1px solid var(--border); background: var(--card);
+      font-size: 13px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .grade-btn .lbl { color: var(--foreground); }
+    .grade-btn.again .lbl { color: var(--destructive); }
+    .grade-btn.hard .lbl { color: var(--warning-ink); }
+    .grade-btn.ok .lbl { color: var(--primary); }
+    .grade-btn.easy .lbl { color: var(--success-ink); }
+    .grade-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .nav-row { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 4px 0 18px; }
+    .nav-btn {
+      width: 40px; height: 40px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--card);
+      color: var(--foreground); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .up-dot.current { box-shadow: 0 0 0 3px var(--primary-tint, var(--muted)); }
+    .pinyin-line { font-size: 15px; font-weight: 500; color: var(--muted-foreground); }
+    .read-aloud-block { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 4px; }
+    .peek-link {
+      background: none; border: none; color: var(--muted-foreground); font-size: 12px; font-weight: 600;
+      text-decoration: underline; text-underline-offset: 2px; cursor: pointer; padding: 4px;
+    }
+    .peek-link:hover { color: var(--foreground); }
+    .up-next { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; }
+    .up-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--border); }
+    .up-dot.writing { background: var(--skill-writing); }
+    .up-dot.reading { background: var(--skill-reading); }
+    .mark-head { padding: 18px 20px 8px; }
+    .mark-title { font-size: 18px; font-weight: 700; color: var(--foreground); }
+    .mark-sub { font-size: 13px; color: var(--muted-foreground); margin-top: 3px; line-height: 1.4; }
+    .mark-list { flex: 1; overflow-y: auto; padding: 4px 16px; display: flex; flex-direction: column; }
+    .mark-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .mark-word { flex: 1; min-width: 0; font-size: 20px; font-weight: 700; color: var(--foreground); }
+    .mark-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .mark-actions .grade-btn { flex: 0 0 auto; height: 44px; padding: 0 10px; font-size: 12px; }
+    .mark-actions .grade-btn.again { width: 68px; }
+    .mark-actions .grade-btn.good { width: 108px; }
+    .grade-btn.again.picked { background: var(--destructive); border-color: var(--destructive); }
+    .grade-btn.good.picked { background: var(--primary); border-color: var(--primary); }
+    .grade-btn.picked .lbl { color: hsl(0, 0%, 100%); }
+    .mark-count { font-size: 12px; color: var(--muted-foreground); text-align: center; }
+    .session-menu-btn { background: none; border: none; padding: 6px; margin-left: 4px; border-radius: 4px; cursor: pointer; color: var(--muted-foreground); display: flex; flex-shrink: 0; }
+    .session-menu-btn:hover { background: var(--accent); }
+    .session-menu-wrap { position: relative; }
+    .session-menu {
+      position: absolute; top: calc(100% + 4px); right: 0; min-width: 190px; background: var(--popover);
+      color: var(--foreground); border: 1px solid var(--border); border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 4px; z-index: 15;
+    }
+    .session-menu-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .session-menu-item:hover { background: var(--accent); }
+    .session-overlay { position: fixed; inset: 0; z-index: 10; }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="position: relative; width: 384px; height: 640px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); overflow: hidden; display: flex; flex-direction: column;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; padding: 16px 12px 0;">
+    <button type="button" class="close-btn" aria-label="End session">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="progress-track"><div class="progress-fill" style="width: {{progressPct}}%;"></div></div>
+    <span class="progress-count">{{position}} / {{total}}</span>
+    <div class="session-menu-wrap">
+      <button type="button" class="session-menu-btn" onClick="{{toggleSessionMenu}}" aria-label="Session options">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="18" r="1.5"></circle></svg>
+      </button>
+      <sc-if value="{{sessionMenuOpen}}" hint-placeholder-val="{{false}}">
+        <div class="session-overlay" onClick="{{toggleSessionMenu}}"></div>
+        <div class="session-menu">
+          <sc-if value="{{isFullReview}}" hint-placeholder-val="{{false}}">
+            <div class="session-menu-item" onClick="{{switchToRefresher}}">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Switch to due only</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{notFullReview}}" hint-placeholder-val="{{true}}">
+            <div class="session-menu-item" onClick="{{switchToFullReview}}">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.99 6.57 2.64"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
+              <span>Switch to Revise all</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div class="top-badges">
+    <div class="modality-tag {{modality}}">
+      <sc-if value="{{isWriting}}" hint-placeholder-val="{{true}}">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+      </sc-if>
+      <sc-if value="{{isReading}}" hint-placeholder-val="{{false}}">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+      </sc-if>
+      {{modalityLabel}}
+    </div>
+    <sc-if value="{{isFullReview}}" hint-placeholder-val="{{false}}">
+      <div class="mode-badge">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.99 6.57 2.64"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
+        Revise all
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{inProgress}}" hint-placeholder-val="{{true}}">
+    <!-- Writing stage — dictation, then the Offline Grading marking pass -->
+    <sc-if value="{{isWriting}}" hint-placeholder-val="{{true}}">
+    <sc-if value="{{writingDictation}}" hint-placeholder-val="{{true}}">
+      <div class="stage">
+        <div class="word-info">Word {{writingPosition}} of {{writingTotal}}</div>
+        <div class="write-controls">
+          <sc-if value="{{writingIdle}}" hint-placeholder-val="{{true}}">
+            <button type="button" class="write-btn outline" onClick="{{playWord}}" aria-label="Play word">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:24px;height:24px;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+            </button>
+          </sc-if>
+          <sc-if value="{{writingPlaying}}" hint-placeholder-val="{{false}}">
+            <button type="button" class="write-btn outline" onClick="{{pausePlayback}}" aria-label="Pause">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:24px;height:24px;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+          </sc-if>
+          <button type="button" class="write-btn filled" onClick="{{skipWord}}" disabled="{{writingLast}}" aria-label="Next word">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+        <sc-if value="{{writingLast}}" hint-placeholder-val="{{false}}">
+          <button type="button" class="primary-btn" style="max-width: 200px;" onClick="{{startMarking}}">Done</button>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- Offline Grading: the words are revealed only now, after every word
+         has been dictated, and a parent marks them against what the child
+         wrote on paper. Not self-report — the learner is not the one
+         grading — but the same two AHGE buttons Read Mode uses. -->
+    <sc-if value="{{writingMarking}}" hint-placeholder-val="{{false}}">
+      <div class="mark-head">
+        <div class="mark-title">Mark the writing</div>
+        <div class="mark-sub">Check each word against the paper.</div>
+      </div>
+      <div class="mark-list">
+        <sc-for list="{{markRows}}" as="row" hint-placeholder-count="5">
+          <div class="mark-row">
+            <span class="mark-word">{{row.word}}</span>
+            <div class="mark-actions">
+              <button type="button" class="grade-btn again {{row.againCls}}" onClick="{{row.markAgain}}"><span class="lbl">Oops</span></button>
+              <button type="button" class="grade-btn good {{row.goodCls}}" onClick="{{row.markGood}}"><span class="lbl">I&#39;ve got this</span></button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="mark-count">{{markedCount}} of {{writingTotal}} marked</div>
+        <button type="button" class="primary-btn" onClick="{{finishMarking}}" disabled="{{markIncomplete}}">Finish</button>
+      </div>
+    </sc-if>
+    </sc-if>
+
+    <!-- Reading stage -->
+    <sc-if value="{{isReading}}" hint-placeholder-val="{{false}}">
+      <div class="stage">
+        <div class="headword">{{card.word}}</div>
+        <!-- Read Aloud gates the positive grades: the mic must hear the word
+             read correctly before Hard / OK / Easy unlock (ADR-0009). -->
+        <sc-if value="{{pinyinHidden}}" hint-placeholder-val="{{true}}">
+          <div class="read-aloud-block">
+            <sc-if value="{{showMic}}" hint-placeholder-val="{{true}}">
+              <button type="button" class="mic-btn {{micCls}}" onClick="{{tapMic}}" disabled="{{micBusy}}" aria-label="{{micLabel}}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+              </button>
+              <div class="ra-caption">{{raCaption}}</div>
+            </sc-if>
+            <sc-if value="{{raPassed}}" hint-placeholder-val="{{false}}">
+              <div class="pass-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+              <div class="ra-caption pass">Read correctly</div>
+            </sc-if>
+            <sc-if value="{{raUnavailable}}" hint-placeholder-val="{{false}}">
+              <div class="ra-caption" style="max-width: 240px;">Read Aloud isn&#39;t available here, so grade it yourself.</div>
+            </sc-if>
+            <button type="button" class="peek-link" onClick="{{revealPinyin}}">Stuck? Peek</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{pinyinRevealed}}" hint-placeholder-val="{{false}}">
+          <sc-if value="{{raExhausted}}" hint-placeholder-val="{{false}}">
+            <div class="ra-caption">Three tries used. Here&#39;s how it&#39;s read.</div>
+          </sc-if>
+          <sc-if value="{{hasPinyin}}" hint-placeholder-val="{{true}}">
+            <div class="pinyin-line">{{card.reading}}</div>
+          </sc-if>
+          <div class="reveal-box">{{card.meaning}}</div>
+          <div class="flip-hint">Tap word to hear it again</div>
+        </sc-if>
+      </div>
+      <div class="nav-row">
+        <button type="button" class="nav-btn" onClick="{{goBack}}" disabled="{{backDisabled}}" aria-label="Previous word">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="nav-btn" onClick="{{goNext}}" disabled="{{nextDisabled}}" aria-label="Next word">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+      <div class="grade-row">
+        <button type="button" class="grade-btn again" onClick="{{gradeCard}}"><span class="lbl">Oops</span></button>
+        <button type="button" class="grade-btn hard" onClick="{{gradeCard}}" disabled="{{positivesLocked}}"><span class="lbl">Hard</span></button>
+        <button type="button" class="grade-btn ok" onClick="{{gradeCard}}" disabled="{{positivesLocked}}"><span class="lbl">OK</span></button>
+        <button type="button" class="grade-btn easy" onClick="{{gradeCard}}" disabled="{{positivesLocked}}"><span class="lbl">Easy</span></button>
+      </div>
+      <div class="gate-hint">{{gateHint}}</div>
+    </sc-if>
+
+
+    <sc-if value="{{showUpNext}}" hint-placeholder-val="{{true}}">
+      <div class="up-next">
+        <sc-for list="{{upNext}}" as="u" hint-placeholder-count="6">
+          <span class="up-dot {{u.cls}}"></span>
+        </sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- Complete stage -->
+  <sc-if value="{{isComplete}}" hint-placeholder-val="{{false}}">
+    <div class="stage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 40px; height: 40px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      <div class="complete-title">Session complete</div>
+    </div>
+    <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 8px;">
+      <button type="button" class="primary-btn" onClick="{{restart}}">Review again</button>
+      <sc-if value="{{notFullReview}}" hint-placeholder-val="{{true}}">
+        <button type="button" class="secondary-btn" onClick="{{switchToFullReview}}">Revise all</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- One-time notice before the first Read Aloud attempt. Declining is
+       treated like a denied microphone: the session falls back to
+       self-report rather than locking grading. -->
+  <sc-if value="{{consentOpen}}" hint-placeholder-val="{{false}}">
+    <div class="sheet-scrim"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ra-consent-title">
+      <div id="ra-consent-title" class="sheet-title">Before you read aloud</div>
+      <p class="sheet-body">To check the reading, your browser may send the recording to its speech service (on iPhone, that&#39;s Apple). This app never keeps it.</p>
+      <button type="button" class="primary-btn" onClick="{{acceptConsent}}">OK, start</button>
+      <button type="button" class="secondary-btn" onClick="{{declineConsent}}">Not now</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"},"modality":{"editor":"enum","options":["writing","reading"],"default":"reading","section":"Preview states"},"stage":{"editor":"enum","options":["in-progress","complete"],"default":"in-progress","section":"Preview states"},"fullReview":{"editor":"boolean","default":false,"section":"Preview states"},"readAloud":{"editor":"enum","options":["pass","fail","silence","unavailable"],"default":"pass","section":"Preview states"}}'>
+const READING_CARDS = [
+  { word: '弯曲', meaning: 'to bend, to curve', reading: 'wān qū' },
+  { word: '必要', meaning: 'necessary', reading: 'bì yào' },
+  { word: 'garden', meaning: 'a piece of ground for growing plants', reading: '' },
+  { word: '朋友', meaning: 'friend', reading: 'péng yǒu' },
+  { word: 'beautiful', meaning: 'pleasing to look at', reading: '' },
+  { word: '图书馆', meaning: 'library', reading: 'tú shū guǎn' },
+];
+
+// Write Mode dictation is word-hidden: the word is spoken, never shown, and
+// the user writes it down off-app (see CONTEXT.md, Write Mode). Nothing is
+// graded during dictation and no text is typed — the words are revealed only
+// afterwards, in the marking pass, where a parent grades them against the
+// paper (Offline Grading).
+//
+// WRITING_DUE is what a normal Spelling session draws — the subset the decay
+// model considers due. Revise all (Full Review) pulls the Lesson's whole
+// writing list instead.
+const WRITING_DUE = ['弯曲', '必要', '朋友', '学校', '图书馆'];
+const WRITING_ALL = ['弯曲', '必要', '朋友', '学校', '图书馆', '公园', '老师', '早上'];
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sessionMenuOpen: false,
+      fullReview: null,
+      pinyinRevealed: false,
+      ra: 'idle',
+      misses: 0,
+      raNote: '',
+      raUnavailable: false,
+      consentSeen: false,
+      consentOpen: false,
+      readingIndex: 0,
+      readingGraded: {},
+      writingIndex: 0,
+      writingPlaying: false,
+      writingPhase: 'dictation',
+      writingGrades: {},
+    };
+  }
+  toggleSessionMenu() { this.setState({ sessionMenuOpen: !this.state.sessionMenuOpen }); }
+  playWord() { this.setState({ writingPlaying: true }); }
+  pausePlayback() { this.setState({ writingPlaying: false }); }
+  currentFullReview() {
+    return this.state.fullReview === null ? !!this.props.fullReview : this.state.fullReview;
+  }
+  writingCards() { return this.currentFullReview() ? WRITING_ALL : WRITING_DUE; }
+  skipWord() {
+    if (this.state.writingIndex >= this.writingCards().length - 1) return;
+    this.setState({ writingIndex: this.state.writingIndex + 1, writingPlaying: false });
+  }
+  startMarking() { this.setState({ writingPhase: 'marking', writingPlaying: false }); }
+  markWord(i, grade) {
+    this.setState({ writingGrades: { ...this.state.writingGrades, [i]: grade } });
+  }
+  finishMarking() { this.setState({ writingPhase: 'done' }); }
+  // Both the due filter and "Review again" change which cards the session
+  // holds, so progress against the old set is discarded either way.
+  restartSession(extra) {
+    this.setState({
+      writingIndex: 0, writingPlaying: false, writingPhase: 'dictation', writingGrades: {},
+      readingGraded: {}, readingIndex: 0, ...this.freshCard(),
+      ...extra,
+    });
+  }
+  switchToFullReview() { this.restartSession({ fullReview: true, sessionMenuOpen: false }); }
+  switchToRefresher() { this.restartSession({ fullReview: false, sessionMenuOpen: false }); }
+  // Per-card Read Aloud state; reset whenever the card changes.
+  freshCard() {
+    clearTimeout(this.raTimer);
+    return { pinyinRevealed: false, ra: 'idle', misses: 0, raNote: '' };
+  }
+  componentWillUnmount() { clearTimeout(this.raTimer); }
+  revealPinyin() {
+    clearTimeout(this.raTimer);
+    this.setState({ pinyinRevealed: true, ra: this.state.ra === 'passed' ? 'passed' : 'idle', raNote: '' });
+  }
+  tapMic() {
+    const ra = this.state.ra;
+    if (ra === 'listening') { this.stopListening(); return; }
+    if (ra !== 'idle') return;
+    // Availability is only discovered by trying (Safari has no pre-check).
+    if (this.props.readAloud === 'unavailable') { this.setState({ raUnavailable: true }); return; }
+    if (!this.state.consentSeen) { this.setState({ consentOpen: true }); return; }
+    this.setState({ ra: 'listening', raNote: '' });
+  }
+  acceptConsent() { this.setState({ consentSeen: true, consentOpen: false, ra: 'listening', raNote: '' }); }
+  declineConsent() { this.setState({ consentOpen: false, raUnavailable: true }); }
+  stopListening() {
+    const at = this.state.readingIndex;
+    this.setState({ ra: 'checking' });
+    clearTimeout(this.raTimer);
+    this.raTimer = setTimeout(() => this.finishCheck(at), 700);
+  }
+  // The Preview states "readAloud" tweak stands in for what the recogniser
+  // hears. Silence doesn't use a try; the third miss reveals the pinyin,
+  // exactly as Peek would, which leaves only Oops.
+  finishCheck(at) {
+    if (at !== this.state.readingIndex) return;
+    const result = this.props.readAloud || 'pass';
+    if (result === 'pass') { this.setState({ ra: 'passed' }); return; }
+    if (result === 'silence') { this.setState({ ra: 'idle', raNote: "Didn't hear anything. Tap to try again." }); return; }
+    if (result === 'unavailable') { this.setState({ ra: 'idle', raUnavailable: true }); return; }
+    const misses = this.state.misses + 1;
+    if (misses >= 3) { this.setState({ misses, ra: 'exhausted', pinyinRevealed: true, raNote: '' }); return; }
+    const left = 3 - misses;
+    this.setState({ misses, ra: 'idle', raNote: 'Not quite. ' + left + (left === 1 ? ' try' : ' tries') + ' left.' });
+  }
+
+  // Mirrors the real Read Mode's findNextUnskippedIndex: walks in `dir`,
+  // skipping any index already graded, until it finds one that isn't (or
+  // runs off the end and returns null).
+  findNextUngraded(from, dir, graded) {
+    let i = from + dir;
+    while (i >= 0 && i < READING_CARDS.length) {
+      if (!graded[i]) return i;
+      i += dir;
+    }
+    return null;
+  }
+
+  // Grading (either outcome) marks the card done and auto-advances, same as
+  // the real app's "I've Got This" — looking forward first, then backward,
+  // and leaving the index alone (which lands on the completion state) if
+  // nothing ungraded remains either way.
+  gradeCard() {
+    const idx = this.state.readingIndex;
+    const graded = { ...this.state.readingGraded, [idx]: true };
+    let next = this.findNextUngraded(idx, 1, graded);
+    if (next === null) next = this.findNextUngraded(idx, -1, graded);
+    this.setState({
+      readingGraded: graded,
+      readingIndex: next === null ? idx : next,
+      ...this.freshCard(),
+    });
+  }
+  goBack() {
+    const prev = this.findNextUngraded(this.state.readingIndex, -1, this.state.readingGraded);
+    if (prev !== null) this.setState({ readingIndex: prev, ...this.freshCard() });
+  }
+  goNext() {
+    const next = this.findNextUngraded(this.state.readingIndex, 1, this.state.readingGraded);
+    if (next !== null) this.setState({ readingIndex: next, ...this.freshCard() });
+  }
+
+  renderVals() {
+    const ra = this.state.ra;
+    const raUnavailable = this.state.raUnavailable;
+    const positivesLocked = this.state.pinyinRevealed || !(ra === 'passed' || raUnavailable);
+    const modality = this.props.modality || 'reading';
+    const labels = { writing: 'Writing', reading: 'Reading' };
+    const isFullReview = this.currentFullReview();
+
+    const readingTotal = READING_CARDS.length;
+    const gradedCount = Object.keys(this.state.readingGraded).length;
+    const readingComplete = gradedCount === readingTotal;
+    const readingCard = READING_CARDS[this.state.readingIndex] || READING_CARDS[0];
+
+    const writingCards = this.writingCards();
+    const writingTotal = writingCards.length;
+    const writingLast = this.state.writingIndex === writingTotal - 1;
+    const writingPhase = this.state.writingPhase;
+    const writingMarking = writingPhase === 'marking';
+    const markedCount = Object.keys(this.state.writingGrades).length;
+    const markRows = writingCards.map((w, i) => ({
+      word: w,
+      againCls: this.state.writingGrades[i] === 'again' ? 'picked' : '',
+      goodCls: this.state.writingGrades[i] === 'good' ? 'picked' : '',
+      markAgain: () => this.markWord(i, 'again'),
+      markGood: () => this.markWord(i, 'good'),
+    }));
+    // Dictation counts up word by word; the marking pass is one screen for
+    // the whole list, so the header sits at the end of it.
+    const writingPos = writingMarking ? writingTotal : this.state.writingIndex + 1;
+
+    // Preview-mode stage override lets the Preview states tweak force the
+    // complete screen for any modality; for Reading, real grading progress
+    // (every card marked) drives it directly. Write Mode gets there once the
+    // marking pass is finished, not when the last word is dictated.
+    const isComplete = this.props.stage === 'complete'
+      || (modality === 'reading' && readingComplete)
+      || (modality === 'writing' && writingPhase === 'done');
+
+    const card = modality === 'reading' ? readingCard : { word: '', meaning: '', reading: '' };
+
+    // The dot row is Read Mode's per-card queue — one dot per card, filled
+    // as it is graded. Write Mode has no such queue to show: dictation is a
+    // straight run through the list (the header counter covers it) and the
+    // marking pass is one screen for the whole list, so the row is hidden
+    // there rather than rendered against nothing.
+    const upNext = READING_CARDS.map((_, i) => ({
+      cls: (this.state.readingGraded[i] ? 'reading' : '') + (i === this.state.readingIndex ? ' current' : ''),
+    }));
+
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      modality,
+      modalityLabel: labels[modality],
+      isWriting: modality === 'writing',
+      isReading: modality === 'reading',
+      isFullReview,
+      notFullReview: !isFullReview,
+      sessionMenuOpen: this.state.sessionMenuOpen,
+      toggleSessionMenu: () => this.toggleSessionMenu(),
+      switchToFullReview: () => this.switchToFullReview(),
+      switchToRefresher: () => this.switchToRefresher(),
+      hasPinyin: !!card.reading,
+      pinyinRevealed: this.state.pinyinRevealed,
+      pinyinHidden: !this.state.pinyinRevealed,
+      revealPinyin: () => this.revealPinyin(),
+      inProgress: !isComplete,
+      isComplete,
+      card,
+      gradeCard: () => this.gradeCard(),
+      showMic: !raUnavailable && ra !== 'passed',
+      raPassed: ra === 'passed',
+      raUnavailable,
+      raExhausted: ra === 'exhausted',
+      micCls: ra === 'listening' ? 'listening' : '',
+      micBusy: ra === 'checking',
+      micLabel: ra === 'listening' ? 'Stop and check' : 'Read aloud',
+      raCaption: ra === 'listening' ? 'Listening… tap when done'
+        : ra === 'checking' ? 'Checking…'
+        : (this.state.raNote || 'Tap and read it aloud'),
+      tapMic: () => this.tapMic(),
+      positivesLocked,
+      gateHint: this.state.pinyinRevealed ? 'Answer shown, so only Oops is left.'
+        : positivesLocked ? 'Read it aloud to unlock Hard, OK and Easy.' : '',
+      consentOpen: this.state.consentOpen,
+      acceptConsent: () => this.acceptConsent(),
+      declineConsent: () => this.declineConsent(),
+      goBack: () => this.goBack(),
+      goNext: () => this.goNext(),
+      backDisabled: this.findNextUngraded(this.state.readingIndex, -1, this.state.readingGraded) === null,
+      nextDisabled: this.findNextUngraded(this.state.readingIndex, 1, this.state.readingGraded) === null,
+      restart: () => this.restartSession(),
+      writingPosition: this.state.writingIndex + 1,
+      writingTotal,
+      writingIdle: !this.state.writingPlaying,
+      writingPlaying: this.state.writingPlaying,
+      writingLast,
+      playWord: () => this.playWord(),
+      pausePlayback: () => this.pausePlayback(),
+      skipWord: () => this.skipWord(),
+      writingDictation: !writingMarking,
+      writingMarking,
+      markRows,
+      markedCount,
+      markIncomplete: markedCount < writingTotal,
+      startMarking: () => this.startMarking(),
+      finishMarking: () => this.finishMarking(),
+      showUpNext: modality === 'reading',
+      position: modality === 'reading' ? this.state.readingIndex + 1 : writingPos,
+      total: modality === 'reading' ? readingTotal : writingTotal,
+      progressPct: modality === 'reading'
+        ? Math.round((gradedCount / readingTotal) * 100)
+        : Math.round((writingPos / writingTotal) * 100),
+      upNext,
+    };
+  }
+}
+</script>
+</body>
+</html>

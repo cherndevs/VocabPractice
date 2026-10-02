@@ -1,0 +1,96 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-02T00:00:00Z"
+ },
+ "title": "Practice and Library",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 384,
+   "h": 720,
+   "title": "Practice",
+   "is_interactive": true
+  },
+  "Library.dc.html": {
+   "x": 464,
+   "y": 0,
+   "w": 384,
+   "h": 720,
+   "title": "Library",
+   "is_interactive": true
+  },
+  "Session.dc.html": {
+   "x": 928,
+   "y": 0,
+   "w": 384,
+   "h": 640,
+   "title": "Practice Session",
+   "is_interactive": true
+  },
+  "SessionType.dc.html": {
+   "x": 0,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "1 · Session Type",
+   "is_interactive": true
+  },
+  "Capture.dc.html": {
+   "x": 464,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "2 · Capture"
+  },
+  "Selection.dc.html": {
+   "x": 928,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "3 · Select Lists",
+   "is_interactive": true
+  },
+  "Processing.dc.html": {
+   "x": 1392,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "4 · Processing"
+  },
+  "SessionReview.dc.html": {
+   "x": 1856,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "5 · Review & Confirm",
+   "is_interactive": true
+  },
+  "Created.dc.html": {
+   "x": 2320,
+   "y": 840,
+   "w": 384,
+   "h": 720,
+   "title": "6 · Created"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Library.dc.html",
+  "Session.dc.html",
+  "SessionType.dc.html",
+  "Capture.dc.html",
+  "Selection.dc.html",
+  "Processing.dc.html",
+  "SessionReview.dc.html",
+  "Created.dc.html"
+ ],
+ "notes": {},
+ "designSystems": []
+}
