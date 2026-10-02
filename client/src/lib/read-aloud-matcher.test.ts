@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesTarget, recognitionLang } from "./read-aloud-matcher";
+import { matchKind, matchesTarget, recognitionLang } from "./read-aloud-matcher";
 
 describe("recognitionLang", () => {
   it("picks zh-CN for words with CJK characters and en-US otherwise", () => {
@@ -68,5 +68,15 @@ describe("matchesTarget (English)", () => {
 
   it("fails on empty alternatives", () => {
     expect(matchesTarget("apple", [])).toBe(false);
+  });
+});
+
+describe("matchKind", () => {
+  it("says how a match was made", () => {
+    expect(matchKind("长城", ["长城"])).toBe("same-text");
+    expect(matchKind("弯曲", ["湾区"])).toBe("same-pinyin");
+    expect(matchKind("apple", ["Apple."])).toBe("same-text");
+    expect(matchKind("弯曲", ["完全"])).toBeNull();
+    expect(matchKind("apple", ["able"])).toBeNull();
   });
 });

@@ -12,6 +12,7 @@ const MAX_ALTERNATIVES = 5;
 // The slice of the browser API this adapter uses.
 interface RecognitionResultAlternative {
   transcript: string;
+  confidence?: number;
 }
 interface RecognitionInstance {
   lang: string;
@@ -125,8 +126,12 @@ export function createRecogniser(options: RecogniserOptions = {}): Recogniser {
         cancelTimer();
       };
       instance.onresult = (event) => {
-        const alternatives = Array.from(event.results[0] ?? [], (alt) => alt.transcript);
-        finish(alternatives.length > 0 ? { kind: "heard", alternatives } : { kind: "silence" });
+        const heard = Array.from(event.results[0] ?? []);
+        finish(
+          heard.length > 0
+            ? { kind: "heard", alternatives: heard.map((alt) => alt.transcript), confidences: heard.map((alt) => alt.confidence ?? 0) }
+            : { kind: "silence" },
+        );
       };
       instance.onerror = (event) => {
         // Only errors that mean it can't run here are reported as such; the rest

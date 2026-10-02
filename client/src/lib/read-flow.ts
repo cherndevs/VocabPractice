@@ -1,5 +1,5 @@
 import type { Grade } from "@shared/schema";
-import { matchesTarget } from "./read-aloud-matcher";
+import { matchKind, type MatchKind } from "./read-aloud-matcher";
 
 // Read Mode's word flow (ADR-0009): per-word state plus the session queue,
 // with no framework in it. The page renders this and dispatches to it.
@@ -23,7 +23,7 @@ export interface Showing {
 
 /** What the speech recogniser adapter reports for one attempt. */
 export type RecogniserEvent =
-  | { kind: "heard"; alternatives: string[] }
+  | { kind: "heard"; alternatives: string[]; confidences?: number[] }
   | { kind: "silence" }
   /** Listening didn't start in time; the attempt was cancelled. */
   | { kind: "hang" }
@@ -52,7 +52,7 @@ export interface ReadFlow {
   /** Read Aloud can't run (or was declined): the rest of the session self-reports. */
   readAloudOff: boolean;
   /** What the recogniser last heard and whether it passed, for the debug line. */
-  lastAttempt: { alternatives: string[]; passed: boolean } | null;
+  lastAttempt: { alternatives: string[]; confidences?: number[]; passed: boolean; how: MatchKind | null } | null;
   /** A short line about the last attempt, e.g. when nothing was heard. */
   note: string | null;
 }
@@ -161,8 +161,9 @@ export function stopListening(flow: ReadFlow): ReadFlow {
 export function receive(flow: ReadFlow, event: RecogniserEvent): ReadFlow {
   if (flow.queue.length === 0 || !isAttemptRunning(flow)) return flow;
   if (event.kind === "heard") {
-    const passed = matchesTarget(currentShowing(flow).word, event.alternatives.slice(0, GUESSES_JUDGED));
-    const lastAttempt = { alternatives: event.alternatives, passed };
+    const how = matchKind(currentShowing(flow).word, event.alternatives.slice(0, GUESSES_JUDGED));
+    const passed = how !== null;
+    const lastAttempt = { alternatives: event.alternatives, confidences: event.confidences, passed, how };
     if (passed) return { ...flow, wordState: { kind: "passed" }, hangs: 0, lastAttempt, note: null };
     const triesLeft = flow.triesLeft - 1;
     return triesLeft <= 0

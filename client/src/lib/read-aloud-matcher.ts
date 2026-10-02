@@ -16,31 +16,40 @@ export function recognitionLang(target: string): RecognitionLang {
  * `target` correctly (ADR-0009). Pure: no UI, no browser APIs.
  */
 export function matchesTarget(target: string, alternatives: string[]): boolean {
+  return matchKind(target, alternatives) !== null;
+}
+
+/** How a match was made: the very same text, or (Chinese only) the same tone-marked pinyin. Null if none. */
+export type MatchKind = "same-text" | "same-pinyin";
+
+export function matchKind(target: string, alternatives: string[]): MatchKind | null {
   if (recognitionLang(target) === "zh-CN") {
-    return matchesChinese(target, alternatives);
+    return matchKindChinese(target, alternatives);
   }
   const want = normalizeEnglish(target);
-  return alternatives.some((heard) => normalizeEnglish(heard) === want);
+  return alternatives.some((heard) => normalizeEnglish(heard) === want) ? "same-text" : null;
 }
 
 function normalizeEnglish(text: string): string {
   return text.toLowerCase().replace(EDGE_NON_WORD, "");
 }
 
-function matchesChinese(target: string, alternatives: string[]): boolean {
+function matchKindChinese(target: string, alternatives: string[]): MatchKind | null {
   const targetChars = Array.from(target.replace(NON_CJK, ""));
-  if (targetChars.length === 0) return false;
+  if (targetChars.length === 0) return null;
 
   // Same conversion as Peek's Pinyin Annotation: the whole word at once.
   const targetSyllables = wholeWordSyllables(targetChars.join(""));
-  return alternatives.some((alternative) => {
+  let kind: MatchKind | null = null;
+  for (const alternative of alternatives) {
     const heardChars = Array.from(alternative.replace(NON_CJK, ""));
-    if (heardChars.length !== targetChars.length) return false;
-    if (heardChars.every((char, i) => char === targetChars[i])) return true;
-
-    if (!targetSyllables) return false;
-    return heardChars.every((char, i) => knownReadings(char).includes(targetSyllables[i]));
-  });
+    if (heardChars.length !== targetChars.length) continue;
+    if (heardChars.every((char, i) => char === targetChars[i])) return "same-text";
+    if (targetSyllables && heardChars.every((char, i) => knownReadings(char).includes(targetSyllables[i]))) {
+      kind = "same-pinyin";
+    }
+  }
+  return kind;
 }
 
 /** Every reading pinyin-pro knows for one character; a non-Chinese or unknown character has none. */
