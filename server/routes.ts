@@ -91,6 +91,7 @@ export async function registerRoutes(
       );
       res.json(withTested);
     } catch (error) {
+      console.error("Failed to fetch sessions", error);
       res.status(500).json({ message: "Failed to fetch sessions" });
     }
   });
@@ -103,6 +104,7 @@ export async function registerRoutes(
       }
       res.json(session);
     } catch (error) {
+      console.error("Failed to fetch session", error);
       res.status(500).json({ message: "Failed to fetch session" });
     }
   });
@@ -159,6 +161,7 @@ export async function registerRoutes(
       }
       res.json({ success: true });
     } catch (error) {
+      console.error("Failed to delete session", error);
       res.status(500).json({ message: "Failed to delete session" });
     }
   });
@@ -200,6 +203,7 @@ export async function registerRoutes(
         }),
       );
     } catch (error) {
+      console.error("Failed to fetch review states", error);
       res.status(500).json({ message: "Failed to fetch review states" });
     }
   });

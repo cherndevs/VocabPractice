@@ -36,7 +36,7 @@ export default function Sessions() {
   const { subject, setSubject } = useActiveSubject();
   // Only the active Workspace's sessions are listed (ADR-0005). The list waits
   // for settings so it never flashes the wrong Workspace on startup.
-  const { data: sessions = [], isLoading: sessionsLoading } = useQuery<SessionWithTested[]>({
+  const { data: sessions = [], isLoading: sessionsLoading, isError, refetch } = useQuery<SessionWithTested[]>({
     queryKey: ["/api/sessions", { subject }],
     queryFn: async () => {
       const response = await fetch(`/api/sessions?subject=${subject}`);
@@ -168,6 +168,18 @@ export default function Sessions() {
               </Card>
             ))}
           </div>
+        ) : isError ? (
+          // A failed request is not an empty library: say so, so a server
+          // problem never looks like lost sessions.
+          <Card data-testid="card-sessions-error">
+            <CardContent className="p-8 text-center">
+              <h3 className="text-lg font-medium text-foreground mb-2">Couldn't load your sessions</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                Your sessions are not lost. The server had a problem, or is still waking up.
+              </p>
+              <Button onClick={() => refetch()} data-testid="button-retry-sessions">Try again</Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-3">
             {sessions.length === 0 ? (
