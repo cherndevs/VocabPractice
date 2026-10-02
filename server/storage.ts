@@ -63,17 +63,17 @@ export class MemStorage implements IStorage {
     return Array.from(this.sessions.values())
       .filter((session) => session.subject === subject)
       .sort((a, b) => {
-      const aPinnedTime = a.pinnedAt ? new Date(a.pinnedAt).getTime() : -Infinity;
-      const bPinnedTime = b.pinnedAt ? new Date(b.pinnedAt).getTime() : -Infinity;
+        const aPinnedTime = a.pinnedAt ? new Date(a.pinnedAt).getTime() : -Infinity;
+        const bPinnedTime = b.pinnedAt ? new Date(b.pinnedAt).getTime() : -Infinity;
 
-      if (aPinnedTime !== bPinnedTime) {
-        return bPinnedTime - aPinnedTime; // pinned first, newest pinned first
-      }
+        if (aPinnedTime !== bPinnedTime) {
+          return bPinnedTime - aPinnedTime; // pinned first, newest pinned first
+        }
 
-      const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bCreated - aCreated; // newest created first
-    });
+        const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bCreated - aCreated; // newest created first
+      });
   }
 
   async getSession(id: string): Promise<Session | undefined> {

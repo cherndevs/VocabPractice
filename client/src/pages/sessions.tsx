@@ -34,6 +34,7 @@ export default function Sessions() {
     enabled: !!subject,
   });
   const isLoading = !subject || sessionsLoading;
+  const active = subject ? SUBJECT_META[subject] : undefined;
 
   const deleteSessionMutation = useMutation({
     mutationFn: async (sessionId: string) => {
@@ -105,8 +106,8 @@ export default function Sessions() {
                   aria-label="Switch workspace"
                   data-testid="button-workspace-switcher"
                 >
-                  <span aria-hidden>{subject ? SUBJECT_META[subject].icon : ""}</span>
-                  <span className="text-sm font-medium">{subject ? SUBJECT_META[subject].name : ""}</span>
+                  <span aria-hidden>{active?.icon}</span>
+                  <span className="text-sm font-medium">{active?.shortName}</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -118,7 +119,7 @@ export default function Sessions() {
                     data-testid={`workspace-option-${option.key}`}
                   >
                     <span aria-hidden className="mr-2">{option.icon}</span>
-                    {option.label}
+                    {option.menuLabel}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -161,7 +162,7 @@ export default function Sessions() {
                   <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-foreground mb-2">No sessions yet</h3>
                   <p className="text-muted-foreground text-sm">
-                    Create your first {subject ? SUBJECT_META[subject].name : ""} spelling session to get started
+                    Create your first {active?.shortName} spelling session to get started
                   </p>
                 </CardContent>
               </Card>

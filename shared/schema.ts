@@ -53,7 +53,7 @@ export const insertSessionSchema = createInsertSchema(sessions, {
 });
 
 export const insertSettingsSchema = createInsertSchema(settings, {
-  activeSubject: subjectSchema.nullable(),
+  activeSubject: subjectSchema.optional(),
 }).omit({
   id: true,
 });

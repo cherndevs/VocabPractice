@@ -39,8 +39,8 @@ function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; 
 export default function CreateSession() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  // Sessions are filed under the Workspace that was active when the flow
-  // started; the switcher isn't reachable from here, so it can't change.
+  // Sessions are filed under the active Workspace. The switcher isn't
+  // reachable from this flow, so the Subject can't change while it runs.
   const { subject } = useActiveSubject();
   const [currentStep, setCurrentStep] = useState<CreateSessionStep>("camera");
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word

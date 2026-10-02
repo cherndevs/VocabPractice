@@ -79,6 +79,13 @@ describe("updating a session", () => {
     expect(after.body.subject).toBe("english");
   });
 
+  it("accepts a body that repeats the session's own subject", async () => {
+    const created = await api.request("POST", "/api/sessions", newSession());
+    const res = await api.request("PUT", `/api/sessions/${created.body.id}`, { subject: "english", title: "Same" });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ title: "Same", subject: "english" });
+  });
+
   it("still allows ordinary edits", async () => {
     const created = await api.request("POST", "/api/sessions", newSession());
     const res = await api.request("PUT", `/api/sessions/${created.body.id}`, { title: "Renamed" });
@@ -111,6 +118,14 @@ describe("settings", () => {
   it("rejects an unknown subject", async () => {
     const res = await api.request("PUT", "/api/settings", { activeSubject: "maths" });
     expect(res.status).toBe(400);
+  });
+
+  it("does not let a switch be cleared back to unchosen", async () => {
+    await api.request("PUT", "/api/settings", { activeSubject: "chinese" });
+    const res = await api.request("PUT", "/api/settings", { activeSubject: null });
+    expect(res.status).toBe(400);
+    const get = await api.request("GET", "/api/settings");
+    expect(get.body.activeSubject).toBe("chinese");
   });
 
   it("leaves other settings untouched when switching workspace", async () => {
