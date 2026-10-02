@@ -205,6 +205,7 @@ describe("Read Aloud word flow", () => {
     let flow = listenTo(startReadFlow(words("apple")), heard("able"));
     flow = listenTo(flow, hang);
     expect(flow.wordState).toEqual({ kind: "missed", triesLeft: 2 });
+    expect(flow.note).toBeNull();
   });
 
   it("goes unavailable after two hangs in a row, not after two apart", () => {

@@ -108,6 +108,17 @@ describe("speech recogniser adapter", () => {
     expect(t.events).toEqual([]);
   });
 
+  it("reports silence if the browser never answers a stop", () => {
+    const t = setup();
+    t.begin();
+    t.fake().onstart?.();
+    t.recogniser.stop();
+    expect(t.timerMs()).toBe(5000);
+    t.fire();
+    expect(t.events).toEqual([{ kind: "silence" }]);
+    expect(t.fake().aborted).toBe(true);
+  });
+
   it("reports nothing after an abort", () => {
     const t = setup();
     t.begin();

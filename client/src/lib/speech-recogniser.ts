@@ -5,6 +5,8 @@ import type { RecognitionLang } from "./read-aloud-matcher";
 // It reports what one attempt heard as a RecogniserEvent and nothing else.
 
 const START_TIMEOUT_MS = 3000;
+// After "done", how long the browser gets to deliver a result before the attempt counts as unheard.
+const RESULT_TIMEOUT_MS = 5000;
 const MAX_ALTERNATIVES = 5;
 
 // The slice of the browser API this adapter uses.
@@ -65,8 +67,9 @@ export function createRecogniser(options: RecogniserOptions = {}): Recogniser {
       return () => clearTimeout(handle);
     });
   const startTimeoutMs = options.startTimeoutMs ?? START_TIMEOUT_MS;
-  let end: (() => void) | null = null;
+  let finishAttempt: ((event: RecogniserEvent | null) => void) | null = null;
   let current: RecognitionInstance | null = null;
+  let stopTimer: (() => void) | null = null;
 
   function release(instance: RecognitionInstance) {
     instance.onstart = instance.onresult = instance.onerror = instance.onend = null;
@@ -78,7 +81,7 @@ export function createRecogniser(options: RecogniserOptions = {}): Recogniser {
   }
 
   function abort() {
-    end?.();
+    finishAttempt?.(null);
   }
 
   return {
@@ -104,12 +107,14 @@ export function createRecogniser(options: RecogniserOptions = {}): Recogniser {
         if (finished) return;
         finished = true;
         cancelTimer();
+        stopTimer?.();
+        stopTimer = null;
         release(instance);
         if (current === instance) current = null;
-        end = null;
+        finishAttempt = null;
         if (event) onEvent(event);
       }
-      end = () => finish(null);
+      finishAttempt = finish;
 
       instance.lang = lang;
       instance.maxAlternatives = MAX_ALTERNATIVES;
@@ -137,11 +142,18 @@ export function createRecogniser(options: RecogniserOptions = {}): Recogniser {
     },
 
     stop() {
+      const instance = current;
+      if (!instance) return;
       try {
-        current?.stop();
+        instance.stop();
       } catch {
         // Not running.
       }
+      // Safari may never answer a stop; don't leave the word waiting.
+      stopTimer?.();
+      stopTimer = setTimer(() => {
+        if (current === instance) finishAttempt?.({ kind: "silence" });
+      }, RESULT_TIMEOUT_MS);
     },
 
     abort,

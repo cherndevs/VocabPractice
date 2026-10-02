@@ -21,6 +21,9 @@ import {
   isFinished,
   isGradeEnabled,
   isPeeked,
+  isAttemptRunning,
+  canListen,
+  showsReadAloud,
   isPinyinRevealed,
   peek,
   progress,
@@ -389,7 +392,7 @@ export default function PracticeSession() {
       recogniser.stop();
       return;
     }
-    if (flow.wordState.kind !== "idle" && flow.wordState.kind !== "missed") return;
+    if (!canListen(flow)) return;
     if (!hasSeenReadAloudNotice()) {
       setNoticeOpen(true);
       return;
@@ -408,12 +411,18 @@ export default function PracticeSession() {
     if (readFlowRef.current) setReadFlowState(declineReadAloud(readFlowRef.current));
   };
 
+  // Whenever the word leaves an attempt (graded, peeked, restarted), the recogniser is stopped.
+  const attemptRunning = readFlow !== null && isAttemptRunning(readFlow);
+  useEffect(() => {
+    if (!attemptRunning) recogniser.abort();
+  }, [attemptRunning, showing?.word, showing?.tryOnceMore]);
+
   // The microphone must not stay on in the background (ADR-0009): stop on hide,
   // and an attempt that was running just counts as unheard.
   useEffect(() => {
     const stopRecognition = () => {
       const flow = readFlowRef.current;
-      const running = flow && (flow.wordState.kind === "listening" || flow.wordState.kind === "checking");
+      const running = flow !== null && isAttemptRunning(flow);
       recogniser.abort();
       if (running) applyRecogniserEvent({ kind: "silence" });
     };
@@ -435,7 +444,6 @@ export default function PracticeSession() {
     if (!session || !readFlow) return;
     const { flow, emitted } = gradeWord(readFlow, grade);
     if (!emitted) return;
-    recogniser.abort();
     gradeOutbox.add({
       subject: session.subject,
       word: emitted.word.trim(),
@@ -453,7 +461,6 @@ export default function PracticeSession() {
 
   const restartReading = () => {
     if (!session) return;
-    recogniser.abort();
     setReadFlowState(startReadFlow(session.words, { readAloud: recogniser.supported && !readFlow?.readAloudOff }));
     setPickedMode("read");
   };
@@ -465,10 +472,7 @@ export default function PracticeSession() {
     setIsLooping(false);
     setPickedMode(newMode);
     // Opening Peek locks the positive grades for this showing.
-    if (newMode === "peek" && readFlow) {
-      recogniser.abort();
-      setReadFlowState(peek(readFlow));
-    }
+    if (newMode === "peek" && readFlow) setReadFlowState(peek(readFlow));
     setCurrentRepetition(1);
     // Reinitialize so it's not automatically set to pause upon first play
     setIsPaused(false);
@@ -647,7 +651,7 @@ export default function PracticeSession() {
               )}
 
               {/* Read Aloud: mic, caption and Peek. Not shown once self-report takes over or the answer is out. */}
-              {mode === "read" && readFlow.wordState.kind !== "unavailable" && readFlow.wordState.kind !== "peeked" && (
+              {mode === "read" && showsReadAloud(readFlow) && (
                 <div className="mb-8 space-y-3" data-testid="read-aloud">
                   {readFlow.wordState.kind !== "failed" && readFlow.wordState.kind !== "passed" && (
                     <Button

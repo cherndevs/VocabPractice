@@ -122,10 +122,24 @@ function selfReport(flow: ReadFlow): ReadFlow {
   return { ...flow, readAloudOff: true, wordState: { kind: "unavailable" }, note: null };
 }
 
-/** The mic was tapped: start an attempt (from idle, or after a miss). */
+/** An attempt is under way: the recogniser may be on. */
+export function isAttemptRunning(flow: ReadFlow): boolean {
+  return flow.wordState.kind === "listening" || flow.wordState.kind === "checking";
+}
+
+/** The mic can be tapped to start an attempt. */
+export function canListen(flow: ReadFlow): boolean {
+  return flow.queue.length > 0 && (flow.wordState.kind === "idle" || flow.wordState.kind === "missed");
+}
+
+/** The mic button, caption and Peek link are on show: Read Aloud is running and the answer isn't out. */
+export function showsReadAloud(flow: ReadFlow): boolean {
+  return flow.wordState.kind !== "unavailable" && flow.wordState.kind !== "peeked";
+}
+
+/** The mic can be tapped to start an attempt (from idle, or after a miss). */
 export function startListening(flow: ReadFlow): ReadFlow {
-  const { kind } = flow.wordState;
-  if (flow.queue.length === 0 || (kind !== "idle" && kind !== "missed")) return flow;
+  if (!canListen(flow)) return flow;
   return { ...flow, wordState: { kind: "listening" }, note: null };
 }
 
@@ -140,9 +154,7 @@ export function stopListening(flow: ReadFlow): ReadFlow {
  * errors don't use a try; the third miss reveals the pinyin and leaves only Oops.
  */
 export function receive(flow: ReadFlow, event: RecogniserEvent): ReadFlow {
-  if (flow.queue.length === 0 || (flow.wordState.kind !== "listening" && flow.wordState.kind !== "checking")) {
-    return flow;
-  }
+  if (flow.queue.length === 0 || !isAttemptRunning(flow)) return flow;
   if (event.kind === "heard") {
     if (matchesTarget(currentShowing(flow).word, event.alternatives)) {
       return { ...flow, wordState: { kind: "passed" }, hangs: 0, note: null };
@@ -156,7 +168,8 @@ export function receive(flow: ReadFlow, event: RecogniserEvent): ReadFlow {
   if (event.kind === "hang") {
     const hangs = flow.hangs + 1;
     if (hangs >= HANGS_BEFORE_UNAVAILABLE) return selfReport({ ...flow, hangs });
-    return { ...flow, hangs, wordState: resting(flow.triesLeft), note: SILENCE_NOTE };
+    // A hang is cancelled quietly: back to where the word was, no note, no try used.
+    return { ...flow, hangs, wordState: resting(flow.triesLeft), note: null };
   }
   return { ...flow, hangs: 0, wordState: resting(flow.triesLeft), note: SILENCE_NOTE };
 }
