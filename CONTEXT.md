@@ -35,7 +35,7 @@ The auto-detected, auto-generated romanization line shown below a word in Peek M
 _Avoid_: Translation, transliteration
 
 **AHGE Grading**:
-The grading scale behind review scheduling, named for the Again/Hard/Good/Easy scale it maps onto. Read Mode uses all four, shown left to right as **Oops · Hard · OK · Easy** and self-reported by the learner, who is taught what each one means. "Oops" is always available; the three positive grades unlock only once Read Aloud has passed and lock again for good if the learner peeks. Write Mode uses two — Oops and a single positive — as Offline Grading: a parent marking paper can see right or wrong, but not how hard recall felt, so the finer grades would be guesses.
+The grading scale behind review scheduling, named for the Again/Hard/Good/Easy scale it maps onto. Read Mode uses all four, shown left to right as **Oops · Hard · OK · Easy** and self-reported by the learner, who is taught what each one means. "Oops" is always available; the three positive grades unlock only once Read Aloud has passed and lock again if the learner peeks, for that showing of the word; a word that comes back later in the session starts fresh. Write Mode uses two — Oops and a single positive — as Offline Grading: a parent marking paper can see right or wrong, but not how hard recall felt, so the finer grades would be guesses.
 _Avoid_: Grade, rating, difficulty rating, Again/Hard/Good/Easy (as the shipped UI — that's the underlying algorithm's full scale, not what the user sees)
 
 **Offline Grading**:
@@ -78,7 +78,7 @@ _Avoid_: Practice Talk (the earlier name — Speaking session and Practice Talk 
 A per-Lesson (not per-card) conversational-fluency score produced by Speaking sessions. Deferred with them — nothing else produces it.
 
 **Reading** (mastery composite):
-A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Parked, not reversed: nothing blends the sub-signals, nothing decays, and no score is computed or stored. Until then Read Mode's grade is **pronunciation only** — "I've got this" means the learner said the word correctly, self-reported until Read Aloud exists — recorded as the session's result and as history a later composite can consume. Recognition and comprehension have nothing producing them.
+A per-card mastery score blended from three sub-signals — recognition (identify on sight), pronunciation (say it correctly), comprehension (know what it means) — each updated only by whichever drill actually tested it. Parked, not reversed: nothing blends the sub-signals, nothing decays, and no score is computed or stored. Until then Read Mode's grade is **pronunciation only** — a positive grade means the learner said the word correctly, self-reported until Read Aloud exists — recorded as the session's result and as history a later composite can consume. Recognition and comprehension have nothing producing them.
 _Avoid_: Reading mastery, reading score (ambiguous with Read Mode)
 
 **Writing** (mastery composite):
