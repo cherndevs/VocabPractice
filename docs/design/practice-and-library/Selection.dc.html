@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Select lists</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .close-btn { background: none; border: none; width: 44px; height: 44px; cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; justify-content: center; }
+    .step-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); margin-left: 4px; }
+    .title { font-size: 20px; font-weight: 700; color: var(--foreground); margin: 12px 20px 4px; }
+    .subtitle { font-size: 13px; color: var(--muted-foreground); line-height: 1.4; margin: 0 20px 16px; }
+    .candidate-list { flex: 1; overflow-y: auto; padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+    .candidate-card {
+      display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px;
+      border: 1.5px solid var(--input); background: var(--card); cursor: pointer;
+    }
+    .candidate-card.checked { border-color: var(--primary); background: var(--primary-tint); }
+    .candidate-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .thumb {
+      width: 44px; height: 44px; border-radius: 8px; background: var(--muted); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; color: var(--muted-foreground);
+    }
+    .thumb svg { width: 20px; height: 20px; }
+    .candidate-info { flex: 1; min-width: 0; }
+    .candidate-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+    .candidate-meta { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+    .checkbox {
+      width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--input); background: var(--card);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .checkbox.checked { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+    .checkbox svg { width: 14px; height: 14px; }
+    .footer { display: flex; padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .continue-btn {
+      width: 100%; height: 46px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; padding: 16px 12px 0;">
+    <button type="button" class="close-btn" aria-label="Cancel">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <span class="step-label">Step 3/6 &middot; Select lists</span>
+  </div>
+
+  <div class="title">We found {{count}} lists in this photo</div>
+  <div class="subtitle">Pick which ones to add. Each is processed one at a time in the next steps.</div>
+
+  <div class="candidate-list">
+    <sc-for list="{{candidates}}" as="c" hint-placeholder-count="3">
+      <div class="candidate-card {{c.cls}}" onClick="{{c.toggle}}" onKeyDown="{{c.onKeyDown}}" role="checkbox" aria-checked="{{c.checked}}" tabindex="0">
+        <div class="thumb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        </div>
+        <div class="candidate-info">
+          <div class="candidate-title">{{c.sessionTitle}}</div>
+          <sc-if value="{{c.hasUnit}}" hint-placeholder-val="{{true}}">
+            <div class="candidate-meta">{{c.unit}}</div>
+          </sc-if>
+        </div>
+        <div class="checkbox {{c.cls}}">
+          <sc-if value="{{c.checked}}" hint-placeholder-val="{{true}}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div class="footer">
+    <button type="button" class="continue-btn">Continue with {{selectedCount}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { checked: { 0: true, 1: true, 2: false } };
+  }
+  toggle(i) { this.setState({ checked: { ...this.state.checked, [i]: !this.state.checked[i] } }); }
+  onKeyDown(i, e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.toggle(i);
+    }
+  }
+
+  renderVals() {
+    const raw = [
+      { sessionTitle: 'Week 4 Spelling', unit: 'Unit 10: A Snake in the Garden' },
+      { sessionTitle: 'Week 4 Reading', unit: 'Unit 10: A Snake in the Garden' },
+      { sessionTitle: 'Bonus Words' },
+    ];
+    const candidates = raw.map((c, i) => ({
+      ...c,
+      hasUnit: !!c.unit,
+      checked: !!this.state.checked[i],
+      cls: this.state.checked[i] ? 'checked' : '',
+      toggle: () => this.toggle(i),
+      onKeyDown: (e) => this.onKeyDown(i, e),
+    }));
+    const selectedCount = candidates.filter((c) => c.checked).length;
+
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      count: raw.length,
+      candidates,
+      selectedCount,
+    };
+  }
+}
+</script>
+</body>
+</html>

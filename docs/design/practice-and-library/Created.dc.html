@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Session created</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --success: hsl(142, 71%, 40%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --success: hsl(142, 60%, 48%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 32px; }
+    .check-circle {
+      width: 64px; height: 64px; border-radius: 999px; background: var(--success); display: flex;
+      align-items: center; justify-content: center; color: var(--primary-foreground);
+    }
+    .check-circle svg { width: 30px; height: 30px; }
+    .created-title { font-size: 20px; font-weight: 700; color: var(--foreground); }
+    .created-sub { font-size: 14px; color: var(--muted-foreground); text-align: center; }
+    .created-sub strong { color: var(--foreground); font-weight: 600; }
+    .footer { display: flex; padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .primary-btn {
+      width: 100%; height: 46px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div class="center">
+    <div class="check-circle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <div class="created-title">Session created</div>
+    <div class="created-sub"><strong>{{sessionTitle}}</strong><br>{{wordCount}} words added to your Library</div>
+  </div>
+
+  <div class="footer">
+    <button type="button" class="primary-btn">Go to Library</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      sessionTitle: '生字表 — Lesson 5',
+      wordCount: 5,
+    };
+  }
+}
+</script>
+</body>
+</html>

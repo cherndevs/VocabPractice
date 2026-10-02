@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Review and confirm</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --accent: hsl(210, 40%, 96%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+      --destructive: hsl(0, 72%, 51%);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --accent: hsl(217.2, 32.6%, 17.5%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+      --destructive: hsl(0, 70%, 60%);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    a { color: var(--primary); } a:hover { opacity: 0.85; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .close-btn { background: none; border: none; padding: 6px; cursor: pointer; color: var(--muted-foreground); display: flex; }
+    .step-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--muted-foreground); margin: 18px 0 8px; }
+    .field-label:first-of-type { margin-top: 4px; }
+    .title-input {
+      width: 100%; height: 42px; border: 1.5px solid var(--input); border-radius: 8px; padding: 0 12px;
+      font-size: 15px; font-family: inherit; color: var(--foreground); background: var(--card);
+    }
+    .title-input:focus { outline: none; border-color: var(--primary); }
+    .date-input {
+      width: 100%; height: 42px; border: 1.5px solid var(--input); border-radius: 8px; padding: 0 12px;
+      font-size: 15px; font-family: inherit; color: var(--foreground); background: var(--card);
+    }
+    .date-input:focus { outline: none; border-color: var(--primary); }
+    .field-hint { font-size: 12px; color: var(--muted-foreground); margin-top: 6px; line-height: 1.4; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 13px; border-radius: 999px;
+      border: 1.5px solid var(--input); background: var(--card); font-size: 13px; font-weight: 500; color: var(--foreground); cursor: pointer;
+    }
+    .chip.selected { border-color: var(--primary); background: var(--primary-tint); color: var(--primary); }
+    .chip.new { border-style: dashed; color: var(--muted-foreground); }
+    .new-input-row { display: flex; gap: 8px; margin-top: 10px; }
+    .new-input {
+      flex: 1; height: 40px; border: 1.5px solid var(--input); border-radius: 8px; padding: 0 12px;
+      font-size: 14px; font-family: inherit; color: var(--foreground); background: var(--background);
+    }
+    .new-input:focus { outline: none; border-color: var(--primary); }
+    .add-btn {
+      height: 40px; padding: 0 14px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .word-card { margin-bottom: 10px; }
+    .word-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .word-index { width: 20px; flex-shrink: 0; font-size: 13px; font-weight: 600; color: var(--muted-foreground); text-align: right; }
+    .word-input {
+      flex: 1; height: 42px; border: 1.5px solid var(--input); border-radius: 8px; padding: 0 12px;
+      font-size: 15px; font-family: inherit; color: var(--foreground); background: var(--card);
+    }
+    .word-input:focus { outline: none; border-color: var(--primary); }
+    .meaning-input {
+      display: block; width: calc(100% - 66px); margin-left: 28px; height: 36px; border: 1.5px solid var(--input);
+      border-radius: 8px; padding: 0 12px; font-size: 13px; font-family: inherit; color: var(--muted-foreground);
+      background: var(--background);
+    }
+    .meaning-input:focus { outline: none; border-color: var(--primary); color: var(--foreground); }
+    .word-delete { background: none; border: none; padding: 6px; cursor: pointer; color: var(--muted-foreground); display: flex; flex-shrink: 0; }
+    .word-delete:hover { color: var(--destructive); }
+    .add-word-btn {
+      display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 4px; margin-left: 28px;
+      background: none; border: none; color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .footer { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .confirm-btn {
+      height: 46px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .retake-btn {
+      height: 46px; border-radius: 8px; background: none; border: 1.5px solid var(--input);
+      color: var(--foreground); font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; padding: 16px 12px 0;">
+    <button type="button" class="close-btn" aria-label="Cancel">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <span class="step-label" style="margin-left: 4px;">Step 5/6 &middot; Review</span>
+  </div>
+
+  <div style="padding: 12px 20px 0; flex: 1; overflow-y: auto;">
+    <div class="field-label">Session title (optional)</div>
+    <input class="title-input" type="text" placeholder="{{titlePlaceholder}}" value="{{title}}" />
+
+    <div class="field-label">Group with other sessions? (optional)</div>
+    <div class="chips">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+        <button type="button" class="chip {{c.cls}}" onClick="{{c.pick}}">{{c.label}}</button>
+      </sc-for>
+      <sc-if value="{{showNewChip}}" hint-placeholder-val="{{true}}">
+        <button type="button" class="chip new" onClick="{{openNew}}">+ New</button>
+      </sc-if>
+    </div>
+    <sc-if value="{{newOpen}}" hint-placeholder-val="{{false}}">
+      <div class="new-input-row">
+        <input class="new-input" type="text" placeholder="e.g. {{example}}" value="{{newValue}}" onInput="{{onNewInput}}" />
+        <button type="button" class="add-btn" onClick="{{addNew}}">Add</button>
+      </div>
+    </sc-if>
+
+    <label class="field-label" for="due-date" style="display: block;">Due date (optional)</label>
+    <input id="due-date" class="date-input" type="date" />
+    <div class="field-hint">The day of the test or homework. The session with the nearest due date shows under This week on Practice.</div>
+
+    <div class="field-label">Words ({{wordCount}})</div>
+    <sc-for list="{{words}}" as="w" hint-placeholder-count="6">
+      <div class="word-card">
+        <div class="word-row">
+          <span class="word-index">{{w.index}}</span>
+          <input class="word-input" type="text" value="{{w.value}}" placeholder="Word" />
+          <button type="button" class="word-delete" aria-label="Remove word">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
+        </div>
+        <input class="meaning-input" type="text" value="{{w.meaning}}" placeholder="Meaning" />
+      </div>
+    </sc-for>
+    <button type="button" class="add-word-btn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Add word
+    </button>
+  </div>
+
+  <div class="footer">
+    <button type="button" class="confirm-btn">Confirm Word List</button>
+    <button type="button" class="retake-btn">Retake Photo</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"},"subject":{"editor":"enum","options":["english","chinese"],"default":"chinese","section":"Preview states"},"sessionType":{"editor":"enum","options":["spelling","reading"],"default":"reading","section":"Preview states"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selected: null, newOpen: false, newValue: '' };
+  }
+
+  select(tag) { this.setState({ selected: tag, newOpen: false }); }
+  openNew() { this.setState({ newOpen: true, newValue: '' }); }
+  onNewInput(e) { this.setState({ newValue: e.target.value }); }
+  addNew() {
+    const v = (this.state.newValue || '').trim();
+    if (!v) return;
+    this.setState({ selected: v, newOpen: false });
+  }
+
+  renderVals() {
+    const subjects = {
+      english: {
+        example: 'Unit 3', recent: ['Unit 1', 'Unit 2', 'Unit 3'],
+        titlePlaceholders: { spelling: 'e.g. Spelling List — Unit 3', reading: 'e.g. Reading List — Unit 3' },
+        words: [
+          { value: 'garden', meaning: 'a piece of ground for growing plants' },
+          { value: 'because', meaning: 'for the reason that' },
+          { value: 'beautiful', meaning: 'pleasing to look at' },
+          { value: 'friend', meaning: 'a person you like and trust' },
+          { value: 'people', meaning: 'human beings in general' },
+          { value: 'through', meaning: 'moving in one side and out the other' },
+        ],
+      },
+      chinese: {
+        example: 'Lesson 5', recent: ['Lesson 3', 'Lesson 4', 'Lesson 5'],
+        titlePlaceholders: { spelling: 'e.g. 生字表 — Lesson 5', reading: 'e.g. 阅读 — Lesson 5' },
+        words: [
+          { value: '弯曲', meaning: 'to bend, to curve' },
+          { value: '必要', meaning: 'necessary' },
+          { value: '朋友', meaning: 'friend' },
+          { value: '学校', meaning: 'school' },
+          { value: '图书馆', meaning: 'library' },
+        ],
+      },
+    };
+    const s = subjects[this.props.subject] || subjects.chinese;
+    const sessionType = this.props.sessionType || 'reading';
+
+    let recent = s.recent;
+    if (this.state.selected && !recent.includes(this.state.selected)) {
+      recent = [...recent, this.state.selected];
+    }
+
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      title: '',
+      titlePlaceholder: s.titlePlaceholders[sessionType],
+      example: s.example,
+      showNewChip: !this.state.newOpen,
+      newOpen: this.state.newOpen,
+      newValue: this.state.newValue,
+      openNew: () => this.openNew(),
+      onNewInput: (e) => this.onNewInput(e),
+      addNew: () => this.addNew(),
+      chips: recent.map((tag) => ({
+        label: tag,
+        cls: tag === this.state.selected ? 'selected' : '',
+        pick: () => this.select(tag),
+      })),
+      wordCount: s.words.length,
+      words: s.words.map((w, i) => ({ index: i + 1, value: w.value, meaning: w.meaning })),
+    };
+  }
+}
+</script>
+</body>
+</html>

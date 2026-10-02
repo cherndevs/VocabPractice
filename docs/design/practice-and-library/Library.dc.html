@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Library</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --popover: hsl(0, 0%, 100%);
+      --popover-foreground: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --accent: hsl(210, 40%, 96%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+      --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --success: hsl(142, 71%, 40%);
+      --warning: hsl(38, 92%, 46%);
+      --destructive: hsl(0, 72%, 51%);
+      --skill-writing: hsl(221.2, 83.2%, 53.3%);
+      --skill-writing-bg: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --skill-reading: hsl(262, 60%, 55%);
+      --skill-reading-bg: hsl(262, 60%, 55%, 0.1);
+      --skill-speaking: hsl(172, 66%, 38%);
+      --skill-speaking-bg: hsl(172, 66%, 38%, 0.1);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --popover: hsl(222.2, 84%, 4.9%);
+      --popover-foreground: hsl(210, 40%, 98%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --accent: hsl(217.2, 32.6%, 17.5%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+      --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+      --success: hsl(142, 60%, 48%);
+      --warning: hsl(38, 92%, 55%);
+      --destructive: hsl(0, 70%, 60%);
+      --skill-writing: hsl(217.2, 91.2%, 65%);
+      --skill-writing-bg: hsl(217.2, 91.2%, 65%, 0.16);
+      --skill-reading: hsl(262, 70%, 72%);
+      --skill-reading-bg: hsl(262, 70%, 72%, 0.16);
+      --skill-speaking: hsl(172, 55%, 55%);
+      --skill-speaking-bg: hsl(172, 55%, 55%, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    a { color: var(--primary); } a:hover { opacity: 0.85; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .switcher-trigger {
+      display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px 0 8px;
+      border: 1px solid var(--input); background: var(--background); border-radius: 6px;
+      font-size: 14px; font-weight: 500; color: var(--foreground); cursor: pointer;
+    }
+    .switcher-trigger:hover { background: var(--accent); }
+    .badge-circle {
+      width: 20px; height: 20px; border-radius: 9999px; background: var(--primary-tint); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .switcher-menu {
+      position: absolute; top: calc(100% + 4px); left: 0; min-width: 208px; background: var(--popover);
+      color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 4px; z-index: 20;
+    }
+    .switcher-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+    .switcher-item:hover { background: var(--accent); }
+    .switcher-item .label { flex: 1; color: var(--foreground); }
+    .switcher-item .check { color: var(--primary); }
+    .overlay { position: fixed; inset: 0; z-index: 10; }
+    .create-btn {
+      display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+      border-radius: 6px; background: var(--primary); color: var(--primary-foreground); border: none; cursor: pointer;
+    }
+    .bottom-nav { flex-shrink: 0; display: flex; background: var(--card); border-top: 1px solid var(--border); }
+    .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; background: none; border: none; cursor: pointer; color: var(--muted-foreground); }
+    .nav-tab.active { color: var(--primary); }
+    .nav-tab .icon { width: 22px; height: 22px; }
+    .nav-tab .nav-label { font-size: 11px; font-weight: 500; }
+
+    .deck-card { background: var(--card); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+    .modality-icon {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modality-icon svg { width: 18px; height: 18px; }
+    .modality-icon.writing { background: var(--skill-writing-bg); color: var(--skill-writing); }
+    .modality-icon.reading { background: var(--skill-reading-bg); color: var(--skill-reading); }
+    .deck-info { flex: 1; min-width: 0; }
+    .deck-title { font-size: 14px; font-weight: 500; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .deck-meta { font-size: 11px; color: var(--muted-foreground); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pin-btn { background: none; border: none; padding: 2px; cursor: pointer; color: var(--muted-foreground); display: flex; flex-shrink: 0; }
+    .skill-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex-shrink: 0; }
+    .skill-ring svg { width: 26px; height: 26px; }
+    .skill-ring .track { stroke: var(--border); stroke-width: 3; fill: none; }
+    .skill-ring .fill { stroke-width: 3; fill: none; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 13px 13px; }
+    .skill-ring.state-fresh .fill { stroke: var(--success); }
+    .skill-ring.state-aging .fill { stroke: var(--warning); }
+    .skill-ring.state-due .fill { stroke: var(--destructive); }
+    .skill-ring.state-new .fill { stroke: var(--muted-foreground); }
+    .group-header { display: flex; align-items: center; justify-content: space-between; padding: 0 2px; position: relative; }
+    .group-title { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); }
+    .group-menu-btn { background: none; border: none; padding: 3px; margin-left: 6px; border-radius: 4px; cursor: pointer; color: var(--muted-foreground); display: flex; }
+    .group-menu-btn:hover { background: var(--accent); }
+    .group-menu {
+      position: absolute; top: calc(100% + 4px); right: 0; min-width: 168px; background: var(--popover);
+      color: var(--popover-foreground); border: 1px solid var(--border); border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); padding: 4px; z-index: 15;
+    }
+    .group-menu-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 4px; font-size: 13px; color: var(--foreground); cursor: pointer; }
+    .group-menu-item:hover { background: var(--accent); }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden;">
+
+  <!-- Header -->
+  <div style="padding: 24px 16px 20px; background: var(--card); flex-shrink: 0;">
+    <div style="position: relative; margin-bottom: 14px;">
+      <button type="button" class="switcher-trigger" onClick="{{toggleOpen}}" aria-label="Switch workspace">
+        <span class="badge-circle">{{activeBadge}}</span>
+        <span>{{activeLabel}}</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted-foreground);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <sc-if value="{{open}}" hint-placeholder-val="{{false}}">
+        <div class="overlay" onClick="{{toggleOpen}}"></div>
+        <div class="switcher-menu">
+          <sc-for list="{{items}}" as="item" hint-placeholder-count="2">
+            <div class="switcher-item" onClick="{{item.pick}}">
+              <span class="badge-circle">{{item.badge}}</span>
+              <span class="label">{{item.label}}</span>
+              <sc-if value="{{item.isActive}}" hint-placeholder-val="{{false}}">
+                <svg class="icon check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: var(--foreground);">Library</h1>
+      <button type="button" class="create-btn" aria-label="Add source material">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div style="padding: 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+      <sc-if value="{{r.isHeader}}" hint-placeholder-val="{{false}}">
+        <div class="group-header">
+          <span class="group-title">{{r.name}}</span>
+          <button type="button" class="group-menu-btn" onClick="{{r.toggleMenu}}" aria-label="Lesson options">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><circle cx="12" cy="6" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="12" cy="18" r="1.5"></circle></svg>
+          </button>
+          <sc-if value="{{r.menuOpen}}" hint-placeholder-val="{{false}}">
+            <div class="overlay" onClick="{{r.toggleMenu}}"></div>
+            <div class="group-menu">
+              <div class="group-menu-item" onClick="{{r.startFullReview}}">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.99 6.57 2.64"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
+                <span>Revise all</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{r.isDeck}}" hint-placeholder-val="{{true}}">
+        <div class="deck-card">
+          <div class="modality-icon {{r.modality}}">
+            <sc-if value="{{r.isWriting}}" hint-placeholder-val="{{true}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+            </sc-if>
+            <sc-if value="{{r.isReading}}" hint-placeholder-val="{{false}}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            </sc-if>
+          </div>
+          <div class="deck-info">
+            <div class="deck-title">{{r.title}}</div>
+            <div class="deck-meta">{{r.source}} · {{r.coverage}} tested</div>
+          </div>
+          <button type="button" class="pin-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+          </button>
+          <div class="skill-ring {{r.ring.stateClass}}">
+            <svg viewBox="0 0 26 26">
+              <circle class="track" cx="13" cy="13" r="10"></circle>
+              <circle class="fill" cx="13" cy="13" r="10" style="stroke-dasharray: {{r.ring.dash}};"></circle>
+            </svg>
+          </div>
+        </div>
+      </sc-if>
+    </sc-for>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      <span class="nav-label">Practice</span>
+    </button>
+    <button type="button" class="nav-tab active">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <span class="nav-label">Library</span>
+    </button>
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+      <span class="nav-label">Progress</span>
+    </button>
+    <button type="button" class="nav-tab">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span class="nav-label">Settings</span>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: false, subject: 'english', menuOpenGroup: null };
+  }
+  toggleOpen() { this.setState({ open: !this.state.open }); }
+  selectSubject(key) { this.setState({ subject: key, open: false }); }
+  toggleGroupMenu(name) { this.setState({ menuOpenGroup: this.state.menuOpenGroup === name ? null : name }); }
+  startFullReview(name) { this.setState({ menuOpenGroup: null }); }
+
+  ring(pct, state) {
+    const c = 2 * Math.PI * 10;
+    const dash = ((pct / 100) * c).toFixed(1) + ' ' + c.toFixed(1);
+    return { dash, stateClass: 'state-' + state };
+  }
+
+  deck(title, source, coverage, modality, pct, state, group) {
+    return {
+      isDeck: true, isHeader: false,
+      title, source, coverage, modality, group,
+      isWriting: modality === 'writing',
+      isReading: modality === 'reading',
+      ring: this.ring(pct, state),
+    };
+  }
+
+  buildRows(decks) {
+    const rows = [];
+    const seen = new Set();
+    for (const d of decks) {
+      if (!d.group) { rows.push(d); continue; }
+      if (seen.has(d.group)) continue;
+      seen.add(d.group);
+      const siblings = decks.filter((x) => x.group === d.group);
+      rows.push({
+        isHeader: true, isDeck: false,
+        name: d.group,
+        menuOpen: this.state.menuOpenGroup === d.group,
+        toggleMenu: () => this.toggleGroupMenu(d.group),
+        startFullReview: () => this.startFullReview(d.group),
+      });
+      rows.push(...siblings);
+    }
+    return rows;
+  }
+
+  renderVals() {
+    const subjects = {
+      english: { key: 'english', label: 'English', badge: 'EN' },
+      chinese: { key: 'chinese', label: '中文 (Chinese)', badge: '中' },
+    };
+    const active = subjects[this.state.subject] || subjects.english;
+
+    const decksBySubject = {
+      english: [
+        this.deck('Spelling List — Unit 3', 'Term 3 · Week 6', '12 / 12', 'writing', 74, 'aging', 'Unit 3'),
+        this.deck('Reading List — Unit 3', 'Term 3 · Week 6', '10 / 12', 'reading', 68, 'aging', 'Unit 3'),
+        this.deck('Spelling List — Unit 2', 'Term 3 · Week 3', '10 / 10', 'writing', 90, 'fresh', 'Unit 2'),
+        this.deck('Vocabulary Recap', 'Term 2 · Week 9', '6 / 6', 'writing', 100, 'fresh', null),
+      ],
+      chinese: [
+        this.deck('生字表 — Lesson 4', 'Term 3 · Week 5', '10 / 10', 'writing', 85, 'fresh', 'Lesson 4'),
+        this.deck('阅读 — Lesson 4', 'Term 3 · Week 5', '9 / 10', 'reading', 91, 'fresh', 'Lesson 4'),
+        this.deck('生字表 — Lesson 5', 'Term 3 · Week 6', '8 / 10', 'writing', 55, 'aging', 'Lesson 5'),
+        this.deck('Chengyu Practice', 'Term 2 · Week 10', '6 / 6', 'writing', 100, 'fresh', null),
+      ],
+    };
+    const decks = decksBySubject[this.state.subject] || decksBySubject.english;
+    const rows = this.buildRows(decks);
+
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      open: this.state.open,
+      activeLabel: active.label,
+      activeBadge: active.badge,
+      toggleOpen: () => this.toggleOpen(),
+      items: Object.values(subjects).map((s) => ({
+        ...s,
+        isActive: s.key === this.state.subject,
+        pick: () => this.selectSubject(s.key),
+      })),
+      rows,
+    };
+  }
+}
+</script>
+</body>
+</html>

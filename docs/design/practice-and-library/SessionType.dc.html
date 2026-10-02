@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Session type</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: hsl(210, 40%, 98%);
+      --foreground: hsl(222.2, 84%, 4.9%);
+      --card: hsl(0, 0%, 100%);
+      --primary: hsl(221.2, 83.2%, 53.3%);
+      --primary-foreground: hsl(210, 40%, 98%);
+      --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --muted: hsl(210, 40%, 96%);
+      --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+      --border: hsl(214.3, 31.8%, 91.4%);
+      --input: hsl(214.3, 31.8%, 91.4%);
+      --skill-writing: hsl(221.2, 83.2%, 53.3%);
+      --skill-writing-bg: hsl(221.2, 83.2%, 53.3%, 0.1);
+      --skill-reading: hsl(262, 60%, 55%);
+      --skill-reading-bg: hsl(262, 60%, 55%, 0.1);
+      --skill-speaking: hsl(172, 66%, 38%);
+      --skill-speaking-bg: hsl(172, 66%, 38%, 0.1);
+    }
+    .dark {
+      --background: hsl(222.2, 84%, 4.9%);
+      --foreground: hsl(210, 40%, 98%);
+      --card: hsl(222.2, 84%, 4.9%);
+      --primary: hsl(217.2, 91.2%, 59.8%);
+      --primary-foreground: hsl(222.2, 84%, 4.9%);
+      --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+      --muted: hsl(217.2, 32.6%, 17.5%);
+      --muted-foreground: hsl(215, 20.2%, 65.1%);
+      --border: hsl(217.2, 32.6%, 17.5%);
+      --input: hsl(217.2, 32.6%, 17.5%);
+      --skill-writing: hsl(217.2, 91.2%, 65%);
+      --skill-writing-bg: hsl(217.2, 91.2%, 65%, 0.16);
+      --skill-reading: hsl(262, 70%, 72%);
+      --skill-reading-bg: hsl(262, 70%, 72%, 0.16);
+      --skill-speaking: hsl(172, 55%, 55%);
+      --skill-speaking-bg: hsl(172, 55%, 55%, 0.16);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .close-btn { background: none; border: none; width: 44px; height: 44px; cursor: pointer; color: var(--muted-foreground); display: flex; align-items: center; justify-content: center; }
+    .step-label { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-foreground); margin-left: 4px; }
+    .title { font-size: 20px; font-weight: 700; color: var(--foreground); margin: 8px 20px 4px; }
+    .subtitle { font-size: 13px; color: var(--muted-foreground); line-height: 1.4; margin: 0 20px 20px; }
+    .type-list { flex: 1; padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+    .type-card {
+      display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 12px;
+      border: 1.5px solid var(--input); background: var(--card); cursor: pointer;
+    }
+    .type-card.selected { border-color: var(--primary); background: var(--primary-tint); }
+    .type-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .type-icon {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .type-icon svg { width: 22px; height: 22px; }
+    .type-icon.writing { background: var(--skill-writing-bg); color: var(--skill-writing); }
+    .type-icon.reading { background: var(--skill-reading-bg); color: var(--skill-reading); }
+    .type-info { flex: 1; min-width: 0; }
+    .type-title-row { display: flex; align-items: center; gap: 8px; }
+    .type-title { font-size: 15px; font-weight: 600; color: var(--foreground); }
+    .type-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; line-height: 1.35; }
+    .radio {
+      width: 22px; height: 22px; border-radius: 999px; border: 1.5px solid var(--input); background: var(--card);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .radio.selected { border-color: var(--primary); }
+    .radio-dot { width: 10px; height: 10px; border-radius: 999px; background: var(--primary); }
+    .footer { display: flex; padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .continue-btn {
+      width: 100%; height: 46px; border-radius: 8px; background: var(--primary); color: var(--primary-foreground);
+      border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .continue-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</helmet>
+
+<div class="{{rootClass}}" style="width: 384px; height: 720px; background: var(--background); box-shadow: 0 0 20px rgba(0,0,0,0.12); overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="display: flex; align-items: center; padding: 16px 12px 0;">
+    <button type="button" class="close-btn" aria-label="Cancel">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <span class="step-label">Step 1/6 &middot; Session type</span>
+  </div>
+
+  <div class="title">What are you creating?</div>
+  <div class="subtitle">This decides which list the words go into.</div>
+
+  <div class="type-list">
+    <div class="type-card {{spellingCls}}" onClick="{{pickSpelling}}" role="radio" aria-checked="{{isSpelling}}" tabindex="0">
+      <div class="type-icon writing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+      </div>
+      <div class="type-info">
+        <div class="type-title-row"><span class="type-title">Spelling</span></div>
+        <div class="type-desc">Practice writing words from dictation.</div>
+      </div>
+      <div class="radio {{spellingCls}}">
+        <sc-if value="{{isSpelling}}" hint-placeholder-val="{{false}}">
+          <div class="radio-dot"></div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div class="type-card {{readingCls}}" onClick="{{pickReading}}" role="radio" aria-checked="{{isReading}}" tabindex="0">
+      <div class="type-icon reading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+      </div>
+      <div class="type-info">
+        <div class="type-title-row"><span class="type-title">Reading</span></div>
+        <div class="type-desc">Practice recognizing words and their meanings.</div>
+      </div>
+      <div class="radio {{readingCls}}">
+        <sc-if value="{{isReading}}" hint-placeholder-val="{{true}}">
+          <div class="radio-dot"></div>
+        </sc-if>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <button type="button" class="continue-btn">Continue</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"darkMode":{"editor":"boolean","default":false,"section":"Theme"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sessionType: 'reading' };
+  }
+  pickSpelling() { this.setState({ sessionType: 'spelling' }); }
+  pickReading() { this.setState({ sessionType: 'reading' }); }
+
+  renderVals() {
+    const sessionType = this.state.sessionType;
+    const isSpelling = sessionType === 'spelling';
+    const isReading = sessionType === 'reading';
+    return {
+      rootClass: this.props.darkMode ? 'dark' : '',
+      isSpelling,
+      isReading,
+      spellingCls: isSpelling ? 'selected' : '',
+      readingCls: isReading ? 'selected' : '',
+      pickSpelling: () => this.pickSpelling(),
+      pickReading: () => this.pickReading(),
+    };
+  }
+}
+</script>
+</body>
+</html>
