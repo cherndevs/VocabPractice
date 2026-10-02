@@ -58,7 +58,8 @@ Code architecture (high-level)
     - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts
-- Client Read Mode flow (client/src/lib/read-flow.ts): pure reducer-style module owning per-word state (Peek lock, which grades are enabled) and the Reading session queue with "Try once more" repeats; the practice page only renders it.
+- Client Read Mode flow (client/src/lib/read-flow.ts): pure reducer-style module owning per-word state (Read Aloud tries, Peek lock, which grades are enabled, fallback to self-report) and the Reading session queue with "Try once more" repeats; the practice page renders it and feeds it recogniser events.
+- Read Aloud (ADR-0009): client/src/lib/read-aloud-matcher.ts decides pass/fail from the heard alternatives; client/src/lib/speech-recogniser.ts is the only code touching SpeechRecognition (start-hang and stop timeouts, releases the mic); client/src/lib/read-aloud-notice.ts remembers the first-use notice per device.
 - Client grade outbox (client/src/lib/grade-outbox.ts, wired in grade-sync.ts): grades queue in localStorage and post in the background with backoff; the UI never waits on them.
 - Shared (shared/)
   - Database schema (users, sessions, settings, review_states, grade_log) with Drizzle; Zod insert schemas for request validation

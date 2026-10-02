@@ -423,10 +423,6 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground">
                   Version 1.0.0 - Built for efficient learning.
                 </p>
-                {/* Temporary: reach the mic test from the home-screen app (CHE-40). Remove with CHE-49. */}
-                <a href="/mic-test.html" className="text-sm text-primary underline" data-testid="link-mic-test">
-                  Mic test
-                </a>
               </div>
             </div>
           </CardContent>
