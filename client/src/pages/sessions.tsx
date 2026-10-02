@@ -16,6 +16,17 @@ import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
 import type { Session } from "@shared/schema";
 import { format } from "date-fns";
 
+function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary ${className}`}
+    >
+      {text}
+    </span>
+  );
+}
+
 export default function Sessions() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -105,7 +116,7 @@ export default function Sessions() {
                 aria-label="Switch workspace"
                 data-testid="button-workspace-switcher"
               >
-                <span aria-hidden>{active?.icon}</span>
+                <SubjectBadge text={active?.badge} />
                 <span className="text-sm font-medium">{active?.shortName}</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
@@ -117,7 +128,7 @@ export default function Sessions() {
                   onSelect={() => setSubject(option.key)}
                   data-testid={`workspace-option-${option.key}`}
                 >
-                  <span aria-hidden className="mr-2">{option.icon}</span>
+                  <SubjectBadge text={option.badge} className="mr-2" />
                   {option.menuLabel}
                 </DropdownMenuItem>
               ))}
