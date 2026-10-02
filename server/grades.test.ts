@@ -139,6 +139,43 @@ describe("grades and review state", () => {
   });
 });
 
+describe("reading schedule", () => {
+  const readingGrade = (word: string, g: string, at: Date) => grade(word, g, at, { skill: "reading" });
+
+  it("takes an always-Good word through the short-term steps, then roughly 3 → 6 → 15 days (ADR-0010)", async () => {
+    const intervals: number[] = [];
+    let at = T0;
+    for (let i = 0; i < 5; i++) {
+      const { body } = await post(readingGrade("apple", "good", at));
+      const due = new Date(body.states[0].due);
+      intervals.push((due.getTime() - at.getTime()) / 86_400_000);
+      at = due; // always graded exactly when due
+    }
+    // Short-term steps first (minutes, then the one-day graduating interval).
+    expect(intervals[0]).toBeLessThan(1);
+    const [graduating, ...spaced] = intervals.slice(1);
+    expect(graduating).toBe(1);
+    // Then ADR-0010's 3 → 6 → 15. The steps add some stability, so reading runs
+    // a little longer than the no-steps simulation (3 → 8 → 19 today); the
+    // tolerance catches a changed retention target or weights, not that drift.
+    const expected = [3, 6, 15];
+    expected.forEach((target, i) => {
+      expect(spaced[i]).toBeGreaterThanOrEqual(target * 0.8);
+      expect(spaced[i]).toBeLessThanOrEqual(target * 1.4);
+    });
+  });
+
+  it("moves a word's reading and spelling states independently", async () => {
+    await post(readingGrade("apple", "again", T0));
+    expect((await reviewState("apple", "reading"))[0].state).toMatchObject({ reps: 1 });
+    expect((await reviewState("apple", "spelling"))[0]).toMatchObject({ state: null, needsReview: true });
+
+    await post(grade("apple", "good", days(1)));
+    expect((await reviewState("apple", "spelling"))[0].state).toMatchObject({ reps: 1 });
+    expect((await reviewState("apple", "reading"))[0].state).toMatchObject({ reps: 1 });
+  });
+});
+
 describe("testedCount", () => {
   const create = async (title: string, words: string[], sessionType: string) =>
     (await api.request("POST", "/api/sessions", { title, words, wordCount: words.length, subject: "english", sessionType })).body;

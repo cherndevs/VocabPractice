@@ -1,20 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, RotateCcw, Pin, PartyPopper, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Pin, PartyPopper, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
@@ -22,8 +12,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { gradeOutbox } from "@/lib/grade-sync";
+import { currentShowing, enabledGrades, gradeWord, peek, startReadFlow, type ReadFlow } from "@/lib/read-flow";
 import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
-import type { Session, Settings } from "@shared/schema";
+import type { Grade, Session, Settings } from "@shared/schema";
 
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
@@ -34,8 +25,8 @@ export default function PracticeSession() {
   const [pickedMode, setPickedMode] = useState<SessionViewMode | null>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
-  const [sessionSkipped, setSessionSkipped] = useState<Set<number>>(new Set());
-  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  // Reading sessions: the pure Read Mode flow owns the queue and per-word state.
+  const [readFlowState, setReadFlowState] = useState<ReadFlow | null>(null);
   const [timeSpent, setTimeSpent] = useState(0);
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
@@ -140,7 +131,12 @@ export default function PracticeSession() {
   // Peek has nothing to show for a word with no pinyin (e.g. English words
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
-  const currentWordPinyin = session ? getPinyinAnnotation(session.words[currentWordIndex]) : null;
+  const isReading = session?.sessionType === "reading";
+  const readFlow = session && isReading ? (readFlowState ?? startReadFlow(session.words)) : null;
+  const readFlowDone = readFlow !== null && readFlow.queue.length === 0;
+  const showing = readFlow && !readFlowDone ? currentShowing(readFlow) : null;
+  const activeWord = showing ? showing.word : session?.words[currentWordIndex];
+  const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
   const offeredViews = session ? viewsForSessionType(session.sessionType) : [];
   const baseMode = session
     ? pickedMode && offeredViews.includes(pickedMode)
@@ -164,7 +160,7 @@ export default function PracticeSession() {
 
   const playWord = async (repetitionCount: number = 1) => {
     if (!session || isMuted) return;
-    const word = session.words[currentWordIndex];
+    const word = activeWord;
     if (!word) return;
 
     setIsLooping(true)
@@ -337,69 +333,31 @@ export default function PracticeSession() {
     }
   };
 
-  // Finds the next word index in `direction` that isn't in `skipSet`, or null if none remain.
-  const findNextUnskippedIndex = (fromIndex: number, direction: 1 | -1, skipSet: Set<number>) => {
-    if (!session) return null;
-    let idx = fromIndex + direction;
-    while (idx >= 0 && idx < session.words.length) {
-      if (!skipSet.has(idx)) return idx;
-      idx += direction;
-    }
-    return null;
-  };
-
-  const nextWordRead = () => {
-    const next = findNextUnskippedIndex(currentWordIndex, 1, sessionSkipped);
-    if (next === null) return;
+  // Grades the current showing. The outbox does the sending, so the next card
+  // appears at once; the flow decides whether the word comes back.
+  const handleReadGrade = (grade: Grade) => {
+    if (!session || !readFlow) return;
+    const { flow, emitted } = gradeWord(readFlow, grade);
+    if (!emitted) return;
+    gradeOutbox.add({
+      subject: session.subject,
+      word: emitted.word.trim(),
+      skill: "reading",
+      grade: emitted.grade,
+      sessionId: session.id,
+    });
     stopAllPlayback();
-    setIsPaused(true);
     setIsPaused(false);
     setIsLooping(false);
-    setCurrentWordIndex(next);
-    setCurrentRepetition(1);
+    setReadFlowState(flow);
+    // A fresh showing starts on Read, whatever tab the last one ended on.
+    setPickedMode("read");
   };
 
-  const previousWordRead = () => {
-    const prev = findNextUnskippedIndex(currentWordIndex, -1, sessionSkipped);
-    if (prev === null) return;
-    stopAllPlayback();
-    setIsPaused(true);
-    setIsLooping(false);
-    setCurrentWordIndex(prev);
-    setCurrentRepetition(1);
-  };
-
-  // Session-scoped "I've Got This": marks the word skipped for this session only
-  // (never persisted, never affects spaced-repetition), then advances.
-  // Falls back to searching backward when nothing unmarked remains ahead (e.g. marking
-  // the last word while an earlier word is still unmarked).
-  const handleIveGotThis = () => {
+  const restartReading = () => {
     if (!session) return;
-    const updated = new Set(sessionSkipped);
-    updated.add(currentWordIndex);
-    setSessionSkipped(updated);
-
-    const next =
-      findNextUnskippedIndex(currentWordIndex, 1, updated) ??
-      findNextUnskippedIndex(currentWordIndex, -1, updated);
-    if (next !== null) {
-      stopAllPlayback();
-      setIsPaused(true);
-      setIsPaused(false);
-      setIsLooping(false);
-      setCurrentWordIndex(next);
-      setCurrentRepetition(1);
-    }
-  };
-
-  const handleResetSkipped = () => {
-    setSessionSkipped(new Set());
-    setCurrentWordIndex(0);
-    setCurrentRepetition(1);
-    stopAllPlayback();
-    setIsPaused(false);
-    setIsLooping(false);
-    setResetDialogOpen(false);
+    setReadFlowState(startReadFlow(session.words));
+    setPickedMode("read");
   };
 
   const switchMode = (newMode: SessionViewMode) => {
@@ -408,11 +366,11 @@ export default function PracticeSession() {
     setIsPaused(true);
     setIsLooping(false);
     setPickedMode(newMode);
+    // Opening Peek locks the positive grades for this showing.
+    if (newMode === "peek" && readFlow) setReadFlowState(peek(readFlow));
     setCurrentRepetition(1);
     // Reinitialize so it's not automatically set to pause upon first play
     setIsPaused(false);
-    // Session-scoped skip marks don't survive a tab switch
-    setSessionSkipped(new Set());
   };
 
   const startMarking = () => {
@@ -489,10 +447,15 @@ export default function PracticeSession() {
     );
   }
 
-  const currentWord = session.words[currentWordIndex];
-  const progressPercentage = Math.floor((sessionSkipped.size / session.words.length) * 100);
-  const allWordsSkipped = session.words.length > 0 && sessionSkipped.size === session.words.length;
-  const isCurrentWordSkipped = sessionSkipped.has(currentWordIndex);
+  const readDone = readFlow?.done ?? 0;
+  const readTotal = readFlow?.total ?? 0;
+  const progressPercentage = readTotal > 0 ? Math.floor((readDone / readTotal) * 100) : 0;
+  const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
+    { grade: "again", label: "Oops", tone: "text-destructive" },
+    { grade: "hard", label: "Hard", tone: "text-amber-600" },
+    { grade: "good", label: "OK", tone: "text-primary" },
+    { grade: "easy", label: "Easy", tone: "text-green-600" },
+  ];
 
   return (
     <div className="fade-in">
@@ -517,35 +480,6 @@ export default function PracticeSession() {
             <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
               <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
             </Button>
-            {mode === "read" && (
-              <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-2"
-                  onClick={() => setResetDialogOpen(true)}
-                  disabled={sessionSkipped.size === 0}
-                  aria-label="Reset completed words"
-                  data-testid="button-reset-skipped"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                </Button>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Reset all completed marks?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This clears "I've Got This" marks for this session and takes you back to the first word.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleResetSkipped} data-testid="button-confirm-reset">
-                      Reset
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
           </div>
         </div>
 
@@ -563,95 +497,81 @@ export default function PracticeSession() {
       </div>
 
       {/* Read / Peek Mode Content */}
-      {(mode === "read" || mode === "peek") && (
+      {(mode === "read" || mode === "peek") && readFlow && (
         <div className="px-4 py-8">
-          {allWordsSkipped ? (
-            /* All words marked with "I've Got This" for this session */
+          {readFlowDone || !showing ? (
             <Card className="mb-8" data-testid="card-all-completed">
               <CardContent className="pt-6 text-center space-y-4">
                 <PartyPopper className="w-10 h-10 mx-auto text-primary" />
                 <p className="text-lg font-medium text-foreground">All Done!</p>
                 <p className="text-sm text-muted-foreground">
-                  You've marked every word in this session. Reset to go through them again.
+                  You've been through every word in this session.
                 </p>
-                <Button onClick={handleResetSkipped} data-testid="button-reset-to-continue">
-                  Reset and try again?
+                <Button onClick={restartReading} data-testid="button-reset-to-continue">
+                  Go again?
                 </Button>
               </CardContent>
             </Card>
           ) : (
-          /* Word Display */
-          <div className="text-center mb-8">
-            <div
-              className={`text-4xl font-bold text-foreground ${mode === "peek" && currentWordPinyin ? "" : "mb-6"}`}
-              data-testid="text-current-word"
-            >
-              {currentWord}
-            </div>
-
-            {mode === "peek" && currentWordPinyin && (
-              <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
-                {currentWordPinyin}
-              </div>
-            )}
-
-            {isCurrentWordSkipped && (
-              <div className="text-sm text-muted-foreground mb-6" data-testid="badge-word-completed">
-                ✓ Marked this session
-              </div>
-            )}
-
-            {/* Audio Controls */}
-            {mode === "peek" && (
-              <div className="flex items-center justify-center space-x-4 mb-8">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="p-3 rounded-full"
-                  onClick={() => playWord(1)}
-                  disabled={isMuted}
-                  data-testid="button-play-audio"
-                >
-                  <Volume2 className="w-6 h-6" />
-                </Button>
-              </div>
-            )}
-
-            {/* Navigation Controls */}
-            <div className="flex items-center justify-center space-x-6 mb-6">
-              <Button
-                variant="outline"
-                size="lg"
-                className="p-4 rounded-full"
-                onClick={previousWordRead}
-                disabled={findNextUnskippedIndex(currentWordIndex, -1, sessionSkipped) === null}
-                data-testid="button-previous-word"
+            <div className="text-center mb-8">
+              {showing.tryOnceMore && (
+                <div className="text-sm font-medium text-primary mb-2" data-testid="badge-try-once-more">
+                  Try once more
+                </div>
+              )}
+              <div
+                className={`text-4xl font-bold text-foreground ${mode === "peek" && currentWordPinyin ? "" : "mb-6"}`}
+                data-testid="text-current-word"
               >
-                <ChevronLeft className="w-6 h-6" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="p-4 rounded-full"
-                onClick={nextWordRead}
-                disabled={findNextUnskippedIndex(currentWordIndex, 1, sessionSkipped) === null}
-                data-testid="button-next-word"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </Button>
-            </div>
+                {showing.word}
+              </div>
 
-            {/* Progress Indicator */}
-            <div className="text-sm text-muted-foreground mb-8" data-testid="text-progress">
-              {currentWordIndex + 1}/{session.words.length} words
-            </div>
+              {mode === "peek" && currentWordPinyin && (
+                <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
+                  {currentWordPinyin}
+                </div>
+              )}
 
-            {mode === "read" && (
-              <Button onClick={handleIveGotThis} data-testid="button-mark-completed">
-                I've Got This
-              </Button>
-            )}
-          </div>
+              {mode === "peek" && (
+                <div className="flex items-center justify-center space-x-4 mb-8">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="p-3 rounded-full"
+                    onClick={() => playWord(1)}
+                    disabled={isMuted}
+                    data-testid="button-play-audio"
+                  >
+                    <Volume2 className="w-6 h-6" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Progress Indicator: repeats are counted in */}
+              <div className="text-sm text-muted-foreground mb-8" data-testid="text-progress">
+                {Math.min(readDone + 1, readTotal)}/{readTotal} words
+              </div>
+
+              <div className="flex gap-2" data-testid="grade-row">
+                {gradeButtons.map(({ grade, label, tone }) => (
+                  <Button
+                    key={grade}
+                    variant="outline"
+                    className={`flex-1 h-11 font-semibold ${tone} disabled:opacity-40 disabled:cursor-not-allowed`}
+                    disabled={!enabledGrades(readFlow.wordState).includes(grade)}
+                    onClick={() => handleReadGrade(grade)}
+                    data-testid={`button-grade-${grade}`}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              {readFlow.wordState.kind === "peeked" && (
+                <div className="text-xs text-muted-foreground mt-2" data-testid="text-grade-hint">
+                  Answer shown, so only Oops is left.
+                </div>
+              )}
+            </div>
           )}
 
           {/* Session Overview */}
@@ -660,13 +580,6 @@ export default function PracticeSession() {
               <CardTitle>Session Overview</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Words Mastered:</span>
-                <span className="font-medium text-foreground" data-testid="text-words-completed">
-                  {sessionSkipped.size}/{session.words.length}
-                </span>
-              </div>
-
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Time Spent:</span>
                 <span className="font-medium text-foreground" data-testid="text-time-spent">
