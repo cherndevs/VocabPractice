@@ -185,9 +185,13 @@ export function declineReadAloud(flow: ReadFlow): ReadFlow {
   return selfReport(flow);
 }
 
-/** The Pinyin Annotation shows after the third miss, as it does under Peek. */
+/**
+ * The Pinyin Annotation shows after the third miss, as it does under Peek, and
+ * after a pass, so the child or parent can check the reading by eye: Read Aloud
+ * only confirms the browser recognised the word, not the pronunciation.
+ */
 export function isPinyinRevealed(flow: ReadFlow): boolean {
-  return flow.wordState.kind === "failed";
+  return flow.wordState.kind === "failed" || flow.wordState.kind === "passed";
 }
 
 /** The line under the mic button. */

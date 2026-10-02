@@ -201,13 +201,24 @@ describe("Read Aloud word flow", () => {
     expect(listenTo(flow, heard("apple")).wordState).toEqual({ kind: "passed" });
   });
 
-  it("reveals the pinyin after a pass only through Peek", () => {
+  it("shows the pinyin after a pass so the reading can be checked by eye, without locking grades", () => {
     const flow = listenTo(startReadFlow(words("长城")), heard("长城"));
+    expect(isPinyinRevealed(flow)).toBe(true);
+    expect(enabledGrades(flow.wordState)).toEqual(["again", "hard", "good", "easy"]);
+  });
+
+  it("keeps the pinyin hidden until a pass or the third miss", () => {
+    const flow = startReadFlow(words("长城"));
     expect(isPinyinRevealed(flow)).toBe(false);
-    const peeked = peek(flow);
+    expect(isPinyinRevealed(listenTo(flow, heard("苹果")))).toBe(false);
+  });
+
+  it("locks positives once Peek is opened after a pass", () => {
+    const peeked = peek(listenTo(startReadFlow(words("长城")), heard("长城")));
     expect(enabledGrades(peeked.wordState)).toEqual(["again"]);
     expect(gradeWord(peeked, "good").emitted).toBeNull();
   });
+
 
   it("falls back to self-report for the rest of the session on each unavailable error", () => {
     for (const error of ["unsupported", "not-allowed", "service-not-allowed", "network", "language-not-supported"]) {
