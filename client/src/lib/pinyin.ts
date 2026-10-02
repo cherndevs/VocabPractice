@@ -1,6 +1,6 @@
 import { pinyin } from "pinyin-pro";
 
-const CJK_CHAR = /[一-鿿]/;
+export const CJK_CHAR = /[一-鿿]/;
 const RUN_PATTERN = /[一-鿿]+|[^一-鿿]+/g;
 
 /**
@@ -19,10 +19,20 @@ export function getPinyinAnnotation(word: string): string | null {
   return pieces.filter((piece) => piece.length > 0).join(" ");
 }
 
-function annotateChineseRun(run: string): string {
+/**
+ * Tone-marked syllables for a run of Chinese characters, converted as a
+ * whole word so contextual readings resolve. Null if pinyin-pro doesn't
+ * return one syllable per character.
+ */
+export function wholeWordSyllables(run: string): string[] | null {
   const syllables = pinyin(run, { toneType: "symbol", type: "array" }) as string[];
+  return syllables.length === Array.from(run).length ? syllables : null;
+}
+
+function annotateChineseRun(run: string): string {
+  const syllables = wholeWordSyllables(run);
   const chars = Array.from(run);
-  if (syllables.length !== chars.length) {
+  if (!syllables) {
     return chars.map(() => "?").join(" ");
   }
   return syllables.map((syllable, i) => (syllable === chars[i] ? "?" : syllable)).join(" ");

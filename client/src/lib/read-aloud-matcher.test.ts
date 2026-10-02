@@ -52,6 +52,11 @@ describe("matchesTarget (English)", () => {
     expect(matchesTarget("apple", ["  apple  "])).toBe(true);
   });
 
+  it("keeps internal spaces and hyphens significant", () => {
+    expect(matchesTarget("ok", ["o k"])).toBe(false);
+    expect(matchesTarget("apple pie", ["apple-pie"])).toBe(false);
+  });
+
   it("passes when a later alternative matches", () => {
     expect(matchesTarget("two", ["too", "two"])).toBe(true);
   });
