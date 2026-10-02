@@ -51,7 +51,7 @@ A word whose review state says it is ready for practice again in that skill. Wha
 _Avoid_: Due (reserved for a Session's due date), overdue
 
 **Refresher**:
-A session made of the words that need review in one skill, across Lessons, rather than one Lesson's list. There is one per skill — a spelling refresher and a reading refresher — each offered on the Practice screen only when it has words. Never mixed, so a reading refresher can be done without a parent free to mark.
+A session made of the words that need review in one skill, across Lessons, rather than one Lesson's list. There is one per skill — a spelling refresher and a reading refresher — each offered on the Practice screen only when it has words. It holds at most the refresher size set in Settings (20 by default). Never mixed, so a reading refresher can be done without a parent free to mark.
 _Avoid_: Quick Refresher as a single mixed session, review session
 
 **Due date**:
