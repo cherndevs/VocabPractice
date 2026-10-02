@@ -1,19 +1,51 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
+import { Plus, ChevronRight, ChevronDown, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useActiveSubject } from "@/hooks/use-active-subject";
+import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
 import type { Session } from "@shared/schema";
 import { format } from "date-fns";
+
+function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary ${className}`}
+    >
+      {text}
+    </span>
+  );
+}
 
 export default function Sessions() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
-  const { data: sessions = [], isLoading } = useQuery<Session[]>({
-    queryKey: ["/api/sessions"],
+  const { subject, setSubject } = useActiveSubject();
+  // Only the active Workspace's sessions are listed (ADR-0005). The list waits
+  // for settings so it never flashes the wrong Workspace on startup.
+  const { data: sessions = [], isLoading: sessionsLoading } = useQuery<Session[]>({
+    queryKey: ["/api/sessions", { subject }],
+    queryFn: async () => {
+      const response = await fetch(`/api/sessions?subject=${subject}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sessions");
+      }
+      return response.json();
+    },
+    enabled: !!subject,
   });
+  const isLoading = !subject || sessionsLoading;
+  const active = subject ? SUBJECT_META[subject] : undefined;
 
   const deleteSessionMutation = useMutation({
     mutationFn: async (sessionId: string) => {
@@ -74,7 +106,36 @@ export default function Sessions() {
     <div className="fade-in">
       {/* Header */}
       <div className="px-4 py-6 bg-card">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-1 px-2"
+                disabled={!subject}
+                aria-label="Switch workspace"
+                data-testid="button-workspace-switcher"
+              >
+                <SubjectBadge text={active?.badge} />
+                <span className="text-sm font-medium">{active?.shortName}</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {SUBJECT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.key}
+                  onSelect={() => setSubject(option.key)}
+                  data-testid={`workspace-option-${option.key}`}
+                >
+                  <SubjectBadge text={option.badge} className="mr-2" />
+                  {option.menuLabel}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-foreground">Mber Spelling Pro</h1>
           <Button
             asChild
@@ -111,7 +172,9 @@ export default function Sessions() {
                 <CardContent className="p-8 text-center">
                   <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-foreground mb-2">No sessions yet</h3>
-                  <p className="text-muted-foreground text-sm">Create your first spelling session to get started</p>
+                  <p className="text-muted-foreground text-sm">
+                    Create your first {active?.shortName} spelling session to get started
+                  </p>
                 </CardContent>
               </Card>
             ) : (

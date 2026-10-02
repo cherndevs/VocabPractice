@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useActiveSubject } from "@/hooks/use-active-subject";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import CameraCapture from "@/components/camera-capture";
@@ -38,6 +39,9 @@ function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; 
 export default function CreateSession() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  // Sessions are filed under the active Workspace. The switcher isn't
+  // reachable from this flow, so the Subject can't change while it runs.
+  const { subject } = useActiveSubject();
   const [currentStep, setCurrentStep] = useState<CreateSessionStep>("camera");
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
@@ -207,11 +211,21 @@ export default function CreateSession() {
       return;
     }
 
+    if (!subject) {
+      toast({
+        title: "Still loading",
+        description: "Your workspace hasn't loaded yet. Please try again in a moment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const title = sessionTitle.trim() || defaultSessionTitle();
 
     try {
       await createSessionMutation.mutateAsync({
         title,
+        subject,
         words: filteredWords,
         wordCount: filteredWords.length,
         status: "new",

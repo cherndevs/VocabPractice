@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertSessionSchema, insertSettingsSchema } from "@shared/schema";
+import type { IStorage } from "./storage";
+import { DEFAULT_SUBJECT, insertSessionSchema, insertSettingsSchema, subjectSchema } from "@shared/schema";
 import {
   extractSpellingLists,
   ExtractionServiceError,
@@ -9,7 +9,15 @@ import {
   type SupportedMediaType,
 } from "./spelling-extraction";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+// Storage is injected rather than imported so tests can mount these routes on
+// in-memory storage (CHE-29: the HTTP API is the testing seam).
+// activeSubject is stored null until the user first chooses a workspace; the
+// API reports the first-run default so clients never see null.
+function withActiveSubject<T extends { activeSubject: string | null }>(settings: T) {
+  return { ...settings, activeSubject: settings.activeSubject ?? DEFAULT_SUBJECT };
+}
+
+export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   // Spelling list extraction — relays a worksheet photo to Claude and returns
   // the sessions it reads off the page. Takes the image as raw bytes rather
   // than JSON so the global express.json() limit stays small for every other
@@ -47,9 +55,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Sessions routes
-  app.get("/api/sessions", async (_req, res) => {
+  app.get("/api/sessions", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    if (!subject.success) {
+      return res.status(400).json({ message: "A valid subject is required" });
+    }
     try {
-      const sessions = await storage.getSessions();
+      const sessions = await storage.getSessions(subject.data);
       res.json(sessions);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch sessions" });
@@ -82,6 +94,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
       const updates = { ...req.body } as any;
+
+      // A session's Subject is fixed at creation (ADR-0005).
+      if (Object.prototype.hasOwnProperty.call(updates, "subject")) {
+        const existing = await storage.getSession(req.params.id);
+        if (!existing) {
+          return res.status(404).json({ message: "Session not found" });
+        }
+        if (updates.subject !== existing.subject) {
+          return res.status(400).json({ message: "A session's subject cannot be changed" });
+        }
+        delete updates.subject;
+      }
+
       if (Object.prototype.hasOwnProperty.call(updates, "pinnedAt")) {
         updates.pinnedAt = updates.pinnedAt ? new Date(updates.pinnedAt) : null;
       }
@@ -113,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/settings", async (_req, res) => {
     try {
       const settings = await storage.getSettings();
-      res.json(settings);
+      res.json(settings && withActiveSubject(settings));
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch settings" });
     }
@@ -123,7 +148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const settingsData = insertSettingsSchema.partial().parse(req.body);
       const settings = await storage.updateSettings(settingsData);
-      res.json(settings);
+      res.json(withActiveSubject(settings));
     } catch (error) {
       res.status(400).json({ message: "Invalid settings data" });
     }

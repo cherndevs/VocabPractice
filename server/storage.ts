@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Session, type InsertSession, type Settings, type InsertSettings, users, sessions, settings } from "@shared/schema";
+import { type User, type InsertUser, type Session, type InsertSession, type Settings, type InsertSettings, type Subject, users, sessions, settings } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -10,7 +10,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   
   // Sessions
-  getSessions(): Promise<Session[]>;
+  getSessions(subject: Subject): Promise<Session[]>;
   getSession(id: string): Promise<Session | undefined>;
   createSession(session: InsertSession): Promise<Session>;
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
@@ -38,6 +38,7 @@ export class MemStorage implements IStorage {
       darkMode: false,
       dataSync: false,
       enablePauseButton: true,
+      activeSubject: null,
     };
   }
 
@@ -58,19 +59,21 @@ export class MemStorage implements IStorage {
     return user;
   }
 
-  async getSessions(): Promise<Session[]> {
-    return Array.from(this.sessions.values()).sort((a, b) => {
-      const aPinnedTime = a.pinnedAt ? new Date(a.pinnedAt).getTime() : -Infinity;
-      const bPinnedTime = b.pinnedAt ? new Date(b.pinnedAt).getTime() : -Infinity;
+  async getSessions(subject: Subject): Promise<Session[]> {
+    return Array.from(this.sessions.values())
+      .filter((session) => session.subject === subject)
+      .sort((a, b) => {
+        const aPinnedTime = a.pinnedAt ? new Date(a.pinnedAt).getTime() : -Infinity;
+        const bPinnedTime = b.pinnedAt ? new Date(b.pinnedAt).getTime() : -Infinity;
 
-      if (aPinnedTime !== bPinnedTime) {
-        return bPinnedTime - aPinnedTime; // pinned first, newest pinned first
-      }
+        if (aPinnedTime !== bPinnedTime) {
+          return bPinnedTime - aPinnedTime; // pinned first, newest pinned first
+        }
 
-      const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bCreated - aCreated; // newest created first
-    });
+        const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bCreated - aCreated; // newest created first
+      });
   }
 
   async getSession(id: string): Promise<Session | undefined> {
@@ -83,6 +86,7 @@ export class MemStorage implements IStorage {
     const session: Session = {
       id,
       title: insertSession.title,
+      subject: insertSession.subject,
       words: insertSession.words as string[],
       status: insertSession.status || "new",
       wordCount: insertSession.wordCount,
@@ -150,10 +154,11 @@ class PgStorage implements IStorage {
     return result[0]!;
   }
 
-  async getSessions(): Promise<Session[]> {
+  async getSessions(subject: Subject): Promise<Session[]> {
     const result = await this.db
       .select()
       .from(sessions)
+      .where(eq(sessions.subject, subject))
       .orderBy(desc(sessions.pinnedAt), desc(sessions.createdAt));
     return result;
   }
@@ -169,6 +174,7 @@ class PgStorage implements IStorage {
       .insert(sessions)
       .values({
         title: insertSession.title,
+        subject: insertSession.subject,
         words: insertSession.words as unknown as string[],
         status: insertSession.status ?? "new",
         wordCount: insertSession.wordCount,
@@ -223,6 +229,7 @@ class PgStorage implements IStorage {
         darkMode: false,
         dataSync: false,
         enablePauseButton: true,
+        activeSubject: null,
       } as Settings;
     }
   }
