@@ -9,7 +9,7 @@ Project overview
 
 Common commands
 - Install dependencies
-  - npm ci
+  - npm install (`npm ci` fails until the lockfile is fixed: CHE-51)
 - Run in development (Express + Vite middleware)
   - npm run dev
 - Type-check
@@ -70,4 +70,4 @@ Build and tooling
 - Tailwind/PostCSS configured via tailwind.config.ts and postcss.config.js
 
 Testing and linting
-- No test runner or linting configuration is present in this repo at the moment.
+- Tests: `npm test` (vitest; files sit next to the code as `*.test.ts`). No linter is configured.
