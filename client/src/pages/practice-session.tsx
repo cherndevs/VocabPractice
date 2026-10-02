@@ -368,11 +368,13 @@ export default function PracticeSession() {
   // Read Aloud. The adapter reports how an attempt ended; the flow decides what it means.
   const readFlowRef = useRef<ReadFlow | null>(null);
   readFlowRef.current = readFlow;
-  const applyRecogniserEvent = (event: RecogniserEvent) =>
+  const applyRecogniserEvent = (event: RecogniserEvent) => {
+    console.log("[Read Aloud] recogniser:", JSON.stringify(event));
     setReadFlowState((flow) => {
       const base = flow ?? readFlowRef.current;
       return base ? receive(base, event) : base;
     });
+  };
 
   const beginListening = () => {
     const flow = readFlowRef.current;
@@ -676,6 +678,13 @@ export default function PracticeSession() {
                   >
                     {captionFor(readFlow)}
                   </div>
+                  {/* Debug: what the app heard. Temporary, for checking Read Aloud by ear. */}
+                  {readFlow.lastAttempt && (
+                    <div className="text-xs text-muted-foreground" data-testid="text-heard-debug">
+                      Heard: {readFlow.lastAttempt.alternatives.map((alt, i) => (i === 0 ? `[${alt}]` : alt)).join(" · ")}
+                      {" "}→ {readFlow.lastAttempt.passed ? "match" : "no match"}
+                    </div>
+                  )}
                   {currentWordPinyin && readFlow.wordState.kind !== "passed" && readFlow.wordState.kind !== "failed" && (
                     <button
                       type="button"
