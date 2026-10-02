@@ -51,6 +51,8 @@ export interface ReadFlow {
   hangs: number;
   /** Read Aloud can't run (or was declined): the rest of the session self-reports. */
   readAloudOff: boolean;
+  /** What the recogniser last heard and whether it passed, for the debug line. */
+  lastAttempt: { alternatives: string[]; passed: boolean } | null;
   /** A short line about the last attempt, e.g. when nothing was heard. */
   note: string | null;
 }
@@ -59,6 +61,8 @@ const ALL_GRADES: Grade[] = ["again", "hard", "good", "easy"];
 const RIGHT_ANSWERS_TO_STOP_RETURNING = 2;
 const CARDS_BEFORE_RETURN = 3;
 const TRIES = 3;
+// Only the recogniser's best guess is judged; lower-ranked alternatives made wrong words pass.
+const GUESSES_JUDGED = 1;
 const HANGS_BEFORE_UNAVAILABLE = 2;
 const SILENCE_NOTE = "Didn't hear anything. Tap to try again.";
 
@@ -78,6 +82,7 @@ export function startReadFlow(words: string[], options: { readAloud?: boolean } 
     triesLeft: TRIES,
     hangs: 0,
     readAloudOff,
+    lastAttempt: null,
     note: null,
   };
 }
@@ -140,7 +145,7 @@ export function showsReadAloud(flow: ReadFlow): boolean {
 /** The mic can be tapped to start an attempt (from idle, or after a miss). */
 export function startListening(flow: ReadFlow): ReadFlow {
   if (!canListen(flow)) return flow;
-  return { ...flow, wordState: { kind: "listening" }, note: null };
+  return { ...flow, wordState: { kind: "listening" }, lastAttempt: null, note: null };
 }
 
 /** The child tapped "done": the recogniser is wrapping up and the app is checking. */
@@ -156,13 +161,13 @@ export function stopListening(flow: ReadFlow): ReadFlow {
 export function receive(flow: ReadFlow, event: RecogniserEvent): ReadFlow {
   if (flow.queue.length === 0 || !isAttemptRunning(flow)) return flow;
   if (event.kind === "heard") {
-    if (matchesTarget(currentShowing(flow).word, event.alternatives)) {
-      return { ...flow, wordState: { kind: "passed" }, hangs: 0, note: null };
-    }
+    const passed = matchesTarget(currentShowing(flow).word, event.alternatives.slice(0, GUESSES_JUDGED));
+    const lastAttempt = { alternatives: event.alternatives, passed };
+    if (passed) return { ...flow, wordState: { kind: "passed" }, hangs: 0, lastAttempt, note: null };
     const triesLeft = flow.triesLeft - 1;
     return triesLeft <= 0
-      ? { ...flow, triesLeft: 0, wordState: { kind: "failed" }, hangs: 0, note: null }
-      : { ...flow, triesLeft, wordState: { kind: "missed", triesLeft }, hangs: 0, note: null };
+      ? { ...flow, triesLeft: 0, wordState: { kind: "failed" }, hangs: 0, lastAttempt, note: null }
+      : { ...flow, triesLeft, wordState: { kind: "missed", triesLeft }, hangs: 0, lastAttempt, note: null };
   }
   if (event.kind === "error" && isUnavailableError(event.error)) return selfReport(flow);
   if (event.kind === "hang") {
@@ -239,6 +244,7 @@ export function gradeWord(
       wordState: stateOfNewShowing(flow.readAloudOff),
       triesLeft: TRIES,
       note: null,
+      lastAttempt: null,
       rightCount: { ...flow.rightCount, [current.word]: rights },
       done: flow.done + 1,
       total: flow.total + (returns ? 1 : 0),

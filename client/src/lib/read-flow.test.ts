@@ -153,8 +153,21 @@ describe("Read Aloud word flow", () => {
     expect(flow.wordState).toEqual({ kind: "missed", triesLeft: 2 });
     flow = listenTo(flow, heard("ample"));
     expect(flow.wordState).toEqual({ kind: "missed", triesLeft: 1 });
-    flow = listenTo(flow, heard("grape", "apple"));
+    flow = listenTo(flow, heard("apple", "grape"));
     expect(flow.wordState).toEqual({ kind: "passed" });
+  });
+
+  it("judges only the top guess: the target further down the alternatives is a miss", () => {
+    const flow = listenTo(startReadFlow(words("apple")), heard("able", "apple"));
+    expect(flow.wordState).toEqual({ kind: "missed", triesLeft: 2 });
+  });
+
+  it("keeps what was heard on the flow, with the verdict, for debugging", () => {
+    const missed = listenTo(startReadFlow(words("apple")), heard("able", "apple"));
+    expect(missed.lastAttempt).toEqual({ alternatives: ["able", "apple"], passed: false });
+    const passed = listenTo(missed, heard("apple"));
+    expect(passed.lastAttempt).toEqual({ alternatives: ["apple"], passed: true });
+    expect(startListening(missed).lastAttempt).toBeNull();
   });
 
   it("fails after three misses, revealing the answer with only Oops open", () => {
