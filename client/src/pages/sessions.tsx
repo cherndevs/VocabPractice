@@ -95,37 +95,37 @@ export default function Sessions() {
     <div className="fade-in">
       {/* Header */}
       <div className="px-4 py-6 bg-card">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3 min-w-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="gap-1 px-2"
-                  disabled={!subject}
-                  aria-label="Switch workspace"
-                  data-testid="button-workspace-switcher"
+        <div className="mb-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-1 px-2"
+                disabled={!subject}
+                aria-label="Switch workspace"
+                data-testid="button-workspace-switcher"
+              >
+                <span aria-hidden>{active?.icon}</span>
+                <span className="text-sm font-medium">{active?.shortName}</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {SUBJECT_OPTIONS.map((option) => (
+                <DropdownMenuItem
+                  key={option.key}
+                  onSelect={() => setSubject(option.key)}
+                  data-testid={`workspace-option-${option.key}`}
                 >
-                  <span aria-hidden>{active?.icon}</span>
-                  <span className="text-sm font-medium">{active?.shortName}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {SUBJECT_OPTIONS.map((option) => (
-                  <DropdownMenuItem
-                    key={option.key}
-                    onSelect={() => setSubject(option.key)}
-                    data-testid={`workspace-option-${option.key}`}
-                  >
-                    <span aria-hidden className="mr-2">{option.icon}</span>
-                    {option.menuLabel}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <h1 className="text-xl font-bold text-foreground truncate">Mber Spelling Pro</h1>
-          </div>
+                  <span aria-hidden className="mr-2">{option.icon}</span>
+                  {option.menuLabel}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-foreground">Mber Spelling Pro</h1>
           <Button
             asChild
             variant="default"
