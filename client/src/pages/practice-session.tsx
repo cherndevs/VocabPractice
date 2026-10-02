@@ -1,18 +1,39 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Pin, PartyPopper, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Pin, PartyPopper, CheckCircle2, Mic, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { gradeOutbox } from "@/lib/grade-sync";
-import { currentShowing, gradeWord, isFinished, isGradeEnabled, isPeeked, peek, progress, startReadFlow, type ReadFlow } from "@/lib/read-flow";
+import {
+  captionFor,
+  currentShowing,
+  declineReadAloud,
+  gradeWord,
+  isFinished,
+  isGradeEnabled,
+  isPeeked,
+  isPinyinRevealed,
+  peek,
+  progress,
+  receive,
+  startListening,
+  startReadFlow,
+  stopListening,
+  type ReadFlow,
+  type RecogniserEvent,
+} from "@/lib/read-flow";
+import { recognitionLang } from "@/lib/read-aloud-matcher";
+import { hasSeenReadAloudNotice, markReadAloudNoticeSeen } from "@/lib/read-aloud-notice";
+import { createRecogniser } from "@/lib/speech-recogniser";
 import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
 import type { Grade, Session, Settings } from "@shared/schema";
 
@@ -27,6 +48,11 @@ export default function PracticeSession() {
   const [currentRepetition, setCurrentRepetition] = useState(1);
   // Reading sessions: the pure Read Mode flow owns the queue and per-word state.
   const [storedReadFlow, setReadFlowState] = useState<ReadFlow | null>(null);
+  // Read Aloud: the recogniser adapter, and the first-use notice sheet.
+  const recogniserRef = useRef<ReturnType<typeof createRecogniser> | null>(null);
+  if (recogniserRef.current === null) recogniserRef.current = createRecogniser();
+  const recogniser = recogniserRef.current;
+  const [noticeOpen, setNoticeOpen] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
@@ -132,7 +158,9 @@ export default function PracticeSession() {
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
   const isReading = session?.sessionType === "reading";
-  const readFlow = session && isReading ? (storedReadFlow ?? startReadFlow(session.words)) : null;
+  const readFlow = session && isReading
+    ? (storedReadFlow ?? startReadFlow(session.words, { readAloud: recogniser.supported }))
+    : null;
   const showing = readFlow && !isFinished(readFlow) ? currentShowing(readFlow) : null;
   const activeWord = showing ? showing.word : session?.words[currentWordIndex];
   const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
@@ -143,6 +171,8 @@ export default function PracticeSession() {
       : initialViewMode(session.sessionType)
     : "write";
   const mode = resolveSessionViewMode(baseMode, currentWordPinyin !== null);
+  // Peek shows the pinyin, and so does the third miss in Read Aloud.
+  const showPinyin = currentWordPinyin !== null && (mode === "peek" || (readFlow !== null && isPinyinRevealed(readFlow)));
 
   // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
   useEffect(() => {
@@ -332,12 +362,80 @@ export default function PracticeSession() {
     }
   };
 
+  // Read Aloud. The adapter reports how an attempt ended; the flow decides what it means.
+  const readFlowRef = useRef<ReadFlow | null>(null);
+  readFlowRef.current = readFlow;
+  const applyRecogniserEvent = (event: RecogniserEvent) =>
+    setReadFlowState((flow) => {
+      const base = flow ?? readFlowRef.current;
+      return base ? receive(base, event) : base;
+    });
+
+  const beginListening = () => {
+    const flow = readFlowRef.current;
+    const word = flow && !isFinished(flow) ? currentShowing(flow).word : null;
+    if (!flow || !word) return;
+    const next = startListening(flow);
+    if (next === flow) return;
+    setReadFlowState(next);
+    recogniser.start(recognitionLang(word), applyRecogniserEvent);
+  };
+
+  const handleMicTap = () => {
+    const flow = readFlowRef.current;
+    if (!flow) return;
+    if (flow.wordState.kind === "listening") {
+      setReadFlowState(stopListening(flow));
+      recogniser.stop();
+      return;
+    }
+    if (flow.wordState.kind !== "idle" && flow.wordState.kind !== "missed") return;
+    if (!hasSeenReadAloudNotice()) {
+      setNoticeOpen(true);
+      return;
+    }
+    beginListening();
+  };
+
+  const acceptNotice = () => {
+    markReadAloudNoticeSeen();
+    setNoticeOpen(false);
+    beginListening();
+  };
+
+  const declineNotice = () => {
+    setNoticeOpen(false);
+    if (readFlowRef.current) setReadFlowState(declineReadAloud(readFlowRef.current));
+  };
+
+  // The microphone must not stay on in the background (ADR-0009): stop on hide,
+  // and an attempt that was running just counts as unheard.
+  useEffect(() => {
+    const stopRecognition = () => {
+      const flow = readFlowRef.current;
+      const running = flow && (flow.wordState.kind === "listening" || flow.wordState.kind === "checking");
+      recogniser.abort();
+      if (running) applyRecogniserEvent({ kind: "silence" });
+    };
+    const onVisibility = () => {
+      if (document.hidden) stopRecognition();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", stopRecognition);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", stopRecognition);
+      recogniser.abort();
+    };
+  }, []);
+
   // Grades the current showing. The outbox does the sending, so the next card
   // appears at once; the flow decides whether the word comes back.
   const handleReadGrade = (grade: Grade) => {
     if (!session || !readFlow) return;
     const { flow, emitted } = gradeWord(readFlow, grade);
     if (!emitted) return;
+    recogniser.abort();
     gradeOutbox.add({
       subject: session.subject,
       word: emitted.word.trim(),
@@ -355,7 +453,8 @@ export default function PracticeSession() {
 
   const restartReading = () => {
     if (!session) return;
-    setReadFlowState(startReadFlow(session.words));
+    recogniser.abort();
+    setReadFlowState(startReadFlow(session.words, { readAloud: recogniser.supported && !readFlow?.readAloudOff }));
     setPickedMode("read");
   };
 
@@ -366,7 +465,10 @@ export default function PracticeSession() {
     setIsLooping(false);
     setPickedMode(newMode);
     // Opening Peek locks the positive grades for this showing.
-    if (newMode === "peek" && readFlow) setReadFlowState(peek(readFlow));
+    if (newMode === "peek" && readFlow) {
+      recogniser.abort();
+      setReadFlowState(peek(readFlow));
+    }
     setCurrentRepetition(1);
     // Reinitialize so it's not automatically set to pause upon first play
     setIsPaused(false);
@@ -517,13 +619,13 @@ export default function PracticeSession() {
                 </div>
               )}
               <div
-                className={`text-4xl font-bold text-foreground ${mode === "peek" && currentWordPinyin ? "" : "mb-6"}`}
+                className={`text-4xl font-bold text-foreground ${showPinyin ? "" : "mb-6"}`}
                 data-testid="text-current-word"
               >
                 {showing.word}
               </div>
 
-              {mode === "peek" && currentWordPinyin && (
+              {showPinyin && (
                 <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
                   {currentWordPinyin}
                 </div>
@@ -541,6 +643,50 @@ export default function PracticeSession() {
                   >
                     <Volume2 className="w-6 h-6" />
                   </Button>
+                </div>
+              )}
+
+              {/* Read Aloud: mic, caption and Peek. Not shown once self-report takes over or the answer is out. */}
+              {mode === "read" && readFlow.wordState.kind !== "unavailable" && readFlow.wordState.kind !== "peeked" && (
+                <div className="mb-8 space-y-3" data-testid="read-aloud">
+                  {readFlow.wordState.kind !== "failed" && readFlow.wordState.kind !== "passed" && (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className={`p-4 rounded-full h-16 w-16 ${readFlow.wordState.kind === "listening" ? "animate-pulse border-primary" : ""}`}
+                      onClick={handleMicTap}
+                      disabled={readFlow.wordState.kind === "checking"}
+                      aria-label={readFlow.wordState.kind === "listening" ? "Stop and check" : "Read aloud"}
+                      data-testid="button-mic"
+                    >
+                      {readFlow.wordState.kind === "checking" ? (
+                        <Loader2 className="w-7 h-7 animate-spin" />
+                      ) : (
+                        <Mic className="w-7 h-7 text-primary" />
+                      )}
+                    </Button>
+                  )}
+                  <div
+                    className={`text-sm ${readFlow.wordState.kind === "passed" ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                    data-testid="text-read-aloud-caption"
+                  >
+                    {captionFor(readFlow)}
+                  </div>
+                  {currentWordPinyin && readFlow.wordState.kind !== "passed" && readFlow.wordState.kind !== "failed" && (
+                    <button
+                      type="button"
+                      className="text-sm text-primary underline"
+                      onClick={() => switchMode("peek")}
+                      data-testid="button-peek-link"
+                    >
+                      Stuck? Peek
+                    </button>
+                  )}
+                </div>
+              )}
+              {readFlow.wordState.kind === "unavailable" && mode === "read" && (
+                <div className="text-sm text-muted-foreground mb-8" data-testid="text-read-aloud-unavailable">
+                  {captionFor(readFlow)}
                 </div>
               )}
 
@@ -736,6 +882,21 @@ export default function PracticeSession() {
           </div>
         </div>
       )}
+
+      <Sheet open={noticeOpen} onOpenChange={(open) => { if (!open) declineNotice(); }}>
+        <SheetContent side="bottom" data-testid="sheet-read-aloud-notice">
+          <SheetHeader>
+            <SheetTitle>Before you read aloud</SheetTitle>
+            <SheetDescription>
+              To check the reading, your browser may send the recording to its speech service (on iPhone, that's Apple). This app never keeps it.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-4 flex flex-col gap-2">
+            <Button onClick={acceptNotice} data-testid="button-notice-ok">OK, start</Button>
+            <Button variant="outline" onClick={declineNotice} data-testid="button-notice-not-now">Not now</Button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
