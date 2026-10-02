@@ -30,7 +30,7 @@ export default function PracticeSession() {
   const { toast } = useToast();
   // The view the user picked; the view actually shown is derived below, since
   // which views exist depends on the session's type (ADR-0008).
-  const [pickedMode, setMode] = useState<SessionViewMode | null>(null);
+  const [pickedMode, setPickedMode] = useState<SessionViewMode | null>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentRepetition, setCurrentRepetition] = useState(1);
   const [sessionSkipped, setSessionSkipped] = useState<Set<number>>(new Set());
@@ -402,7 +402,7 @@ export default function PracticeSession() {
     stopAllPlayback();
     setIsPaused(true);
     setIsLooping(false);
-    setMode(newMode);
+    setPickedMode(newMode);
     setCurrentRepetition(1);
     // Reinitialize so it's not automatically set to pause upon first play
     setIsPaused(false);

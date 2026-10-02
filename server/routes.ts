@@ -97,7 +97,7 @@ export async function registerRoutes(app: Express, storage: IStorage): Promise<S
 
       // A session's Subject (ADR-0005) and Session Type (ADR-0008) are fixed
       // at creation. Repeating the current value is harmless.
-      for (const [field, label] of [["subject", "subject"], ["sessionType", "type"]] as const) {
+      for (const [field, label] of [["subject", "subject"], ["sessionType", "session type"]] as const) {
         if (!Object.prototype.hasOwnProperty.call(updates, field)) continue;
         const existing = await storage.getSession(req.params.id);
         if (!existing) {

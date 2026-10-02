@@ -327,7 +327,7 @@ export default function CreateSession() {
       case "processing":
         return "Create New Session - Step 4";
       case "edit-words":
-        return "Create New Session - Step 5/6";
+        return "Create New Session - Step 5";
       case "session-created":
         return "Session Created!";
       default:
