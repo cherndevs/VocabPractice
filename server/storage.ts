@@ -1,8 +1,8 @@
-import { type User, type InsertUser, type Session, type InsertSession, type Settings, type InsertSettings, type Subject, users, sessions, settings } from "@shared/schema";
+import { type User, type InsertUser, type Session, type InsertSession, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, users, sessions, settings, reviewStates, gradeLog } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -16,6 +16,14 @@ export interface IStorage {
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
   deleteSession(id: string): Promise<boolean>;
   
+  // Grades and review state. The scheduling rules live in server/grades.ts;
+  // storage only keeps what it is told.
+  /** Appends to the grade log. False if the id was already logged. */
+  logGrade(grade: GradeInput): Promise<boolean>;
+  getReviewState(subject: Subject, word: string, skill: Skill): Promise<ReviewState | undefined>;
+  getReviewStates(subject: Subject, skill: Skill, words: string[]): Promise<ReviewState[]>;
+  saveReviewState(state: ReviewState): Promise<void>;
+
   // Settings
   getSettings(): Promise<Settings | undefined>;
   updateSettings(settings: Partial<Settings>): Promise<Settings>;
@@ -25,6 +33,8 @@ export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private sessions: Map<string, Session>;
   private settings: Settings | undefined;
+  private grades = new Map<string, GradeInput>();
+  private reviewStates = new Map<string, ReviewState>();
 
   constructor() {
     this.users = new Map();
@@ -118,6 +128,33 @@ export class MemStorage implements IStorage {
     return this.sessions.delete(id);
   }
 
+  async logGrade(grade: GradeInput): Promise<boolean> {
+    if (this.grades.has(grade.id)) return false;
+    this.grades.set(grade.id, grade);
+    return true;
+  }
+
+  private reviewKey(subject: Subject, word: string, skill: Skill) {
+    return JSON.stringify([subject, word, skill]);
+  }
+
+  async getReviewState(subject: Subject, word: string, skill: Skill): Promise<ReviewState | undefined> {
+    return this.reviewStates.get(this.reviewKey(subject, word, skill));
+  }
+
+  async getReviewStates(subject: Subject, skill: Skill, words: string[]): Promise<ReviewState[]> {
+    const found: ReviewState[] = [];
+    for (const word of Array.from(new Set(words))) {
+      const state = this.reviewStates.get(this.reviewKey(subject, word, skill));
+      if (state) found.push(state);
+    }
+    return found;
+  }
+
+  async saveReviewState(state: ReviewState): Promise<void> {
+    this.reviewStates.set(this.reviewKey(state.subject, state.word, state.skill), state);
+  }
+
   async getSettings(): Promise<Settings | undefined> {
     return this.settings;
   }
@@ -204,6 +241,39 @@ class PgStorage implements IStorage {
   async deleteSession(id: string): Promise<boolean> {
     const result = await this.db.delete(sessions).where(eq(sessions.id, id)).returning({ id: sessions.id });
     return result.length > 0;
+  }
+
+  async logGrade(grade: GradeInput): Promise<boolean> {
+    const inserted = await this.db
+      .insert(gradeLog)
+      .values(grade)
+      .onConflictDoNothing()
+      .returning({ id: gradeLog.id });
+    return inserted.length > 0;
+  }
+
+  async getReviewState(subject: Subject, word: string, skill: Skill): Promise<ReviewState | undefined> {
+    const result = await this.db
+      .select()
+      .from(reviewStates)
+      .where(and(eq(reviewStates.subject, subject), eq(reviewStates.word, word), eq(reviewStates.skill, skill)))
+      .limit(1);
+    return result[0];
+  }
+
+  async getReviewStates(subject: Subject, skill: Skill, words: string[]): Promise<ReviewState[]> {
+    if (words.length === 0) return [];
+    return this.db
+      .select()
+      .from(reviewStates)
+      .where(and(eq(reviewStates.subject, subject), eq(reviewStates.skill, skill), inArray(reviewStates.word, words)));
+  }
+
+  async saveReviewState(state: ReviewState): Promise<void> {
+    await this.db
+      .insert(reviewStates)
+      .values(state)
+      .onConflictDoUpdate({ target: [reviewStates.subject, reviewStates.word, reviewStates.skill], set: state });
   }
 
   async getSettings(): Promise<Settings | undefined> {

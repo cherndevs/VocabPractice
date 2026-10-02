@@ -7,6 +7,8 @@ import { MemStorage } from "./storage";
 export interface TestApi {
   url: string;
   close(): Promise<void>;
+  /** Moves the server's clock (it starts at a fixed instant). */
+  setNow(now: Date): void;
   request(method: string, path: string, body?: unknown): Promise<{ status: number; body: any }>;
 }
 
@@ -15,12 +17,16 @@ export interface TestApi {
 export async function startTestApi(): Promise<TestApi> {
   const app = express();
   app.use(express.json());
-  const server: Server = await registerRoutes(app, new MemStorage());
+  let now = new Date("2026-01-05T09:00:00Z");
+  const server: Server = await registerRoutes(app, new MemStorage(), { now: () => now });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
   return {
     url,
+    setNow: (next) => {
+      now = next;
+    },
     close: () => new Promise<void>((resolve) => server.close(() => resolve())),
     async request(method, path, body) {
       const res = await fetch(url + path, {

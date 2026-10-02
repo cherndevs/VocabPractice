@@ -54,11 +54,13 @@ Code architecture (high-level)
   - Production: serveStatic (server/vite.ts) serves dist/public with an SPA fallback to index.html
   - Routes (server/routes.ts): `registerRoutes(app, storage)` takes the storage instance, so tests mount the real routes over `MemStorage` (see server/test-harness.ts)
     - Sessions: GET /api/sessions?subject= (subject required), GET /api/sessions/:id, POST /api/sessions (subject and sessionType required), PUT /api/sessions/:id (subject and sessionType immutable), DELETE /api/sessions/:id
+    - Grades: POST /api/grades `{grades:[…]}` logs each grade (client id = primary key, replays are no-ops) and moves the word's review state through FSRS (server/scheduling.ts wraps `ts-fsrs`; server/grades.ts applies a batch oldest-first). GET /api/review-states?subject=&skill=&words= reports state and `needsReview`. GET /api/sessions adds `testedCount`. `registerRoutes` takes an injectable clock (`{now}`); the test harness has `setNow`.
     - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts
+- Client grade outbox (client/src/lib/grade-outbox.ts, wired in grade-sync.ts): grades queue in localStorage and post in the background with backoff; the UI never waits on them.
 - Shared (shared/)
-  - Database schema (users, sessions, settings) with Drizzle; Zod insert schemas for request validation
+  - Database schema (users, sessions, settings, review_states, grade_log) with Drizzle; Zod insert schemas for request validation
   - Used by server and drizzle-kit migrations
 
 Build and tooling

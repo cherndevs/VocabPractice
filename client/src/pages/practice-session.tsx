@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, RotateCcw, Pin, PartyPopper } from "lucide-react";
+import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, RotateCcw, Pin, PartyPopper, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +21,7 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { getPinyinAnnotation } from "@/lib/pinyin";
+import { gradeOutbox } from "@/lib/grade-sync";
 import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
 import type { Session, Settings } from "@shared/schema";
 
@@ -40,6 +41,10 @@ export default function PracticeSession() {
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
+  // Spelling flow: dictation, then a parent marks each word against the paper
+  // (Offline Grading), then done. Marks are by word position.
+  const [spellingPhase, setSpellingPhase] = useState<"dictation" | "marking" | "complete">("dictation");
+  const [marks, setMarks] = useState<Record<number, "again" | "good">>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -410,6 +415,47 @@ export default function PracticeSession() {
     setSessionSkipped(new Set());
   };
 
+  const startMarking = () => {
+    stopAllPlayback();
+    setIsLooping(false);
+    setMarks({});
+    setSpellingPhase("marking");
+  };
+
+  // Queues the grades and moves on at once; the outbox does the sending.
+  const finishMarking = () => {
+    if (!session) return;
+    session.words.forEach((word, index) => {
+      const mark = marks[index];
+      if (!mark) return;
+      gradeOutbox.add({
+        subject: session.subject,
+        word: word.trim(),
+        skill: session.sessionType,
+        grade: mark,
+        sessionId: session.id,
+      });
+    });
+    setSpellingPhase("complete");
+  };
+
+  const dictateAgain = () => {
+    stopAllPlayback();
+    setIsPaused(false);
+    setIsLooping(false);
+    setCurrentWordIndex(0);
+    setCurrentRepetition(1);
+    setMarks({});
+    setSpellingPhase("dictation");
+  };
+
+  // Tap a word while marking to hear it again.
+  const speakWord = (word: string) => {
+    if (isMuted) return;
+    const lang = /[\u4e00-\u9fff]/.test(word) ? "zh-CN" : "en-US";
+    void speak(word, { lang }).catch(() => {});
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -643,7 +689,75 @@ export default function PracticeSession() {
       )}
 
       {/* Write Mode Content */}
-      {mode === "write" && (
+      {mode === "write" && spellingPhase === "marking" && (
+        <div className="px-4 py-6" data-testid="section-marking">
+          <h2 className="text-xl font-semibold text-foreground">Mark the writing</h2>
+          <p className="text-sm text-muted-foreground mb-4">Check each word against the paper. Tap a word to hear it again.</p>
+          <ul className="space-y-2">
+            {session.words.map((word, index) => (
+              <li key={index} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
+                <button
+                  type="button"
+                  className="text-lg font-medium text-foreground text-left"
+                  onClick={() => speakWord(word)}
+                  data-testid={`button-hear-word-${index}`}
+                >
+                  {word}
+                </button>
+                <div className="flex gap-2 shrink-0">
+                  <Button
+                    size="sm"
+                    variant={marks[index] === "again" ? "destructive" : "outline"}
+                    aria-pressed={marks[index] === "again"}
+                    onClick={() => setMarks((m) => ({ ...m, [index]: "again" }))}
+                    data-testid={`button-oops-${index}`}
+                  >
+                    Oops
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={marks[index] === "good" ? "default" : "outline"}
+                    aria-pressed={marks[index] === "good"}
+                    onClick={() => setMarks((m) => ({ ...m, [index]: "good" }))}
+                    data-testid={`button-got-it-${index}`}
+                  >
+                    I've got this
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 space-y-2 text-center">
+            <div className="text-sm text-muted-foreground" data-testid="text-marked-count">
+              {Object.keys(marks).length} of {session.words.length} marked
+            </div>
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={finishMarking}
+              disabled={Object.keys(marks).length < session.words.length}
+              data-testid="button-finish-marking"
+            >
+              Finish
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {mode === "write" && spellingPhase === "complete" && (
+        <div className="px-4 py-12 text-center space-y-6" data-testid="section-complete">
+          <CheckCircle2 className="w-10 h-10 mx-auto text-green-600" />
+          <p className="text-xl font-semibold text-foreground">Session complete</p>
+          <div className="flex flex-col gap-2">
+            <Button onClick={dictateAgain} data-testid="button-review-again">Review again</Button>
+            <Button variant="outline" onClick={() => navigate("/sessions")} data-testid="button-back-to-sessions">
+              Back to sessions
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {mode === "write" && spellingPhase === "dictation" && (
         <div className="px-4 py-8">
           {/* Word Display Hidden */}
           <div className="text-center mb-8">
@@ -701,7 +815,7 @@ export default function PracticeSession() {
                 <Button 
                   variant="default"
                   size="lg"
-                  onClick={() => navigate("/sessions")}
+                  onClick={startMarking}
                   data-testid="button-done"
                   className="px-8 py-3"
                 >

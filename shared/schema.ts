@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, jsonb, boolean, doublePrecision, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -24,6 +24,18 @@ export const SESSION_TYPES = ["spelling", "reading"] as const;
 export type SessionType = (typeof SESSION_TYPES)[number];
 export const sessionTypeSchema = z.enum(SESSION_TYPES);
 
+// The skill a grade or review state is about (ADR-0010). A session's skill
+// comes from its Session Type.
+export const SKILLS = SESSION_TYPES;
+export type Skill = SessionType;
+export const skillSchema = sessionTypeSchema;
+
+// The FSRS rating scale behind review scheduling. Spelling's Offline Grading
+// only ever sends "again" (Oops) or "good" (I've got this).
+export const GRADES = ["again", "hard", "good", "easy"] as const;
+export type Grade = (typeof GRADES)[number];
+export const gradeSchema = z.enum(GRADES);
+
 export const sessions = pgTable("sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -37,6 +49,42 @@ export const sessions = pgTable("sessions", {
   pinnedAt: timestamp("pinned_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// What the app knows about how well one word is remembered in one skill, and
+// when it next needs practice: the FSRS card fields. Scheduled on the server.
+export const reviewStates = pgTable(
+  "review_states",
+  {
+    subject: text("subject").notNull().$type<Subject>(),
+    word: text("word").notNull(), // trimmed
+    skill: text("skill").notNull().$type<Skill>(),
+    due: timestamp("due").notNull(),
+    stability: doublePrecision("stability").notNull(),
+    difficulty: doublePrecision("difficulty").notNull(),
+    elapsedDays: integer("elapsed_days").notNull(),
+    scheduledDays: integer("scheduled_days").notNull(),
+    learningSteps: integer("learning_steps").notNull(),
+    reps: integer("reps").notNull(),
+    lapses: integer("lapses").notNull(),
+    state: integer("state").notNull(), // ts-fsrs State enum
+    lastReview: timestamp("last_review"),
+  },
+  (t) => [primaryKey({ columns: [t.subject, t.word, t.skill] })],
+);
+
+// Append-only record of every grade, kept raw so FSRS weights can be fitted
+// later. The client generates the id, which makes a replayed POST a no-op.
+// There is deliberately no source column: an Offline Grading grade is stored
+// indistinguishably from any future recognition-derived one.
+export const gradeLog = pgTable("grade_log", {
+  id: varchar("id").primaryKey(),
+  subject: text("subject").notNull().$type<Subject>(),
+  word: text("word").notNull(),
+  skill: text("skill").notNull().$type<Skill>(),
+  grade: text("grade").notNull().$type<Grade>(),
+  gradedAt: timestamp("graded_at").notNull(),
+  sessionId: text("session_id"),
 });
 
 export const settings = pgTable("settings", {
@@ -66,6 +114,21 @@ export const insertSettingsSchema = createInsertSchema(settings, {
 }).omit({
   id: true,
 });
+
+export const gradeInputSchema = z.object({
+  id: z.string().min(1).max(100),
+  subject: subjectSchema,
+  word: z.string().trim().min(1),
+  skill: skillSchema,
+  grade: gradeSchema,
+  gradedAt: z.coerce.date().refine((d) => !Number.isNaN(d.getTime()), "Invalid date"),
+  sessionId: z.string().nullish().transform((v) => v ?? null),
+});
+export const gradeBatchSchema = z.object({
+  grades: z.array(gradeInputSchema).max(500),
+});
+export type GradeInput = z.infer<typeof gradeInputSchema>;
+export type ReviewState = typeof reviewStates.$inferSelect;
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
