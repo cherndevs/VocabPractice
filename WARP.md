@@ -58,6 +58,7 @@ Code architecture (high-level)
     - Lessons: POST/PUT /api/sessions accept `lessonName` (string tags, creating the Lesson if new to the Subject; null clears); sessions come back with `lesson: {id, name} | null`. GET /api/lessons?subject= lists a Subject's Lessons by name. No management screen.
     - Due date: POST/PUT /api/sessions accept `dueDate` (`YYYY-MM-DD` string or null; else 400); a date-only `date` column returned as the same string. It never affects review scheduling.
     - Practice: GET /api/practice?subject=&today=YYYY-MM-DD (client's local date) returns `{thisWeek, pinned}`: thisWeek is the session with the smallest `dueDate >= today` (null if none); pinned excludes it. Client: `/` Practice, `/library` (old `/sessions` redirects), `/progress` placeholder.
+    - Drill: GET /api/sessions/:id/drill?scope=due|all (default due) returns `{words}`: words needing review in the session's skill (most overdue first, then never-graded), then for `all` the rest in list order (server/drill.ts). GET /api/sessions adds `needsReviewCount`. The practice page loads its words from here; the header button toggles "Revise all" / "due only" and restarts the drill.
     - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts

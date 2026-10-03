@@ -41,8 +41,101 @@ import { createRecogniser } from "@/lib/speech-recogniser";
 import { initialViewMode, resolveSessionViewMode, viewsForSessionType, type SessionViewMode } from "@/lib/session-mode";
 import type { Grade, Session, Settings } from "@shared/schema";
 
+type DrillScope = "due" | "all";
+
+// Loads the session and its drill (the words to practise now), and keys the
+// drill by scope so switching restarts it. The words are held as loaded: grades
+// refresh review states mid-drill, and the list must not shift under the child.
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
+  const [, navigate] = useLocation();
+  const [scope, setScope] = useState<DrillScope>("due");
+  const [drill, setDrill] = useState<{ scope: DrillScope; words: string[] } | null>(null);
+  const [drillFailed, setDrillFailed] = useState(false);
+  const { data: session, isLoading: sessionLoading } = useQuery<Session>({
+    queryKey: ["/api/sessions", id],
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    setDrill(null);
+    setDrillFailed(false);
+    fetch(`/api/sessions/${id}/drill?scope=${scope}`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .then((body: { words: string[] }) => {
+        if (!cancelled) setDrill({ scope, words: body.words });
+      })
+      .catch(() => {
+        if (!cancelled) setDrillFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, scope]);
+
+  if (sessionLoading || (!drill && !drillFailed && session)) {
+    return (
+      <div className="px-4 py-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-muted rounded w-1/2"></div>
+          <div className="h-32 bg-muted rounded"></div>
+          <div className="h-48 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session || drillFailed || !drill) {
+    return (
+      <div className="px-4 py-6">
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-muted-foreground">{session ? "Couldn't load the words" : "Session not found"}</p>
+            <Button onClick={() => navigate("/library")} className="mt-4">
+              Back to Sessions
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (drill.words.length === 0) {
+    return (
+      <div className="px-4 py-12 text-center space-y-4" data-testid="section-nothing-due">
+        <CheckCircle2 className="w-10 h-10 mx-auto text-green-600" />
+        <p className="text-xl font-semibold text-foreground">Nothing needs review</p>
+        <p className="text-sm text-muted-foreground">Every word in {session.title} is up to date.</p>
+        <div className="flex flex-col gap-2">
+          <Button onClick={() => setScope("all")} data-testid="button-revise-all">Revise all</Button>
+          <Button variant="outline" onClick={() => navigate("/library")}>Back to sessions</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <PracticeDrill
+      key={drill.scope}
+      session={session}
+      words={drill.words}
+      scope={drill.scope}
+      onScopeChange={setScope}
+    />
+  );
+}
+
+function PracticeDrill({
+  session,
+  words,
+  scope,
+  onScopeChange,
+}: {
+  session: Session;
+  words: string[];
+  scope: DrillScope;
+  onScopeChange: (scope: DrillScope) => void;
+}) {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   // The view the user picked; the view actually shown is derived below, since
@@ -68,9 +161,6 @@ export default function PracticeSession() {
   const [marks, setMarks] = useState<Record<number, "again" | "good">>({});
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { speak, cancel, pause, resume, isSpeaking } = useSpeech();
-  const { data: session, isLoading: sessionLoading } = useQuery<Session>({
-    queryKey: ["/api/sessions", id],
-  });
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
   });
@@ -152,19 +242,16 @@ export default function PracticeSession() {
   // Peek has nothing to show for a word with no pinyin (e.g. English words
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
-  const isReading = session?.sessionType === "reading";
-  const readFlow = session && isReading
-    ? (storedReadFlow ?? startReadFlow(session.words, { readAloud: recogniser.supported }))
+  const isReading = session.sessionType === "reading";
+  const readFlow = isReading
+    ? (storedReadFlow ?? startReadFlow(words, { readAloud: recogniser.supported }))
     : null;
   const showing = readFlow && !isFinished(readFlow) ? currentShowing(readFlow) : null;
-  const activeWord = showing ? showing.word : session?.words[currentWordIndex];
+  const activeWord = showing ? showing.word : words[currentWordIndex];
   const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
-  const offeredViews = session ? viewsForSessionType(session.sessionType) : [];
-  const baseMode = session
-    ? pickedMode && offeredViews.includes(pickedMode)
-      ? pickedMode
-      : initialViewMode(session.sessionType)
-    : "write";
+  const offeredViews = viewsForSessionType(session.sessionType);
+  const baseMode =
+    pickedMode && offeredViews.includes(pickedMode) ? pickedMode : initialViewMode(session.sessionType);
   const mode = resolveSessionViewMode(baseMode, currentWordPinyin !== null);
   // Peek shows the pinyin, and so does the third miss in Read Aloud.
   const showPinyin = currentWordPinyin !== null && (mode === "peek" || (readFlow !== null && isPinyinRevealed(readFlow)));
@@ -304,7 +391,7 @@ export default function PracticeSession() {
     setIsPaused(false);  // Reinitialize so it's not automatically set to pause upon first play
     setIsLooping(false);
 
-    if (currentWordIndex < session.words.length - 1) {
+    if (currentWordIndex < words.length - 1) {
       setCurrentWordIndex(prev => prev + 1);
       setCurrentRepetition(1);
     }
@@ -455,7 +542,7 @@ export default function PracticeSession() {
 
   const restartReading = () => {
     if (!session) return;
-    setReadFlowState(startReadFlow(session.words, { readAloud: recogniser.supported && !readFlow?.readAloudOff }));
+    setReadFlowState(startReadFlow(words, { readAloud: recogniser.supported && !readFlow?.readAloudOff }));
     setPickedMode("read");
   };
 
@@ -482,7 +569,7 @@ export default function PracticeSession() {
   // Queues the grades and moves on at once; the outbox does the sending.
   const finishMarking = () => {
     if (!session) return;
-    session.words.forEach((word, index) => {
+    words.forEach((word, index) => {
       const mark = marks[index];
       if (!mark) return;
       gradeOutbox.add({
@@ -519,33 +606,6 @@ export default function PracticeSession() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (sessionLoading) {
-    return (
-      <div className="px-4 py-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/2"></div>
-          <div className="h-32 bg-muted rounded"></div>
-          <div className="h-48 bg-muted rounded"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="px-4 py-6">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">Session not found</p>
-            <Button onClick={() => navigate("/library")} className="mt-4">
-              Back to Sessions
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   const readProgress = readFlow ? progress(readFlow) : { position: 0, total: 0, percent: 0 };
   const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
     { grade: "again", label: "Oops", tone: "text-destructive" },
@@ -578,6 +638,17 @@ export default function PracticeSession() {
               <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
             </Button>
           </div>
+        </div>
+
+        <div className="mt-3 flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onScopeChange(scope === "due" ? "all" : "due")}
+            data-testid="button-toggle-scope"
+          >
+            {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
+          </Button>
         </div>
 
         {/* Mode Toggle: Spelling sessions have a single view, so no toggle */}
@@ -761,7 +832,7 @@ export default function PracticeSession() {
           <h2 className="text-xl font-semibold text-foreground">Mark the writing</h2>
           <p className="text-sm text-muted-foreground mb-4">Check each word against the paper. Tap a word to hear it again.</p>
           <ul className="space-y-2">
-            {session.words.map((word, index) => (
+            {words.map((word, index) => (
               <li key={index} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
                 <button
                   type="button"
@@ -796,13 +867,13 @@ export default function PracticeSession() {
           </ul>
           <div className="mt-4 space-y-2 text-center">
             <div className="text-sm text-muted-foreground" data-testid="text-marked-count">
-              {Object.keys(marks).length} of {session.words.length} marked
+              {Object.keys(marks).length} of {words.length} marked
             </div>
             <Button
               size="lg"
               className="w-full"
               onClick={finishMarking}
-              disabled={Object.keys(marks).length < session.words.length}
+              disabled={Object.keys(marks).length < words.length}
               data-testid="button-finish-marking"
             >
               Finish
@@ -830,7 +901,7 @@ export default function PracticeSession() {
           <div className="text-center mb-8">
             {/* Word Info */}
             <div className="text-sm text-muted-foreground mb-8" data-testid="text-word-info">
-              Word {currentWordIndex + 1} of {session.words.length}
+              Word {currentWordIndex + 1} of {words.length}
             </div>
 
             {/* Audio Controls */}
@@ -869,7 +940,7 @@ export default function PracticeSession() {
                 size="lg" 
                 className="p-4 rounded-full"
                 onClick={nextWord}
-                disabled={currentWordIndex === session.words.length - 1}
+                disabled={currentWordIndex === words.length - 1}
                 data-testid="button-skip-word"
               >
                 <ChevronRight className="w-8 h-8" />
@@ -877,7 +948,7 @@ export default function PracticeSession() {
             </div>
 
             {/* Done Button - Show when at last word */}
-            {currentWordIndex === session.words.length - 1 && (
+            {currentWordIndex === words.length - 1 && (
               <div className="flex items-center justify-center mt-8">
                 <Button 
                   variant="default"
