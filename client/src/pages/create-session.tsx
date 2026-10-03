@@ -306,33 +306,11 @@ export default function CreateSession() {
     setCurrentStep("session-created");
   };
 
-  const goBack = () => {
-    if (currentStep === "type") {
-      navigate("/library");
-    } else if (currentStep === "camera") {
-      setCurrentStep("type");
-    } else if (currentStep === "selection") {
-      setMultiCandidates([]);
-      setSelected([]);
-      setCurrentStep("camera");
-    } else if (currentStep === "edit-words") {
-      if (queue.length > 0) {
-        // Mid-batch: back goes to reselecting rather than to the camera.
-        // Sessions already created earlier in this batch stay created —
-        // there's no way to undo a save that already landed — so they're
-        // dropped from the list entirely rather than left checked, or
-        // Continue would recreate them as duplicates.
-        const alreadyCreated = queue.slice(0, queueIndex);
-        const remaining = multiCandidates.filter((c) => !alreadyCreated.includes(c));
-        setMultiCandidates(remaining);
-        setSelected(remaining.map(() => true));
-        setQueue([]);
-        setQueueIndex(0);
-        setCurrentStep("selection");
-      } else {
-        setCurrentStep("camera");
-      }
-    }
+  // X cancels the whole flow. Past the first step there is work to lose, so ask first.
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+  const handleCancel = () => {
+    if (currentStep === "type") navigate("/library");
+    else setConfirmCancelOpen(true);
   };
 
   // Numbering follows the design canvas ("Step N/6"); the last step, Created, has no header.
@@ -345,7 +323,7 @@ export default function CreateSession() {
   };
 
   const stepLabel = STEP_LABELS[currentStep];
-  const canGoBack = currentStep !== "processing";
+  const canCancel = currentStep !== "processing";
   // One pinned footer per step, so the primary action never scrolls away.
   const footer = "flex shrink-0 flex-col gap-2 border-t border-border p-4";
   const fieldLabel = "mb-2 block text-xs font-semibold text-muted-foreground";
@@ -357,11 +335,11 @@ export default function CreateSession() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={goBack}
-            disabled={!canGoBack}
-            aria-label={currentStep === "type" ? "Cancel" : "Back"}
+            onClick={handleCancel}
+            disabled={!canCancel}
+            aria-label="Cancel"
             className="h-11 w-11 text-muted-foreground"
-            data-testid="button-go-back"
+            data-testid="button-cancel-create"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -590,6 +568,25 @@ export default function CreateSession() {
           </div>
         </>
       )}
+
+      <AlertDialog open={confirmCancelOpen} onOpenChange={setConfirmCancelOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel creating this session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {queueIndex > 0
+                ? "Sessions already saved from this photo stay in your Library. The rest will be discarded."
+                : "Anything you've entered will be discarded."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-keep-editing">Keep editing</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate("/library")} data-testid="button-confirm-cancel">
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={extractionError !== null}
