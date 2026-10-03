@@ -15,7 +15,7 @@ import { groupSessionsByLesson } from "@/lib/group-sessions";
 // The list endpoint adds how many of a session's words have ever been graded.
 type SessionWithTested = SessionWithLesson & { testedCount: number };
 
-export default function Sessions() {
+export default function Library() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
   const { subject } = useActiveSubject();

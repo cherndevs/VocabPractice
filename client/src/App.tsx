@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import Practice from "@/pages/practice";
-import Library from "@/pages/sessions";
+import Library from "@/pages/library";
 import Progress from "@/pages/progress";
 import Settings from "@/pages/settings";
 import CreateSession from "@/pages/create-session";

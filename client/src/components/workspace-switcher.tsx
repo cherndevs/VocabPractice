@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -48,7 +48,8 @@ export default function WorkspaceSwitcher() {
             data-testid={`workspace-option-${option.key}`}
           >
             <SubjectBadge text={option.badge} className="mr-2" />
-            {option.menuLabel}
+            <span className="flex-1">{option.menuLabel}</span>
+            {option.key === subject && <Check className="w-4 h-4 text-primary" aria-label="Active workspace" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

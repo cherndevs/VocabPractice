@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Plus, Pin, Pencil, BookOpen, Calendar } from "lucide-react";
+import { Pin, Pencil, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
@@ -14,41 +14,46 @@ interface PracticeData {
 }
 
 function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onTogglePin: () => void }) {
+  const reading = session.sessionType === "reading";
+  const Icon = reading ? BookOpen : Pencil;
+  const meta = `${formatDueDate(session.dueDate)} · ${session.wordCount} ${session.wordCount === 1 ? "word" : "words"}`;
   return (
     <Card className="word-card hover:shadow-md transition-shadow" data-testid={`card-session-${session.id}`}>
       <Link href={`/practice/${session.id}`}>
-        <CardContent className="p-4 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
-              {session.sessionType === "reading" ? (
-                <BookOpen className="w-4 h-4 shrink-0 text-purple-600" aria-label="Reading session" data-testid={`icon-session-type-${session.id}`} />
-              ) : (
-                <Pencil className="w-4 h-4 shrink-0 text-blue-600" aria-label="Spelling session" data-testid={`icon-session-type-${session.id}`} />
-              )}
+        <CardContent className="flex items-center gap-3 px-3.5 py-3 cursor-pointer">
+          <div
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+              reading ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"
+            }`}
+          >
+            <Icon
+              className="w-[18px] h-[18px]"
+              aria-label={reading ? "Reading session" : "Spelling session"}
+              data-testid={`icon-session-type-${session.id}`}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-sm font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
               {session.title}
             </h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={session.pinnedAt ? "text-primary" : "text-muted-foreground"}
-              aria-label={session.pinnedAt ? "Unpin session" : "Pin session"}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onTogglePin();
-              }}
-              data-testid={`button-pin-${session.id}`}
-            >
-              <Pin className="w-4 h-4" />
-            </Button>
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground" data-testid={`text-session-meta-${session.id}`}>
+              {meta}
+            </p>
           </div>
-          <div className="flex items-center space-x-3 text-sm text-muted-foreground">
-            <span className="flex items-center space-x-1">
-              <Calendar className="w-3 h-3" />
-              <span data-testid={`text-session-date-${session.id}`}>{formatDueDate(session.dueDate)}</span>
-            </span>
-            <span data-testid={`text-session-word-count-${session.id}`}>{session.wordCount} Words</span>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={session.pinnedAt ? "text-primary" : "text-muted-foreground"}
+            aria-label={session.pinnedAt ? "Unpin session" : "Pin session"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onTogglePin();
+            }}
+            data-testid={`button-pin-${session.id}`}
+          >
+            <Pin className="w-4 h-4" />
+          </Button>
         </CardContent>
       </Link>
     </Card>
@@ -96,13 +101,8 @@ export default function Practice() {
         <div className="mb-4">
           <WorkspaceSwitcher />
         </div>
-        <div className="flex items-center justify-between">
+        <div>
           <h1 className="text-2xl font-bold text-foreground">Practice</h1>
-          <Button asChild variant="default" size="icon" aria-label="Create New Session" data-testid="button-create-session">
-            <Link href="/create-session">
-              <Plus className="w-4 h-4" />
-            </Link>
-          </Button>
         </div>
       </div>
 
