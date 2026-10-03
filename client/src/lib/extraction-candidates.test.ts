@@ -4,12 +4,27 @@ import { sanitizeExtractedCandidates } from "./extraction-candidates";
 const DEFAULT_TITLE = "Spelling Session 1/1/2026";
 
 describe("sanitizeExtractedCandidates", () => {
+  it("carries each candidate's lesson, trimmed, and null when absent or blank", () => {
+    const result = sanitizeExtractedCandidates(
+      {
+        candidates: [
+          { title: "A", lesson: "  Unit 3  ", words: ["cat"] },
+          { title: "B", lesson: "", words: ["dog"] },
+          { title: "C", words: ["pig"] },
+          { title: "D", lesson: 7, words: ["cow"] },
+        ],
+      },
+      DEFAULT_TITLE,
+    );
+    expect(result.candidates.map((c) => c.lesson)).toEqual(["Unit 3", null, null, null]);
+  });
+
   it("passes a single clean candidate through with title and words intact", () => {
     const result = sanitizeExtractedCandidates(
       { candidates: [{ title: "Week 1", words: ["cat", "dog"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Week 1", words: ["cat", "dog"] }]);
+    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, words: ["cat", "dog"] }]);
     expect(result.isEmpty).toBe(false);
   });
 
@@ -31,7 +46,7 @@ describe("sanitizeExtractedCandidates", () => {
       { candidates: [{ title: "Week 1", words: ["cat", "  ", "", "dog"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Week 1", words: ["cat", "dog"] }]);
+    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, words: ["cat", "dog"] }]);
   });
 
   it("drops a candidate whose entries are all blank", () => {
@@ -44,7 +59,7 @@ describe("sanitizeExtractedCandidates", () => {
       },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Good", words: ["cat"] }]);
+    expect(result.candidates).toEqual([{ title: "Good", lesson: null, words: ["cat"] }]);
   });
 
   it("reports isEmpty when there are no candidates at all", () => {
@@ -119,7 +134,7 @@ describe("sanitizeExtractedCandidates", () => {
       { candidates: [{ title: "听写", words: ["考一考", "苹果"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates[0]).toEqual({ title: "听写", words: ["考一考", "苹果"] });
+    expect(result.candidates[0]).toEqual({ title: "听写", lesson: null, words: ["考一考", "苹果"] });
   });
 
   it("drops non-string values in the entries array without throwing", () => {

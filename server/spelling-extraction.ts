@@ -11,7 +11,8 @@
 // romanization steer which character it reads (confirmed with Claude, where
 // it produced the homophone 烤一烤 for 考一考 before this rule was added).
 const EXTRACTION_PROMPT = `You extract spelling-list content from a photo of a worksheet or study sheet.
-The image may contain one or more distinct spelling sessions/units (e.g. separate numbered lists, headed sections, or visually separated blocks). For each one you find, produce a candidate with a short title (use the worksheet's own heading/label if present, otherwise a brief descriptive title) and the list of words belonging to it, in the order they appear.
+The image may contain one or more distinct spelling sessions/units (e.g. separate numbered lists, headed sections, or visually separated blocks). For each one you find, produce a candidate with a short title (use the worksheet's own heading/label if present, otherwise a brief descriptive title), the lesson it belongs to, and the list of words belonging to it, in the order they appear.
+The lesson is the school unit, week or lesson the sheet says the list is part of (e.g. "Unit 3", "Week 5", "第三课"). Different lists on one sheet can belong to different lessons. If the sheet does not name one, use an empty string — never invent one.
 Rules:
 - Only include actual vocabulary/spelling words. Ignore instructions, page numbers, dates, and other non-word text.
 - Preserve original spelling and characters exactly as written, including non-English text (e.g. Chinese characters) — do not translate or romanize.
@@ -22,7 +23,7 @@ Rules:
 // A looser variant for the free-form extraction pass — same rules, no
 // mention of JSON, since forcing structure on the vision call is exactly
 // what was found to be unreliable on Chinese content with this model.
-const FREEFORM_EXTRACTION_PROMPT = `List each spelling-list unit on this worksheet. For each unit, write its title on its own line, then each numbered word or sentence on its own line below it, exactly as printed.
+const FREEFORM_EXTRACTION_PROMPT = `List each spelling-list unit on this worksheet. For each unit, write its title on its own line, then (only if the sheet names the school unit, week or lesson it belongs to, e.g. "Unit 3") a line starting "Lesson: " with that name, then each numbered word or sentence on its own line below it, exactly as printed.
 Rules:
 - Only include actual vocabulary/spelling words. Ignore instructions, page numbers, dates, and other non-word text.
 - Preserve original spelling and characters exactly as written, including non-English text (e.g. Chinese characters) — do not translate or romanize.
@@ -31,7 +32,7 @@ Rules:
 
 const FORMAT_PROMPT_PREFIX =
   "Convert the following extracted worksheet content into structured data. " +
-  "Each unit becomes a candidate with its title and its list of words/sentences. " +
+  "Each unit becomes a candidate with its title, its lesson (the text after \"Lesson: \" if given, otherwise an empty string; never invent one) and its list of words/sentences. " +
   "Do not translate, alter, or reorder any text — pass every character through exactly as given.\n\n";
 
 // OpenAI-compatible strict JSON schema, as OpenRouter expects it.
@@ -44,9 +45,10 @@ const CANDIDATES_SCHEMA = {
         type: "object",
         properties: {
           title: { type: "string" },
+          lesson: { type: "string" }, // "" when the sheet names none
           words: { type: "array", items: { type: "string" } },
         },
-        required: ["title", "words"],
+        required: ["title", "lesson", "words"],
         additionalProperties: false,
       },
     },
@@ -87,7 +89,7 @@ export const SUPPORTED_MEDIA_TYPES = [
 
 export type SupportedMediaType = (typeof SUPPORTED_MEDIA_TYPES)[number];
 
-export type ExtractedCandidate = { title: string; words: string[] };
+export type ExtractedCandidate = { title: string; lesson: string; words: string[] };
 
 /** Upstream failure the caller can retry, as opposed to a bad request. */
 export class ExtractionServiceError extends Error {

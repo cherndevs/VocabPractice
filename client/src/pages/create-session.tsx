@@ -56,9 +56,9 @@ function defaultSessionTitle(type: SessionType): string {
   return `${label} Session ${new Date().toLocaleDateString()}`;
 }
 
-/** Splits a candidate's `words`/`title` back into the two pieces of state the edit-words screen edits. */
-function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; title: string } {
-  return { words: candidate.words, title: candidate.title };
+/** Splits a candidate into the pieces of state the edit-words screen edits. */
+function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; title: string; lesson: string | null } {
+  return { words: candidate.words, title: candidate.title, lesson: candidate.lesson };
 }
 
 export default function CreateSession() {
@@ -72,8 +72,8 @@ export default function CreateSession() {
   const [sessionType, setSessionType] = useState<SessionType | null>(null);
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
-  // Optional Lesson tag. Kept across a multi-unit batch (one worksheet is
-  // usually one unit) and cleared on retake.
+  // Optional Lesson tag, filled from the sheet when it names one and loaded
+  // afresh for each candidate in a multi-unit batch.
   const [lessonName, setLessonName] = useState<string | null>(null);
 
   // Multi-candidate selection state. `queue` holds the candidates the user
@@ -123,9 +123,10 @@ export default function CreateSession() {
       }
 
       if (candidates.length === 1) {
-        const { words, title } = loadCandidateFields(candidates[0]);
+        const { words, title, lesson } = loadCandidateFields(candidates[0]);
         setWords(words);
         setSessionTitle(title);
+        setLessonName(lesson);
         setCurrentStep("edit-words");
         return;
       }
@@ -154,6 +155,7 @@ export default function CreateSession() {
   const handleEnterWordsManually = () => {
     setWords([""]);
     setSessionTitle("");
+    setLessonName(null);
     setExtractionError(null);
     setCurrentStep("edit-words");
   };
@@ -184,11 +186,12 @@ export default function CreateSession() {
     const chosen = multiCandidates.filter((_, i) => selected[i]);
     if (chosen.length === 0) return;
 
-    const { words, title } = loadCandidateFields(chosen[0]);
+    const { words, title, lesson } = loadCandidateFields(chosen[0]);
     setQueue(chosen);
     setQueueIndex(0);
     setWords(words);
     setSessionTitle(title);
+    setLessonName(lesson);
     setCurrentStep("edit-words");
   };
 
@@ -279,10 +282,11 @@ export default function CreateSession() {
     // than treating this one creation as the end of the flow.
     const nextIndex = queueIndex + 1;
     if (nextIndex < queue.length) {
-      const { words: nextWords, title: nextTitle } = loadCandidateFields(queue[nextIndex]);
+      const { words: nextWords, title: nextTitle, lesson: nextLesson } = loadCandidateFields(queue[nextIndex]);
       setQueueIndex(nextIndex);
       setWords(nextWords);
       setSessionTitle(nextTitle);
+      setLessonName(nextLesson);
       return;
     }
 
