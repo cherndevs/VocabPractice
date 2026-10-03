@@ -83,7 +83,6 @@ export default function Refresher() {
         sessionType: skill.data,
         pinnedAt: null,
         exitTo: "/",
-        exitLabel: "Back to Practice",
       }}
       words={words}
     />

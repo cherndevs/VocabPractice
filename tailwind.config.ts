@@ -41,8 +41,8 @@ export default {
           DEFAULT: "var(--destructive)",
           foreground: "var(--destructive-foreground)",
         },
-        success: "var(--success)",
-        warning: "var(--warning)",
+        success: { DEFAULT: "var(--success)", ink: "var(--success-ink)" },
+        warning: { DEFAULT: "var(--warning)", ink: "var(--warning-ink)" },
         "primary-tint": "var(--primary-tint)",
         skill: {
           writing: { DEFAULT: "var(--skill-writing)", bg: "var(--skill-writing-bg)" },
