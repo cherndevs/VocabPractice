@@ -19,12 +19,38 @@ describe("sanitizeExtractedCandidates", () => {
     expect(result.candidates.map((c) => c.lesson)).toEqual(["Unit 3", null, null, null]);
   });
 
+  it("carries each candidate's due date when it is a real YYYY-MM-DD, else null", () => {
+    const result = sanitizeExtractedCandidates(
+      {
+        candidates: [
+          { title: "A", dueDate: "2026-10-08", words: ["cat"] },
+          { title: "B", dueDate: "", words: ["dog"] },
+          { title: "C", words: ["pig"] },
+          { title: "D", dueDate: "8 Oct", words: ["cow"] },
+          { title: "E", dueDate: "2026-02-30", words: ["hen"] },
+          { title: "F", dueDate: 20261008, words: ["ant"] },
+          { title: "G", dueDate: " 2026-10-08 ", words: ["bee"] },
+        ],
+      },
+      DEFAULT_TITLE,
+    );
+    expect(result.candidates.map((c) => c.dueDate)).toEqual([
+      "2026-10-08",
+      null,
+      null,
+      null,
+      null,
+      null,
+      "2026-10-08",
+    ]);
+  });
+
   it("passes a single clean candidate through with title and words intact", () => {
     const result = sanitizeExtractedCandidates(
       { candidates: [{ title: "Week 1", words: ["cat", "dog"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, words: ["cat", "dog"] }]);
+    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, dueDate: null, words: ["cat", "dog"] }]);
     expect(result.isEmpty).toBe(false);
   });
 
@@ -46,7 +72,7 @@ describe("sanitizeExtractedCandidates", () => {
       { candidates: [{ title: "Week 1", words: ["cat", "  ", "", "dog"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, words: ["cat", "dog"] }]);
+    expect(result.candidates).toEqual([{ title: "Week 1", lesson: null, dueDate: null, words: ["cat", "dog"] }]);
   });
 
   it("drops a candidate whose entries are all blank", () => {
@@ -59,7 +85,7 @@ describe("sanitizeExtractedCandidates", () => {
       },
       DEFAULT_TITLE,
     );
-    expect(result.candidates).toEqual([{ title: "Good", lesson: null, words: ["cat"] }]);
+    expect(result.candidates).toEqual([{ title: "Good", lesson: null, dueDate: null, words: ["cat"] }]);
   });
 
   it("reports isEmpty when there are no candidates at all", () => {
@@ -134,7 +160,7 @@ describe("sanitizeExtractedCandidates", () => {
       { candidates: [{ title: "听写", words: ["考一考", "苹果"] }] },
       DEFAULT_TITLE,
     );
-    expect(result.candidates[0]).toEqual({ title: "听写", lesson: null, words: ["考一考", "苹果"] });
+    expect(result.candidates[0]).toEqual({ title: "听写", lesson: null, dueDate: null, words: ["考一考", "苹果"] });
   });
 
   it("drops non-string values in the entries array without throwing", () => {

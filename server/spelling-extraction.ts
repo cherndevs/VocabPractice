@@ -11,8 +11,9 @@
 // romanization steer which character it reads (confirmed with Claude, where
 // it produced the homophone 烤一烤 for 考一考 before this rule was added).
 const EXTRACTION_PROMPT = `You extract spelling-list content from a photo of a worksheet or study sheet.
-The image may contain one or more distinct spelling sessions/units (e.g. separate numbered lists, headed sections, or visually separated blocks). For each one you find, produce a candidate with a short title (use the worksheet's own heading/label if present, otherwise a brief descriptive title), the lesson it belongs to, and the list of words belonging to it, in the order they appear.
+The image may contain one or more distinct spelling sessions/units (e.g. separate numbered lists, headed sections, or visually separated blocks). For each one you find, produce a candidate with a short title (use the worksheet's own heading/label if present, otherwise a brief descriptive title), the lesson it belongs to, the due date, and the list of words belonging to it, in the order they appear.
 The lesson is the school unit, week or lesson the sheet says the list is part of (e.g. "Unit 3", "Week 5", "第三课"). Different lists on one sheet can belong to different lessons. If the sheet does not name one, use an empty string — never invent one.
+The due date is the day the sheet says the list is for (a test, dictation or homework date, e.g. "Test: Thu 8 Oct"), as YYYY-MM-DD. If the sheet gives no year, use the next occurrence of that day on or after today's date, given below. Lists on one sheet can have different dates. If the sheet names no such date, or you cannot read it with confidence, use an empty string — never invent one, and never use a date that is not for the list (such as a print date).
 Rules:
 - Only include actual vocabulary/spelling words. Ignore instructions, page numbers, dates, and other non-word text.
 - Preserve original spelling and characters exactly as written, including non-English text (e.g. Chinese characters) — do not translate or romanize.
@@ -23,7 +24,7 @@ Rules:
 // A looser variant for the free-form extraction pass — same rules, no
 // mention of JSON, since forcing structure on the vision call is exactly
 // what was found to be unreliable on Chinese content with this model.
-const FREEFORM_EXTRACTION_PROMPT = `List each spelling-list unit on this worksheet. For each unit, write its title on its own line, then (only if the sheet names the school unit, week or lesson it belongs to, e.g. "Unit 3") a line starting "Lesson: " with that name, then each numbered word or sentence on its own line below it, exactly as printed.
+const FREEFORM_EXTRACTION_PROMPT = `List each spelling-list unit on this worksheet. For each unit, write its title on its own line, then (only if the sheet names the school unit, week or lesson it belongs to, e.g. "Unit 3") a line starting "Lesson: " with that name, then (only if the sheet names a test, dictation or homework date for it) a line starting "Due: " with that date exactly as printed, then each numbered word or sentence on its own line below it, exactly as printed.
 Rules:
 - Only include actual vocabulary/spelling words. Ignore instructions, page numbers, dates, and other non-word text.
 - Preserve original spelling and characters exactly as written, including non-English text (e.g. Chinese characters) — do not translate or romanize.
@@ -32,7 +33,7 @@ Rules:
 
 const FORMAT_PROMPT_PREFIX =
   "Convert the following extracted worksheet content into structured data. " +
-  "Each unit becomes a candidate with its title, its lesson (the text after \"Lesson: \" if given, otherwise an empty string; never invent one) and its list of words/sentences. " +
+  "Each unit becomes a candidate with its title, its lesson (the text after \"Lesson: \" if given, otherwise an empty string; never invent one), its due date (the text after \"Due: \" as YYYY-MM-DD, using the next occurrence on or after today's date, given below, when no year is printed; otherwise an empty string; never invent one) and its list of words/sentences. " +
   "Do not translate, alter, or reorder any text — pass every character through exactly as given.\n\n";
 
 // OpenAI-compatible strict JSON schema, as OpenRouter expects it.
@@ -46,9 +47,10 @@ const CANDIDATES_SCHEMA = {
         properties: {
           title: { type: "string" },
           lesson: { type: "string" }, // "" when the sheet names none
+          dueDate: { type: "string" }, // YYYY-MM-DD, "" when the sheet names none
           words: { type: "array", items: { type: "string" } },
         },
-        required: ["title", "lesson", "words"],
+        required: ["title", "lesson", "dueDate", "words"],
         additionalProperties: false,
       },
     },
@@ -89,7 +91,7 @@ export const SUPPORTED_MEDIA_TYPES = [
 
 export type SupportedMediaType = (typeof SUPPORTED_MEDIA_TYPES)[number];
 
-export type ExtractedCandidate = { title: string; lesson: string; words: string[] };
+export type ExtractedCandidate = { title: string; lesson: string; dueDate: string; words: string[] };
 
 /** Upstream failure the caller can retry, as opposed to a bad request. */
 export class ExtractionServiceError extends Error {
@@ -161,6 +163,7 @@ async function extractStructured(
   apiKey: string,
   image: Buffer,
   mediaType: SupportedMediaType,
+  today: string,
 ): Promise<ExtractedCandidate[]> {
   const content = await callOpenRouter(apiKey, {
     model: MODEL,
@@ -172,7 +175,7 @@ async function extractStructured(
             type: "image_url",
             image_url: { url: `data:${mediaType};base64,${image.toString("base64")}` },
           },
-          { type: "text", text: EXTRACTION_PROMPT },
+          { type: "text", text: `${EXTRACTION_PROMPT}\nToday's date: ${today}` },
         ],
       },
     ],
@@ -185,6 +188,7 @@ async function extractThenFormat(
   apiKey: string,
   image: Buffer,
   mediaType: SupportedMediaType,
+  today: string,
 ): Promise<ExtractedCandidate[]> {
   const raw = await callOpenRouter(apiKey, {
     model: MODEL,
@@ -204,7 +208,7 @@ async function extractThenFormat(
 
   const formatted = await callOpenRouter(apiKey, {
     model: MODEL,
-    messages: [{ role: "user", content: FORMAT_PROMPT_PREFIX + raw }],
+    messages: [{ role: "user", content: `${FORMAT_PROMPT_PREFIX}Today's date: ${today}\n\n${raw}` }],
     response_format: RESPONSE_FORMAT,
   });
   return parseCandidates(formatted);
@@ -213,14 +217,16 @@ async function extractThenFormat(
 export async function extractSpellingLists(
   image: Buffer,
   mediaType: SupportedMediaType,
+  /** The current day, YYYY-MM-DD: lets the model place a due date printed without a year. */
+  today: string,
 ): Promise<ExtractedCandidate[]> {
   const apiKey = getApiKey();
 
-  const candidates = await extractStructured(apiKey, image, mediaType);
+  const candidates = await extractStructured(apiKey, image, mediaType, today);
   if (candidates.length > 0) return candidates;
 
   // Empty here means either a genuinely blank photo or the structured-output
   // collapse — indistinguishable from the response alone, so always retry
   // via the slower path rather than trusting the fast path's empty result.
-  return extractThenFormat(apiKey, image, mediaType);
+  return extractThenFormat(apiKey, image, mediaType, today);
 }

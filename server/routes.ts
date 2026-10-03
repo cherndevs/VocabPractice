@@ -64,6 +64,7 @@ export async function registerRoutes(
         const candidates = await extractSpellingLists(
           req.body,
           mediaType as SupportedMediaType,
+          now().toISOString().slice(0, 10),
         );
         res.json({ candidates });
       } catch (error) {
