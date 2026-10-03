@@ -81,3 +81,40 @@ describe("GET /api/practice", () => {
     expect((await practice("today=2026-10-03")).status).toBe(400);
   });
 });
+
+describe("session retrievability (card ring)", () => {
+  const T0 = new Date("2026-01-05T09:00:00Z");
+  const gradeWord = (word: string, g: string, at: Date) =>
+    api.request("POST", "/api/grades", {
+      grades: [{ id: `${word}-${g}-${at.getTime()}`, subject: "english", word, skill: "spelling", grade: g, gradedAt: at.toISOString() }],
+    });
+  const sessionOf = async (id: string) =>
+    (await api.request("GET", "/api/sessions?subject=english")).body.find((s: any) => s.id === id);
+
+  it("is null until a word in the session has been graded", async () => {
+    const s = await make({ words: ["apple", "pear"], wordCount: 2, dueDate: "2026-10-03" });
+    expect((await sessionOf(s.id)).retrievability).toBeNull();
+    expect((await practice()).body.thisWeek.retrievability).toBeNull();
+  });
+
+  it("is near 1 just after grading every word, and counts ungraded words as 0", async () => {
+    const s = await make({ words: ["apple", "pear"], wordCount: 2, dueDate: "2026-10-03" });
+    api.setNow(T0);
+    await gradeWord("apple", "good", T0);
+    const half = (await sessionOf(s.id)).retrievability;
+    expect(half).toBeGreaterThan(0.45);
+    expect(half).toBeLessThanOrEqual(0.5);
+    await gradeWord("pear", "good", T0);
+    expect((await sessionOf(s.id)).retrievability).toBeGreaterThan(0.95);
+    expect((await practice()).body.thisWeek.retrievability).toBeGreaterThan(0.95);
+  });
+
+  it("decays as time passes", async () => {
+    const s = await make({ words: ["apple"], wordCount: 1 });
+    api.setNow(T0);
+    await gradeWord("apple", "good", T0);
+    const fresh = (await sessionOf(s.id)).retrievability;
+    api.setNow(new Date(T0.getTime() + 60 * 86_400_000));
+    expect((await sessionOf(s.id)).retrievability).toBeLessThan(fresh);
+  });
+});

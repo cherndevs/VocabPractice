@@ -91,3 +91,27 @@ export function scheduleGrade(
 export function needsReview(state: Pick<ReviewCard, "due"> | null, now: Date): boolean {
   return !state || state.due.getTime() <= now.getTime();
 }
+
+/** Chance (0–1) the learner still recalls a word, from its FSRS state at `now`. */
+export function retrievability(skill: Skill, state: ReviewCard, now: Date): number {
+  return schedulers[skill].get_retrievability(toCard(state), now, false);
+}
+
+/**
+ * How well a session's words are retained: the mean retrievability over its
+ * distinct words, counting a never-graded word as 0. null when none has been
+ * graded yet (the "new" ring), so a fresh session isn't shown as forgotten.
+ */
+export function sessionRetrievability(
+  skill: Skill,
+  words: string[],
+  states: (ReviewCard & { word: string })[],
+  now: Date,
+): number | null {
+  const byWord = new Map(states.map((s) => [s.word, s]));
+  const distinct = Array.from(new Set(words.map((w) => w.trim())));
+  const tested = distinct.filter((w) => byWord.has(w));
+  if (tested.length === 0) return null;
+  const sum = tested.reduce((acc, w) => acc + retrievability(skill, byWord.get(w)!, now), 0);
+  return sum / distinct.length;
+}

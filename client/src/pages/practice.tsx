@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { usePinSession } from "@/hooks/use-pin-session";
 import SessionTypeIcon from "@/components/session-type-icon";
+import SkillRing from "@/components/skill-ring";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { formatDueDate, localToday } from "@/lib/due-date";
 import type { Skill, SessionWithLesson } from "@shared/schema";
@@ -13,11 +14,14 @@ import type { Skill, SessionWithLesson } from "@shared/schema";
 interface PracticeData {
   /** Words needing review per skill, before the Refresher size cap. */
   refreshers: Record<Skill, number>;
-  thisWeek: SessionWithLesson | null;
-  pinned: SessionWithLesson[];
+  thisWeek: PracticeSession | null;
+  pinned: PracticeSession[];
 }
 
-function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onTogglePin: () => void }) {
+// The practice endpoint adds how well a session's words are retained (null until one is graded).
+type PracticeSession = SessionWithLesson & { retrievability: number | null };
+
+function SessionCard({ session, onTogglePin }: { session: PracticeSession; onTogglePin: () => void }) {
   const reading = session.sessionType === "reading";
   const meta = `${formatDueDate(session.dueDate)} · ${session.wordCount} ${session.wordCount === 1 ? "word" : "words"}`;
   return (
@@ -43,6 +47,7 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
               {meta}
             </p>
           </div>
+          <SkillRing retrievability={session.retrievability} data-testid={`ring-session-${session.id}`} />
           <Button
             variant="ghost"
             size="icon"
