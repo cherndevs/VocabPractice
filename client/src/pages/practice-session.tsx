@@ -118,7 +118,7 @@ export default function PracticeSession() {
   if (drill.words.length === 0) {
     return (
       <div className="px-4 py-12 text-center space-y-4" data-testid="section-nothing-due">
-        <CheckCircle2 className="w-10 h-10 mx-auto text-green-600" />
+        <CheckCircle2 className="w-10 h-10 mx-auto text-success" />
         <p className="text-xl font-semibold text-foreground">Nothing needs review</p>
         <p className="text-sm text-muted-foreground">Every word in {session.title} is up to date.</p>
         <div className="flex flex-col gap-2">
@@ -625,9 +625,9 @@ export function PracticeDrill({
   const readProgress = readFlow ? progress(readFlow) : { position: 0, total: 0, percent: 0 };
   const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
     { grade: "again", label: "Oops", tone: "text-destructive" },
-    { grade: "hard", label: "Hard", tone: "text-amber-600" },
+    { grade: "hard", label: "Hard", tone: "text-warning" },
     { grade: "good", label: "OK", tone: "text-primary" },
-    { grade: "easy", label: "Easy", tone: "text-green-600" },
+    { grade: "easy", label: "Easy", tone: "text-success" },
   ];
 
   return (
@@ -756,7 +756,7 @@ export function PracticeDrill({
                     </Button>
                   )}
                   <div
-                    className={`text-sm ${readFlow.wordState.kind === "passed" ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                    className={`text-sm ${readFlow.wordState.kind === "passed" ? "text-success font-medium" : "text-muted-foreground"}`}
                     data-testid="text-read-aloud-caption"
                   >
                     {captionFor(readFlow)}
@@ -904,7 +904,7 @@ export function PracticeDrill({
 
       {mode === "write" && spellingPhase === "complete" && (
         <div className="px-4 py-12 text-center space-y-6" data-testid="section-complete">
-          <CheckCircle2 className="w-10 h-10 mx-auto text-green-600" />
+          <CheckCircle2 className="w-10 h-10 mx-auto text-success" />
           <p className="text-xl font-semibold text-foreground">Session complete</p>
           <div className="flex flex-col gap-2">
             <Button onClick={dictateAgain} data-testid="button-review-again">Review again</Button>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { BookOpen, PenLine, Pin } from "lucide-react";
+import { BookOpen, SquarePen, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
@@ -26,7 +26,7 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
         <CardContent className="flex items-center gap-3 px-3.5 py-3 cursor-pointer">
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-              reading ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"
+              reading ? "bg-skill-reading-bg text-skill-reading" : "bg-skill-writing-bg text-skill-writing"
             }`}
           >
             <SessionTypeIcon
@@ -63,9 +63,9 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
   );
 }
 
-export const REFRESHERS: { skill: Skill; title: string; Icon: typeof PenLine; tint: string }[] = [
-  { skill: "spelling", title: "Spelling refresher", Icon: PenLine, tint: "bg-blue-100 text-blue-600" },
-  { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-purple-100 text-purple-600" },
+export const REFRESHERS: { skill: Skill; title: string; Icon: typeof SquarePen; tint: string }[] = [
+  { skill: "spelling", title: "Spelling refresher", Icon: SquarePen, tint: "bg-skill-writing-bg text-skill-writing" },
+  { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-skill-reading-bg text-skill-reading" },
 ];
 
 function Refreshers({ counts }: { counts: Record<Skill, number> }) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, Pencil, Plus, Trash2, Check } from "lucide-react";
+import { ArrowLeft, BookOpen, SquarePen, Plus, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -33,22 +33,22 @@ const SESSION_TYPE_OPTIONS: {
   type: SessionType;
   title: string;
   description: string;
-  Icon: typeof Pencil;
+  Icon: typeof SquarePen;
   iconClass: string;
 }[] = [
   {
     type: "spelling",
     title: "Spelling",
     description: "Practice writing words from dictation.",
-    Icon: Pencil,
-    iconClass: "bg-blue-500/10 text-blue-600",
+    Icon: SquarePen,
+    iconClass: "bg-skill-writing-bg text-skill-writing",
   },
   {
     type: "reading",
     title: "Reading",
     description: "Practice recognizing words and their meanings.",
     Icon: BookOpen,
-    iconClass: "bg-purple-500/10 text-purple-600",
+    iconClass: "bg-skill-reading-bg text-skill-reading",
   },
 ];
 
