@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
-import type { Session } from "@shared/schema";
+import type { SessionWithLesson } from "@shared/schema";
+import { groupSessionsByLesson } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
-type SessionWithTested = Session & { testedCount: number };
+type SessionWithTested = SessionWithLesson & { testedCount: number };
 import { format } from "date-fns";
 
 function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
@@ -94,16 +95,62 @@ export default function Sessions() {
     pinMutation.mutate({ id: session.id, pinnedAt: nextPinnedAt });
   };
 
-  // Ensure pinned items render first on the client as well (safety against 304/caching)
-  const sortedSessions = [...sessions].sort((a, b) => {
-    const aPinned = a.pinnedAt ? new Date(a.pinnedAt as unknown as string).getTime() : -Infinity;
-    const bPinned = b.pinnedAt ? new Date(b.pinnedAt as unknown as string).getTime() : -Infinity;
-    if (aPinned !== bPinned) return bPinned - aPinned; // pinned first, latest pinned first
+  // Lesson headings first, then untagged sessions; pinned-first within each group.
+  const groups = groupSessionsByLesson(sessions);
 
-    const aCreated = a.createdAt ? new Date(a.createdAt as unknown as string).getTime() : 0;
-    const bCreated = b.createdAt ? new Date(b.createdAt as unknown as string).getTime() : 0;
-    return bCreated - aCreated; // newest created first
-  });
+  const renderSession = (session: SessionWithTested) => (
+    <SwipeableCard
+      key={session.id}
+      className="word-card hover:shadow-md transition-shadow cursor-pointer"
+      data-testid={`card-session-${session.id}`}
+      onDelete={() => handleDeleteSession(session.id)}
+      onEdit={() => navigate(`/edit-session/${session.id}`)}
+    >
+      <Link href={`/practice/${session.id}`}>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
+              {session.sessionType === "reading" ? (
+                <BookOpen className="w-4 h-4 shrink-0 text-purple-600" aria-label="Reading session" data-testid={`icon-session-type-${session.id}`} />
+              ) : (
+                <Pencil className="w-4 h-4 shrink-0 text-blue-600" aria-label="Spelling session" data-testid={`icon-session-type-${session.id}`} />
+              )}
+              {session.title}
+            </h3>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={session.pinnedAt ? 'text-primary' : 'text-muted-foreground'}
+                aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}
+                onClick={(e) => handleTogglePin(e, session)}
+                data-testid={`button-pin-${session.id}`}
+              >
+                <Pin className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center space-x-3">
+              <span className="flex items-center space-x-1">
+                <Calendar className="w-3 h-3" />
+                <span data-testid={`text-session-date-${session.id}`}>
+                  {session.createdAt ? format(new Date(session.createdAt), 'MMM d, yyyy') : 'Unknown date'}
+                </span>
+              </span>
+              <span data-testid={`text-session-word-count-${session.id}`}>
+                {session.wordCount} Words
+              </span>
+              <span data-testid={`text-session-tested-${session.id}`}>
+                {session.testedCount} / {session.wordCount} tested
+              </span>
+            </div>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </CardContent>
+      </Link>
+    </SwipeableCard>
+  );
 
   return (
     <div className="fade-in">
@@ -181,58 +228,22 @@ export default function Sessions() {
                 </CardContent>
               </Card>
             ) : (
-              sortedSessions.map((session) => (
-                <SwipeableCard
-                  key={session.id}
-                  className="word-card hover:shadow-md transition-shadow cursor-pointer"
-                  data-testid={`card-session-${session.id}`}
-                  onDelete={() => handleDeleteSession(session.id)}
-                  onEdit={() => navigate(`/edit-session/${session.id}`)}
+              groups.map((group) => (
+                <section
+                  key={group.lesson?.id ?? "untagged"}
+                  className="space-y-3"
+                  data-testid={group.lesson ? `group-lesson-${group.lesson.id}` : "group-untagged"}
                 >
-                  <Link href={`/practice/${session.id}`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
-                          {session.sessionType === "reading" ? (
-                            <BookOpen className="w-4 h-4 shrink-0 text-purple-600" aria-label="Reading session" data-testid={`icon-session-type-${session.id}`} />
-                          ) : (
-                            <Pencil className="w-4 h-4 shrink-0 text-blue-600" aria-label="Spelling session" data-testid={`icon-session-type-${session.id}`} />
-                          )}
-                          {session.title}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className={session.pinnedAt ? 'text-primary' : 'text-muted-foreground'}
-                            aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}
-                            onClick={(e) => handleTogglePin(e, session)}
-                            data-testid={`button-pin-${session.id}`}
-                          >
-                            <Pin className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center space-x-3">
-                          <span className="flex items-center space-x-1">
-                            <Calendar className="w-3 h-3" />
-                            <span data-testid={`text-session-date-${session.id}`}>
-                              {session.createdAt ? format(new Date(session.createdAt), 'MMM d, yyyy') : 'Unknown date'}
-                            </span>
-                          </span>
-                          <span data-testid={`text-session-word-count-${session.id}`}>
-                            {session.wordCount} Words
-                          </span>
-                          <span data-testid={`text-session-tested-${session.id}`}>
-                            {session.testedCount} / {session.wordCount} tested
-                          </span>
-                        </div>
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
-                    </CardContent>
-                  </Link>
-                </SwipeableCard>
+                  {group.lesson && (
+                    <h2
+                      className="pt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
+                      data-testid={`heading-lesson-${group.lesson.id}`}
+                    >
+                      {group.lesson.name}
+                    </h2>
+                  )}
+                  {group.sessions.map(renderSession)}
+                </section>
               ))
             )}
           </div>

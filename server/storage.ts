@@ -1,8 +1,8 @@
-import { type User, type InsertUser, type Session, type InsertSession, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, users, sessions, settings, reviewStates, gradeLog } from "@shared/schema";
+import { type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, users, sessions, lessons, settings, reviewStates, gradeLog } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -12,10 +12,16 @@ export interface IStorage {
   // Sessions
   getSessions(subject: Subject): Promise<Session[]>;
   getSession(id: string): Promise<Session | undefined>;
-  createSession(session: InsertSession): Promise<Session>;
+  createSession(session: InsertSession & { lessonId?: string | null }): Promise<Session>;
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
   deleteSession(id: string): Promise<boolean>;
-  
+
+  // Lessons. A name is trimmed by the caller; (subject, name) is unique.
+  getLessons(subject: Subject): Promise<Lesson[]>;
+  getLesson(id: string): Promise<Lesson | undefined>;
+  /** The Subject's Lesson with this name, created if it does not exist yet. */
+  findOrCreateLesson(subject: Subject, name: string): Promise<Lesson>;
+
   // Grades and review state. The scheduling rules live in server/grades.ts;
   // storage only keeps what it is told.
   /** Appends to the grade log. False if the id was already logged. */
@@ -32,6 +38,7 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private sessions: Map<string, Session>;
+  private lessons = new Map<string, Lesson>();
   private settings: Settings | undefined;
   private grades = new Map<string, GradeInput>();
   private reviewStates = new Map<string, ReviewState>();
@@ -90,7 +97,7 @@ export class MemStorage implements IStorage {
     return this.sessions.get(id);
   }
 
-  async createSession(insertSession: InsertSession): Promise<Session> {
+  async createSession(insertSession: InsertSession & { lessonId?: string | null }): Promise<Session> {
     const id = randomUUID();
     const now = new Date();
     const session: Session = {
@@ -103,6 +110,7 @@ export class MemStorage implements IStorage {
       wordCount: insertSession.wordCount,
       progress: insertSession.progress || 0,
       timeSpent: insertSession.timeSpent || 0,
+      lessonId: insertSession.lessonId ?? null,
       pinnedAt: null,
       createdAt: now,
       updatedAt: now,
@@ -126,6 +134,24 @@ export class MemStorage implements IStorage {
 
   async deleteSession(id: string): Promise<boolean> {
     return this.sessions.delete(id);
+  }
+
+  async getLessons(subject: Subject): Promise<Lesson[]> {
+    return Array.from(this.lessons.values())
+      .filter((lesson) => lesson.subject === subject)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  async getLesson(id: string): Promise<Lesson | undefined> {
+    return this.lessons.get(id);
+  }
+
+  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
+    const existing = Array.from(this.lessons.values()).find((l) => l.subject === subject && l.name === name);
+    if (existing) return existing;
+    const lesson: Lesson = { id: randomUUID(), subject, name, topic: null };
+    this.lessons.set(lesson.id, lesson);
+    return lesson;
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {
@@ -206,7 +232,7 @@ class PgStorage implements IStorage {
     return result[0];
   }
 
-  async createSession(insertSession: InsertSession): Promise<Session> {
+  async createSession(insertSession: InsertSession & { lessonId?: string | null }): Promise<Session> {
     const now = new Date();
     const result = await this.db
       .insert(sessions)
@@ -219,6 +245,7 @@ class PgStorage implements IStorage {
         wordCount: insertSession.wordCount,
         progress: insertSession.progress ?? 0,
         timeSpent: insertSession.timeSpent ?? 0,
+        lessonId: insertSession.lessonId ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -241,6 +268,26 @@ class PgStorage implements IStorage {
   async deleteSession(id: string): Promise<boolean> {
     const result = await this.db.delete(sessions).where(eq(sessions.id, id)).returning({ id: sessions.id });
     return result.length > 0;
+  }
+
+  async getLessons(subject: Subject): Promise<Lesson[]> {
+    return this.db.select().from(lessons).where(eq(lessons.subject, subject)).orderBy(asc(lessons.name));
+  }
+
+  async getLesson(id: string): Promise<Lesson | undefined> {
+    const result = await this.db.select().from(lessons).where(eq(lessons.id, id)).limit(1);
+    return result[0];
+  }
+
+  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
+    // The unique index makes concurrent creators converge on one row.
+    await this.db.insert(lessons).values({ subject, name }).onConflictDoNothing();
+    const result = await this.db
+      .select()
+      .from(lessons)
+      .where(and(eq(lessons.subject, subject), eq(lessons.name, name)))
+      .limit(1);
+    return result[0]!;
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {

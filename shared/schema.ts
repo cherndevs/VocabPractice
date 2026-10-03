@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb, boolean, doublePrecision, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, jsonb, boolean, doublePrecision, primaryKey, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -36,6 +36,20 @@ export const GRADES = ["again", "hard", "good", "easy"] as const;
 export type Grade = (typeof GRADES)[number];
 export const gradeSchema = z.enum(GRADES);
 
+// A Lesson is the school unit a session can be tagged with (CONTEXT.md). It is
+// created implicitly the first time a name is used; there is no management
+// screen. `topic` is reserved for a later description and has no UI yet.
+export const lessons = pgTable(
+  "lessons",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    subject: text("subject").notNull().$type<Subject>(),
+    name: text("name").notNull(), // trimmed
+    topic: text("topic"),
+  },
+  (t) => [uniqueIndex("lessons_subject_name_unique").on(t.subject, t.name)],
+);
+
 export const sessions = pgTable("sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -46,6 +60,7 @@ export const sessions = pgTable("sessions", {
   wordCount: integer("word_count").notNull(),
   progress: integer("progress").default(0), // number of words completed
   timeSpent: integer("time_spent").default(0), // in seconds
+  lessonId: varchar("lesson_id").references(() => lessons.id),
   pinnedAt: timestamp("pinned_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -105,9 +120,14 @@ export const insertSessionSchema = createInsertSchema(sessions, {
   sessionType: sessionTypeSchema,
 }).omit({
   id: true,
+  lessonId: true,
   createdAt: true,
   updatedAt: true,
 });
+
+// Sent alongside a session on create and update: a name to tag with (new to
+// the Subject creates the Lesson), or null to clear the tag.
+export const lessonNameSchema = z.string().nullable();
 
 export const insertSettingsSchema = createInsertSchema(settings, {
   activeSubject: subjectSchema.optional(),
@@ -132,6 +152,9 @@ export type ReviewState = typeof reviewStates.$inferSelect;
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
+export type Lesson = typeof lessons.$inferSelect;
+/** A session as the API returns it: the Lesson it is tagged with, if any. */
+export type SessionWithLesson = Session & { lesson: Pick<Lesson, "id" | "name"> | null };
 export type InsertSettings = z.infer<typeof insertSettingsSchema>;
 export type Settings = typeof settings.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

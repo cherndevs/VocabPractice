@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { LessonPicker } from "@/components/lesson-picker";
 import { queryClient } from "@/lib/queryClient";
-import type { Session } from "@shared/schema";
+import type { SessionWithLesson } from "@shared/schema";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -16,10 +17,11 @@ export default function EditSession() {
 
   const [sessionTitle, setSessionTitle] = useState("");
   const [words, setWords] = useState<string[]>([""]);
+  const [lessonName, setLessonName] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
   // Fetch the existing session
-  const { data: session, isLoading } = useQuery<Session>({
+  const { data: session, isLoading } = useQuery<SessionWithLesson>({
     queryKey: [`/api/sessions/${id}`],
     enabled: !!id,
   });
@@ -29,11 +31,12 @@ export default function EditSession() {
     if (session) {
       setSessionTitle(session.title);
       setWords(session.words.length > 0 ? session.words : [""]);
+      setLessonName(session.lesson?.name ?? null);
     }
   }, [session]);
 
   const updateSessionMutation = useMutation({
-    mutationFn: async (payload: { title: string; words: string[]; wordCount: number }) => {
+    mutationFn: async (payload: { title: string; words: string[]; wordCount: number; lessonName: string | null }) => {
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -44,6 +47,7 @@ export default function EditSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
       queryClient.invalidateQueries({ queryKey: [`/api/sessions/${id}`] });
       setIsSaved(true);
       setTimeout(() => {
@@ -104,7 +108,7 @@ export default function EditSession() {
       return;
     }
     const title = sessionTitle.trim() || `Spelling Session ${new Date().toLocaleDateString()}`;
-    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length });
+    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length, lessonName });
   };
 
   if (isLoading) {
@@ -183,6 +187,12 @@ export default function EditSession() {
             data-testid="edit-input-session-title"
           />
         </div>
+
+        {session && (
+          <div className="mb-6">
+            <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} />
+          </div>
+        )}
 
         {/* Word List */}
         <div className="space-y-3 mb-6">

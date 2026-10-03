@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { LessonPicker } from "@/components/lesson-picker";
 import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
@@ -71,6 +72,9 @@ export default function CreateSession() {
   const [sessionType, setSessionType] = useState<SessionType | null>(null);
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
+  // Optional Lesson tag. Kept across a multi-unit batch (one worksheet is
+  // usually one unit) and cleared on retake.
+  const [lessonName, setLessonName] = useState<string | null>(null);
 
   // Multi-candidate selection state. `queue` holds the candidates the user
   // chose to create, one at a time through the same edit-words screen used
@@ -91,12 +95,13 @@ export default function CreateSession() {
   const [extractionError, setExtractionError] = useState<"api-error" | "empty" | null>(null);
 
   const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: InsertSession) => {
+    mutationFn: async (sessionData: InsertSession & { lessonName: string | null }) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
     },
   });
   const handleImageCapture = async (imageData: string) => {
@@ -161,6 +166,7 @@ export default function CreateSession() {
   const handleRetake = () => {
     setWords([""]);
     setSessionTitle("");
+    setLessonName(null);
     setMultiCandidates([]);
     setSelected([]);
     setQueue([]);
@@ -253,6 +259,7 @@ export default function CreateSession() {
         title,
         subject,
         sessionType,
+        lessonName,
         words: filteredWords,
         wordCount: filteredWords.length,
         status: "new",
@@ -494,6 +501,12 @@ export default function CreateSession() {
               data-testid="input-session-title"
             />
           </div>
+
+          {subject && (
+            <div className="mb-6">
+              <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />
+            </div>
+          )}
 
           {/* Word List */}
           <div className="space-y-3 mb-6">
