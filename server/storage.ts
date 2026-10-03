@@ -247,7 +247,7 @@ class PgStorage implements IStorage {
         progress: insertSession.progress ?? 0,
         timeSpent: insertSession.timeSpent ?? 0,
         lessonId: insertSession.lessonId ?? null,
-      dueDate: insertSession.dueDate ?? null,
+        dueDate: insertSession.dueDate ?? null,
         createdAt: now,
         updatedAt: now,
       })

@@ -72,8 +72,14 @@ describe("session due date", () => {
 
   it("does not change review state", async () => {
     const { body } = await api.request("POST", "/api/sessions", newSession({ dueDate: "2026-10-08" }));
+    const grade = { id: "g1", subject: "english", word: "apple", skill: "spelling", grade: "good", gradedAt: "2026-01-05T09:00:00Z" };
+    expect((await api.request("POST", "/api/grades", { grades: [grade] })).status).toBe(200);
+    const states = () => api.request("GET", "/api/review-states?subject=english&skill=spelling&words=apple,pear");
+    const before = (await states()).body;
+    expect(before[0].state).not.toBeNull();
+
     await api.request("PUT", `/api/sessions/${body.id}`, { dueDate: "2026-10-20" });
-    const states = await api.request("GET", "/api/review-states?subject=english&skill=spelling&words=apple,pear");
-    expect(states.status).toBe(200);
+    await api.request("PUT", `/api/sessions/${body.id}`, { dueDate: null });
+    expect((await states()).body).toEqual(before);
   });
 });
