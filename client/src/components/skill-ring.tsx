@@ -30,17 +30,19 @@ export default function SkillRing({
       data-state={state}
     >
       <circle cx="13" cy="13" r={RADIUS} fill="none" strokeWidth="3" className="stroke-border" />
-      <circle
-        cx="13"
-        cy="13"
-        r={RADIUS}
-        fill="none"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray={`${((percent / 100) * CIRCUMFERENCE).toFixed(1)} ${CIRCUMFERENCE.toFixed(1)}`}
-        transform="rotate(-90 13 13)"
-        className={STROKE[state]}
-      />
+      {percent > 0 && (
+        <circle
+          cx="13"
+          cy="13"
+          r={RADIUS}
+          fill="none"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={`${((percent / 100) * CIRCUMFERENCE).toFixed(1)} ${CIRCUMFERENCE.toFixed(1)}`}
+          transform="rotate(-90 13 13)"
+          className={STROKE[state]}
+        />
+      )}
     </svg>
   );
 }

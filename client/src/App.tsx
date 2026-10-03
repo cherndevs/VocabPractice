@@ -22,7 +22,9 @@ function Router() {
   // bar sits directly under the camera controls — a stray tap there both loses
   // the work in progress and, on touch devices, catches the synthesized click
   // that follows a capture.
-  const showBottomNavigation = location !== "/create-session";
+  // A practice session or refresher is focused the same way: the design draws it without the nav bar.
+  const showBottomNavigation =
+    location !== "/create-session" && !location.startsWith("/practice/") && !location.startsWith("/refresher/");
 
   return (
     <div className="mobile-container max-w-sm mx-auto min-h-screen bg-background">
