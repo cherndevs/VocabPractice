@@ -27,7 +27,7 @@ describe("GET /api/practice", () => {
   it("is empty when there are no sessions", async () => {
     const res = await practice();
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ thisWeek: null, pinned: [] });
+    expect(res.body).toMatchObject({ thisWeek: null, pinned: [] });
   });
 
   it("counts a session due today", async () => {
@@ -68,7 +68,7 @@ describe("GET /api/practice", () => {
   it("is scoped to the Subject", async () => {
     const zh = await make({ subject: "chinese", dueDate: "2026-10-05" });
     await api.request("PUT", `/api/sessions/${zh.id}`, { pinnedAt: new Date().toISOString() });
-    expect((await practice()).body).toEqual({ thisWeek: null, pinned: [] });
+    expect((await practice()).body).toMatchObject({ thisWeek: null, pinned: [] });
     const res = await practice("subject=chinese&today=2026-10-03");
     expect(res.body.thisWeek.id).toBe(zh.id);
   });

@@ -9,6 +9,7 @@ import Library from "@/pages/library";
 import Progress from "@/pages/progress";
 import Settings from "@/pages/settings";
 import CreateSession from "@/pages/create-session";
+import Refresher from "@/pages/refresher";
 import PracticeSession from "@/pages/practice-session";
 import EditSession from "@/pages/edit-session";
 import NotFound from "@/pages/not-found";
@@ -35,6 +36,7 @@ function Router() {
           <Route path="/progress" component={Progress} />
           <Route path="/settings" component={Settings} />
           <Route path="/create-session" component={CreateSession} />
+          <Route path="/refresher/:skill" component={Refresher} />
           <Route path="/practice/:id" component={PracticeSession} />
           <Route path="/edit-session/:id" component={EditSession} />
           <Route component={NotFound} />

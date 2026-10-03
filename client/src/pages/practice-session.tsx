@@ -43,6 +43,21 @@ import type { Grade, Session, Settings } from "@shared/schema";
 
 type DrillScope = "due" | "all";
 
+/**
+ * What a drill is run for: a session, or (with a null id) a refresher, which
+ * belongs to no session. Grades from a refresher are saved with no sessionId.
+ */
+export interface DrillSource {
+  id: string | null;
+  title: string;
+  subject: Session["subject"];
+  sessionType: Session["sessionType"];
+  pinnedAt: Session["pinnedAt"];
+  /** Where Back and "Back to sessions" lead. */
+  exitTo: string;
+  exitLabel: string;
+}
+
 // Loads the session and its drill (the words to practise now), and keys the
 // drill by scope so switching restarts it. The words are held as loaded: grades
 // refresh review states mid-drill, and the list must not shift under the child.
@@ -117,7 +132,7 @@ export default function PracticeSession() {
   return (
     <PracticeDrill
       key={drill.scope}
-      session={session}
+      session={{ ...session, exitTo: "/library", exitLabel: "Back to sessions" }}
       words={drill.words}
       scope={drill.scope}
       onScopeChange={setScope}
@@ -125,16 +140,17 @@ export default function PracticeSession() {
   );
 }
 
-function PracticeDrill({
+export function PracticeDrill({
   session,
   words,
   scope,
   onScopeChange,
 }: {
-  session: Session;
+  session: DrillSource;
   words: string[];
-  scope: DrillScope;
-  onScopeChange: (scope: DrillScope) => void;
+  /** Absent for a refresher, which has no Revise all. */
+  scope?: DrillScope;
+  onScopeChange?: (scope: DrillScope) => void;
 }) {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -175,8 +191,8 @@ function PracticeDrill({
   const togglePin = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!session) return;
-    await pinSession.mutateAsync(session);
+    if (!session.id) return;
+    await pinSession.mutateAsync({ id: session.id, pinnedAt: session.pinnedAt });
   };
 
   // Make sure stopAllPlayback logs what it's doing
@@ -623,7 +639,7 @@ function PracticeDrill({
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate("/library")}
+              onClick={() => navigate(session.exitTo)}
               className="p-2"
               data-testid="button-go-back"
             >
@@ -634,22 +650,26 @@ function PracticeDrill({
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
-              <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
-            </Button>
+            {session.id && (
+              <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
+                <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="mt-3 flex justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onScopeChange(scope === "due" ? "all" : "due")}
-            data-testid="button-toggle-scope"
-          >
-            {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
-          </Button>
-        </div>
+        {scope && onScopeChange && (
+          <div className="mt-3 flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onScopeChange(scope === "due" ? "all" : "due")}
+              data-testid="button-toggle-scope"
+            >
+              {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
+            </Button>
+          </div>
+        )}
 
         {/* Mode Toggle: Spelling sessions have a single view, so no toggle */}
         {offeredViews.length > 1 && (
@@ -888,8 +908,8 @@ function PracticeDrill({
           <p className="text-xl font-semibold text-foreground">Session complete</p>
           <div className="flex flex-col gap-2">
             <Button onClick={dictateAgain} data-testid="button-review-again">Review again</Button>
-            <Button variant="outline" onClick={() => navigate("/library")} data-testid="button-back-to-sessions">
-              Back to sessions
+            <Button variant="outline" onClick={() => navigate(session.exitTo)} data-testid="button-back-to-sessions">
+              {session.exitLabel}
             </Button>
           </div>
         </div>

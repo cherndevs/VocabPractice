@@ -2,7 +2,9 @@ import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import type { IStorage } from "./storage";
 import {
+  DEFAULT_REFRESHER_SIZE,
   DEFAULT_SUBJECT,
+  SKILLS,
   gradeBatchSchema,
   insertSessionSchema,
   insertSettingsSchema,
@@ -11,6 +13,7 @@ import {
   skillSchema,
   subjectSchema,
   type Session,
+  type Skill,
   type Subject,
 } from "@shared/schema";
 import { applyGrades } from "./grades";
@@ -118,6 +121,14 @@ export async function registerRoutes(
     }
   });
 
+  // Every word in the Subject's sessions of this skill that needs review,
+  // each listed once, most overdue first then never-graded (CONTEXT.md: Refresher).
+  const dueWords = async (subject: Subject, skill: Skill) => {
+    const words = (await storage.getSessions(subject)).filter((s) => s.sessionType === skill).flatMap((s) => s.words);
+    const states = await storage.getReviewStates(subject, skill, words.map((w) => w.trim()));
+    return drillWords(words, states, "due", now());
+  };
+
   // The Practice screen: This week (the nearest due date that is today or
   // later) and the Pinned sessions. The client passes its own local date, so
   // "today" is the user's, not the server's. A session never appears twice.
@@ -142,11 +153,31 @@ export async function registerRoutes(
         .filter((s) => s.pinnedAt && s.id !== thisWeek?.id)
         .sort((a, b) => time(b.pinnedAt) - time(a.pinnedAt));
       res.json({
+        refreshers: Object.fromEntries(
+          await Promise.all(SKILLS.map(async (skill) => [skill, (await dueWords(subject.data, skill)).length] as const)),
+        ),
         thisWeek: thisWeek ? await withLesson(thisWeek) : null,
         pinned: await Promise.all(pinned.map(withLesson)),
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch practice" });
+    }
+  });
+
+  // A Refresher: the words needing review in one skill across the Subject,
+  // capped at the Refresher size. count is the total before the cap.
+  app.get("/api/refresher", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    const skill = skillSchema.safeParse(req.query.skill);
+    if (!subject.success || !skill.success) {
+      return res.status(400).json({ message: "subject and skill are required" });
+    }
+    try {
+      const due = await dueWords(subject.data, skill.data);
+      const size = (await storage.getSettings())?.refresherSize ?? DEFAULT_REFRESHER_SIZE;
+      res.json({ words: due.slice(0, size), count: due.length });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch refresher" });
     }
   });
 

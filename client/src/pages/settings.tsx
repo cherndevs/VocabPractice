@@ -13,7 +13,7 @@ import { useVoices, VoiceInfo } from "@/hooks/use-voices";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import PinModal from "@/components/pin-modal";
-import type { Settings } from "@shared/schema";
+import { DEFAULT_REFRESHER_SIZE, type Settings } from "@shared/schema";
 
 const SELECTED_VOICES_KEY = 'selectedVoices';
 
@@ -93,6 +93,8 @@ export default function SettingsPage() {
   };
 
   const currentSettings = { ...settings, ...localSettings };
+  // What the Refresher size box shows while being edited; null shows the saved value.
+  const [refresherSizeDraft, setRefresherSizeDraft] = useState<string | null>(null);
 
   // Persist selected voices
   useEffect(() => {
@@ -302,6 +304,42 @@ export default function SettingsPage() {
                 <span>0.5s</span>
                 <span>5s</span>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+  {/* Refreshers */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Refreshers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <Label className="font-medium" htmlFor="input-refresher-size">Refresher size</Label>
+                <p className="text-sm text-muted-foreground">
+                  The most words one Spelling or Reading refresher holds.
+                </p>
+              </div>
+              <Input
+                id="input-refresher-size"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                step={1}
+                className="w-20"
+                value={refresherSizeDraft ?? String(currentSettings.refresherSize ?? DEFAULT_REFRESHER_SIZE)}
+                onChange={(e) => setRefresherSizeDraft(e.target.value)}
+                onBlur={() => {
+                  const size = Number(refresherSizeDraft);
+                  // Only a whole number of at least 1 is saved; anything else reverts.
+                  if (refresherSizeDraft !== null && Number.isInteger(size) && size >= 1 && size !== currentSettings.refresherSize) {
+                    handleSettingChange('refresherSize', size);
+                  }
+                  setRefresherSizeDraft(null);
+                }}
+                data-testid="input-refresher-size"
+              />
             </div>
           </CardContent>
         </Card>

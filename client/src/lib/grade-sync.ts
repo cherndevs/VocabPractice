@@ -20,6 +20,7 @@ export const gradeOutbox = createGradeOutbox({
   },
   onSent: () => {
     queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
   },
 });
 
