@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Play, Pause, Volume2, ChevronRight, Pin, PartyPopper, CheckCircle2, Mic, Loader2, X, MoreVertical, BookOpen, SquarePen, RotateCw } from "lucide-react";
+import { Play, Pause, Volume2, ChevronRight, Pin, CheckCircle2, Check, Clock, Mic, Loader2, X, MoreVertical, BookOpen, SquarePen, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
@@ -42,6 +41,12 @@ import type { Grade, Session, Settings } from "@shared/schema";
 
 type DrillScope = "due" | "all";
 
+// Shared pieces of the design canvas's Session screen.
+const STAGE =
+  "mx-4 mt-4 flex min-h-[260px] flex-col items-center justify-center gap-4 rounded-2xl bg-card px-5 py-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.08)]";
+const ROUND_BUTTON = "flex h-[60px] w-[60px] items-center justify-center rounded-full disabled:cursor-not-allowed disabled:opacity-40";
+const WIDE_BUTTON = "h-[46px] w-full text-[15px] font-semibold";
+
 /**
  * What a drill is run for: a session, or (with a null id) a refresher, which
  * belongs to no session. Grades from a refresher are saved with no sessionId.
@@ -52,9 +57,8 @@ export interface DrillSource {
   subject: Session["subject"];
   sessionType: Session["sessionType"];
   pinnedAt: Session["pinnedAt"];
-  /** Where Back and "Back to sessions" lead. */
+  /** Where the header's close button leads. */
   exitTo: string;
-  exitLabel: string;
 }
 
 // Loads the session and its drill (the words to practise now), and keys the
@@ -89,40 +93,40 @@ export default function PracticeSession() {
 
   if (sessionLoading || (!drill && !drillFailed && session)) {
     return (
-      <div className="px-4 py-6">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/2"></div>
-          <div className="h-32 bg-muted rounded"></div>
-          <div className="h-48 bg-muted rounded"></div>
-        </div>
+      <div className="animate-pulse px-4 pt-4">
+        <div className="mx-auto h-1.5 w-2/3 rounded-full bg-muted"></div>
+        <div className="mx-auto mt-6 h-6 w-24 rounded-full bg-muted"></div>
+        <div className="mt-4 h-[260px] rounded-2xl bg-muted"></div>
       </div>
     );
   }
 
   if (!session || drillFailed || !drill) {
     return (
-      <div className="px-4 py-6">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">{session ? "Couldn't load the words" : "Session not found"}</p>
-            <Button onClick={() => navigate("/library")} className="mt-4">
-              Back to Sessions
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="px-4 pt-4">
+        <div className={STAGE}>
+          <p className="text-[15px] text-muted-foreground">{session ? "Couldn't load the words" : "Session not found"}</p>
+          <Button onClick={() => navigate("/library")} className={`${WIDE_BUTTON} max-w-[200px]`}>
+            Back to sessions
+          </Button>
+        </div>
       </div>
     );
   }
 
   if (drill.words.length === 0) {
     return (
-      <div className="px-4 py-12 text-center space-y-4" data-testid="section-nothing-due">
-        <CheckCircle2 className="w-10 h-10 mx-auto text-success" />
-        <p className="text-xl font-semibold text-foreground">Nothing needs review</p>
-        <p className="text-sm text-muted-foreground">Every word in {session.title} is up to date.</p>
-        <div className="flex flex-col gap-2">
-          <Button onClick={() => setScope("all")} data-testid="button-revise-all">Revise all</Button>
-          <Button variant="outline" onClick={() => navigate("/library")}>Back to sessions</Button>
+      <div className="pt-4" data-testid="section-nothing-due">
+        <div className={STAGE}>
+          <CheckCircle2 className="w-10 h-10 text-success" />
+          <div>
+            <p className="text-lg font-bold text-foreground">Nothing needs review</p>
+            <p className="mt-1 text-[13px] text-muted-foreground">Every word in {session.title} is up to date.</p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-col gap-2 px-4">
+          <Button className={WIDE_BUTTON} onClick={() => setScope("all")} data-testid="button-revise-all">Revise all</Button>
+          <Button variant="outline" className={WIDE_BUTTON} onClick={() => navigate("/library")}>Back to sessions</Button>
         </div>
       </div>
     );
@@ -131,7 +135,7 @@ export default function PracticeSession() {
   return (
     <PracticeDrill
       key={drill.scope}
-      session={{ ...session, exitTo: "/library", exitLabel: "Back to sessions" }}
+      session={{ ...session, exitTo: "/library" }}
       words={drill.words}
       scope={drill.scope}
       onScopeChange={setScope}
@@ -620,10 +624,37 @@ export function PracticeDrill({
     : headerTotal > 0 ? Math.round((headerPosition / headerTotal) * 100) : 0;
   const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
     { grade: "again", label: "Oops", tone: "text-destructive" },
-    { grade: "hard", label: "Hard", tone: "text-warning" },
+    { grade: "hard", label: "Hard", tone: "text-warning-ink" },
     { grade: "good", label: "OK", tone: "text-primary" },
-    { grade: "easy", label: "Easy", tone: "text-success" },
+    { grade: "easy", label: "Easy", tone: "text-success-ink" },
   ];
+  const gateHint = !readFlow
+    ? ""
+    : isPeeked(readFlow) || readFlow.wordState.kind === "failed"
+      ? "Answer shown, so only Oops is left."
+      : !isGradeEnabled(readFlow, "good")
+        ? "Read it aloud to unlock Hard, OK and Easy."
+        : "";
+
+  // The end of a drill, for Reading and Writing alike. The header's close button is the way out.
+  const completeScreen = (reviewAgain: () => void) => (
+    <div data-testid="section-complete">
+      <div className={STAGE}>
+        <CheckCircle2 className="w-10 h-10 text-success" />
+        <p className="text-lg font-bold text-foreground">Session complete</p>
+      </div>
+      <div className="mt-4 flex flex-col gap-2 px-4">
+        <Button className={WIDE_BUTTON} onClick={reviewAgain} data-testid="button-review-again">
+          Review again
+        </Button>
+        {scope === "due" && onScopeChange && (
+          <Button variant="outline" className={WIDE_BUTTON} onClick={() => onScopeChange("all")} data-testid="button-complete-revise-all">
+            Revise all
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="fade-in">
@@ -666,6 +697,7 @@ export function PracticeDrill({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => onScopeChange(scope === "due" ? "all" : "due")} data-testid="button-toggle-scope">
+                {scope === "due" ? <RotateCw className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
                 {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -693,199 +725,167 @@ export function PracticeDrill({
       </div>
 
       {/* Read / Peek Mode Content */}
-      {(mode === "read" || mode === "peek") && readFlow && (
-        <div className="px-4 py-8">
-          {!showing ? (
-            <Card className="mb-8" data-testid="card-all-completed">
-              <CardContent className="pt-6 text-center space-y-4">
-                <PartyPopper className="w-10 h-10 mx-auto text-primary" />
-                <p className="text-lg font-medium text-foreground">All Done!</p>
-                <p className="text-sm text-muted-foreground">
-                  You've been through every word in this session.
-                </p>
-                <Button onClick={restartReading} data-testid="button-reset-to-continue">
-                  Go again?
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="text-center mb-8">
-              {showing.tryOnceMore && (
-                <div className="text-sm font-medium text-primary mb-2" data-testid="badge-try-once-more">
-                  Try once more
-                </div>
-              )}
-              <div
-                className={`text-4xl font-bold text-foreground ${showPinyin ? "" : "mb-6"}`}
-                data-testid="text-current-word"
-              >
-                {showing.word}
+      {(mode === "read" || mode === "peek") && readFlow && !showing && completeScreen(restartReading)}
+
+      {(mode === "read" || mode === "peek") && readFlow && showing && (
+        <>
+          <div className={STAGE}>
+            {showing.tryOnceMore && (
+              <div className="text-sm font-medium text-primary" data-testid="badge-try-once-more">
+                Try once more
               </div>
+            )}
+            <div className="text-[40px] font-extrabold leading-tight text-foreground" data-testid="text-current-word">
+              {showing.word}
+            </div>
 
-              {showPinyin && (
-                <div className="text-lg text-muted-foreground mb-6" data-testid="text-current-word-pinyin">
-                  {currentWordPinyin}
-                </div>
-              )}
+            {readFlow.wordState.kind === "failed" && mode === "read" && (
+              <div className="text-[13px] font-semibold text-muted-foreground" data-testid="text-read-aloud-caption">
+                {captionFor(readFlow)}
+              </div>
+            )}
 
-              {mode === "peek" && (
-                <div className="flex items-center justify-center space-x-4 mb-8">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="p-3 rounded-full"
-                    onClick={() => playWord(1)}
-                    disabled={isMuted}
-                    data-testid="button-play-audio"
+            {showPinyin && (
+              <div className="text-[15px] font-medium text-muted-foreground" data-testid="text-current-word-pinyin">
+                {currentWordPinyin}
+              </div>
+            )}
+
+            {mode === "peek" && (
+              <button
+                type="button"
+                className="flex h-11 w-11 items-center justify-center rounded-full border-[1.5px] border-border bg-card text-primary disabled:opacity-40"
+                onClick={() => playWord(1)}
+                disabled={isMuted}
+                aria-label="Hear it"
+                data-testid="button-play-audio"
+              >
+                <Volume2 className="w-5 h-5" />
+              </button>
+            )}
+
+            {/* Read Aloud: mic or pass badge, caption and Peek. Not shown once the answer is out. */}
+            {mode === "read" && readFlow.wordState.kind !== "failed" && (
+              <div className="mt-1 flex flex-col items-center gap-2" data-testid="read-aloud">
+                {showsReadAloud(readFlow) && readFlow.wordState.kind !== "passed" && (
+                  <button
+                    type="button"
+                    className={`flex h-16 w-16 items-center justify-center rounded-full bg-skill-reading text-white disabled:opacity-55 ${readFlow.wordState.kind === "listening" ? "ra-pulse" : ""}`}
+                    onClick={handleMicTap}
+                    disabled={readFlow.wordState.kind === "checking"}
+                    aria-label={readFlow.wordState.kind === "listening" ? "Stop and check" : "Read aloud"}
+                    data-testid="button-mic"
                   >
-                    <Volume2 className="w-6 h-6" />
-                  </Button>
-                </div>
-              )}
-
-              {/* Read Aloud: mic, caption and Peek. Not shown once self-report takes over or the answer is out. */}
-              {mode === "read" && showsReadAloud(readFlow) && (
-                <div className="mb-8 space-y-3" data-testid="read-aloud">
-                  {readFlow.wordState.kind !== "failed" && readFlow.wordState.kind !== "passed" && (
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className={`p-4 rounded-full h-16 w-16 ${readFlow.wordState.kind === "listening" ? "animate-pulse border-primary" : ""}`}
-                      onClick={handleMicTap}
-                      disabled={readFlow.wordState.kind === "checking"}
-                      aria-label={readFlow.wordState.kind === "listening" ? "Stop and check" : "Read aloud"}
-                      data-testid="button-mic"
-                    >
-                      {readFlow.wordState.kind === "checking" ? (
-                        <Loader2 className="w-7 h-7 animate-spin" />
-                      ) : (
-                        <Mic className="w-7 h-7 text-primary" />
-                      )}
-                    </Button>
-                  )}
-                  <div
-                    className={`text-sm ${readFlow.wordState.kind === "passed" ? "text-success font-medium" : "text-muted-foreground"}`}
-                    data-testid="text-read-aloud-caption"
-                  >
-                    {captionFor(readFlow)}
+                    {readFlow.wordState.kind === "checking" ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <Mic className="w-6 h-6" />
+                    )}
+                  </button>
+                )}
+                {readFlow.wordState.kind === "passed" && (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/[0.12] text-success-ink" data-testid="badge-read-passed">
+                    <Check className="w-7 h-7" strokeWidth={2.5} />
                   </div>
-                  {/* Debug: what the app heard. Temporary, for checking Read Aloud by ear. */}
-                  {readFlow.lastAttempt && (
-                    <div className="text-xs text-muted-foreground space-y-0.5" data-testid="text-heard-debug">
-                      <div>
-                        Judged: [{readFlow.lastAttempt.alternatives[0]}]
-                        {readFlow.lastAttempt.confidences ? ` (conf ${readFlow.lastAttempt.confidences[0].toFixed(2)})` : ""}
-                        {" "}→ {readFlow.lastAttempt.passed ? `match (${readFlow.lastAttempt.how === "same-pinyin" ? "same pinyin, different characters" : "same text"})` : "no match"}
-                      </div>
-                      {readFlow.lastAttempt.alternatives.length > 1 && (
-                        <div>Also heard, ignored: {readFlow.lastAttempt.alternatives.slice(1).join(" · ")}</div>
-                      )}
-                    </div>
-                  )}
-                  {currentWordPinyin && readFlow.wordState.kind !== "passed" && readFlow.wordState.kind !== "failed" && (
-                    <button
-                      type="button"
-                      className="text-sm text-primary underline"
-                      onClick={() => switchMode("peek")}
-                      data-testid="button-peek-link"
-                    >
-                      Stuck? Peek
-                    </button>
-                  )}
-                </div>
-              )}
-              {readFlow.wordState.kind === "unavailable" && mode === "read" && (
-                <div className="text-sm text-muted-foreground mb-8" data-testid="text-read-aloud-unavailable">
+                )}
+                <div
+                  className={`min-h-[18px] max-w-[240px] text-center text-[13px] font-semibold ${readFlow.wordState.kind === "passed" ? "text-success-ink" : "text-muted-foreground"}`}
+                  data-testid={readFlow.wordState.kind === "unavailable" ? "text-read-aloud-unavailable" : "text-read-aloud-caption"}
+                >
                   {captionFor(readFlow)}
                 </div>
-              )}
-
-              <div className="flex gap-2" data-testid="grade-row">
-                {gradeButtons.map(({ grade, label, tone }) => (
-                  <Button
-                    key={grade}
-                    variant="outline"
-                    className={`flex-1 h-11 font-semibold ${tone} disabled:opacity-40 disabled:cursor-not-allowed`}
-                    disabled={!isGradeEnabled(readFlow, grade)}
-                    onClick={() => handleReadGrade(grade)}
-                    data-testid={`button-grade-${grade}`}
+                {currentWordPinyin && readFlow.wordState.kind !== "passed" && (
+                  <button
+                    type="button"
+                    className="p-1 text-xs font-semibold text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    onClick={() => switchMode("peek")}
+                    data-testid="button-peek-link"
                   >
-                    {label}
-                  </Button>
-                ))}
+                    Stuck? Peek
+                  </button>
+                )}
               </div>
-              {isPeeked(readFlow) && (
-                <div className="text-xs text-muted-foreground mt-2" data-testid="text-grade-hint">
-                  Answer shown, so only Oops is left.
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Up next: one dot per word in the queue, filled as it is graded */}
-          {showing && (
-            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 px-6" data-testid="up-next">
-              {Array.from({ length: readProgress.total }, (_, i) => {
-                const done = i < readProgress.done;
-                const current = i === readProgress.done;
-                return (
-                  <span
-                    key={i}
-                    className={`h-1.5 w-1.5 rounded-full ${done ? "bg-skill-reading" : "bg-border"} ${current ? "ring-[3px] ring-primary-tint" : ""}`}
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
+          <div className="mt-4 flex gap-2 px-4" data-testid="grade-row">
+            {gradeButtons.map(({ grade, label, tone }) => (
+              <button
+                key={grade}
+                type="button"
+                className={`h-[46px] flex-1 rounded-lg border border-border bg-card text-[13px] font-semibold ${tone} disabled:cursor-not-allowed disabled:opacity-40`}
+                disabled={!isGradeEnabled(readFlow, grade)}
+                onClick={() => handleReadGrade(grade)}
+                data-testid={`button-grade-${grade}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="mx-4 mt-2 min-h-4 text-center text-xs text-muted-foreground" data-testid="text-grade-hint">
+            {gateHint}
+          </div>
+
+          {/* Up next: one dot per word in the drill, filled once it stops coming back */}
+          <div className="mt-[18px] flex items-center justify-center gap-1.5 px-6" data-testid="up-next">
+            {words.map((word, i) => (
+              <span
+                key={i}
+                className={`h-1.5 w-1.5 rounded-full ${readFlow.queue.some((s) => s.word === word) ? "bg-border" : "bg-skill-reading"} ${word === showing.word ? "ring-[3px] ring-primary-tint" : ""}`}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Write Mode Content */}
       {mode === "write" && spellingPhase === "marking" && (
-        <div className="px-4 py-6" data-testid="section-marking">
-          <h2 className="text-xl font-semibold text-foreground">Mark the writing</h2>
-          <p className="text-sm text-muted-foreground mb-4">Check each word against the paper. Tap a word to hear it again.</p>
-          <ul className="space-y-2">
+        <div data-testid="section-marking">
+          <div className="px-5 pb-2 pt-[18px]">
+            <h2 className="text-lg font-bold text-foreground">Mark the writing</h2>
+            <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">Check each word against the paper.</p>
+          </div>
+          <ul className="flex flex-col px-4 py-1">
             {words.map((word, index) => (
-              <li key={index} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
+              <li key={index} className="flex items-center gap-2 border-b border-border py-2">
                 <button
                   type="button"
-                  className="text-lg font-medium text-foreground text-left"
+                  className="min-w-0 flex-1 text-left text-xl font-bold text-foreground"
                   onClick={() => speakWord(word)}
+                  aria-label={`Hear ${word}`}
                   data-testid={`button-hear-word-${index}`}
                 >
                   {word}
                 </button>
-                <div className="flex gap-2 shrink-0">
-                  <Button
-                    size="sm"
-                    variant={marks[index] === "again" ? "destructive" : "outline"}
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    className={`h-11 w-[68px] rounded-lg border px-2.5 text-xs font-semibold ${marks[index] === "again" ? "border-destructive bg-destructive text-white" : "border-border bg-card text-destructive"}`}
                     aria-pressed={marks[index] === "again"}
                     onClick={() => setMarks((m) => ({ ...m, [index]: "again" }))}
                     data-testid={`button-oops-${index}`}
                   >
                     Oops
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={marks[index] === "good" ? "default" : "outline"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`h-11 w-[108px] rounded-lg border px-2.5 text-xs font-semibold ${marks[index] === "good" ? "border-primary bg-primary text-white" : "border-border bg-card text-primary"}`}
                     aria-pressed={marks[index] === "good"}
                     onClick={() => setMarks((m) => ({ ...m, [index]: "good" }))}
                     data-testid={`button-got-it-${index}`}
                   >
                     I've got this
-                  </Button>
+                  </button>
                 </div>
               </li>
             ))}
           </ul>
-          <div className="mt-4 space-y-2 text-center">
-            <div className="text-sm text-muted-foreground" data-testid="text-marked-count">
+          <div className="flex flex-col gap-2 px-4 pb-4 pt-3">
+            <div className="text-center text-xs text-muted-foreground" data-testid="text-marked-count">
               {Object.keys(marks).length} of {words.length} marked
             </div>
             <Button
-              size="lg"
-              className="w-full"
+              className={WIDE_BUTTON}
               onClick={finishMarking}
               disabled={Object.keys(marks).length < words.length}
               data-testid="button-finish-marking"
@@ -896,100 +896,75 @@ export function PracticeDrill({
         </div>
       )}
 
-      {mode === "write" && spellingPhase === "complete" && (
-        <div className="px-4 py-12 text-center space-y-6" data-testid="section-complete">
-          <CheckCircle2 className="w-10 h-10 mx-auto text-success" />
-          <p className="text-xl font-semibold text-foreground">Session complete</p>
-          <div className="flex flex-col gap-2">
-            <Button onClick={dictateAgain} data-testid="button-review-again">Review again</Button>
-            <Button variant="outline" onClick={() => navigate(session.exitTo)} data-testid="button-back-to-sessions">
-              {session.exitLabel}
-            </Button>
-          </div>
-        </div>
-      )}
+      {mode === "write" && spellingPhase === "complete" && completeScreen(dictateAgain)}
 
       {mode === "write" && spellingPhase === "dictation" && (
-        <div className="px-4 py-8">
-          {/* Word Display Hidden */}
-          <div className="text-center mb-8">
-            {/* Word Info */}
-            <div className="text-sm text-muted-foreground mb-8" data-testid="text-word-info">
-              Word {currentWordIndex + 1} of {words.length}
-            </div>
-
-            {/* Audio Controls */}
-            <div className="flex items-center justify-center space-x-4 mb-6">
-              {!isLooping && (
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="p-4 rounded-full"
-                  onClick={() => playWord(1)}
-                  disabled={isMuted}
-                  data-testid="button-play-word"
-                >
-                  <Play className="w-8 h-8 text-primary" fill="currentColor" />
-                </Button>
-              )}
-
-              {settings?.enablePauseButton && isLooping && (
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="p-4 rounded-full"
-                  onClick={togglePause}
-                  disabled={isMuted}
-                  data-testid="button-pause-resume"
-                >
-                  {isPaused ? (
-                    <Play className="w-8 h-8 text-primary" fill="currentColor" />
-                  ) : (
-                    <Pause className="w-8 h-8 text-primary" fill="currentColor" />
-                  )}
-                </Button>
-              )}
-
-              <Button 
-                size="lg" 
-                className="p-4 rounded-full"
-                onClick={nextWord}
-                disabled={currentWordIndex === words.length - 1}
-                data-testid="button-skip-word"
-              >
-                <ChevronRight className="w-8 h-8" />
-              </Button>
-            </div>
-
-            {/* Done Button - Show when at last word */}
-            {currentWordIndex === words.length - 1 && (
-              <div className="flex items-center justify-center mt-8">
-                <Button 
-                  variant="default"
-                  size="lg"
-                  onClick={startMarking}
-                  data-testid="button-done"
-                  className="px-8 py-3"
-                >
-                  Done
-                </Button>
-              </div>
-            )}
+        <div className={STAGE}>
+          <div className="mb-2 text-[13px] text-muted-foreground" data-testid="text-word-info">
+            Word {currentWordIndex + 1} of {words.length}
           </div>
+
+          <div className="flex items-center justify-center gap-4">
+            {!isLooping && (
+              <button
+                type="button"
+                className={`${ROUND_BUTTON} border-[1.5px] border-border bg-card text-primary`}
+                onClick={() => playWord(1)}
+                disabled={isMuted}
+                aria-label="Play word"
+                data-testid="button-play-word"
+              >
+                <Play className="w-6 h-6" fill="currentColor" strokeWidth={0} />
+              </button>
+            )}
+
+            {effectiveSettings.enablePauseButton && isLooping && (
+              <button
+                type="button"
+                className={`${ROUND_BUTTON} border-[1.5px] border-border bg-card text-primary`}
+                onClick={togglePause}
+                disabled={isMuted}
+                aria-label={isPaused ? "Play word" : "Pause"}
+                data-testid="button-pause-resume"
+              >
+                {isPaused ? (
+                  <Play className="w-6 h-6" fill="currentColor" strokeWidth={0} />
+                ) : (
+                  <Pause className="w-6 h-6" fill="currentColor" strokeWidth={0} />
+                )}
+              </button>
+            )}
+
+            <button
+              type="button"
+              className={`${ROUND_BUTTON} bg-primary text-primary-foreground`}
+              onClick={nextWord}
+              disabled={currentWordIndex === words.length - 1}
+              aria-label="Next word"
+              data-testid="button-skip-word"
+            >
+              <ChevronRight className="w-7 h-7" />
+            </button>
+          </div>
+
+          {currentWordIndex === words.length - 1 && (
+            <Button className={`${WIDE_BUTTON} max-w-[200px]`} onClick={startMarking} data-testid="button-done">
+              Done
+            </Button>
+          )}
         </div>
       )}
-
       <Sheet open={noticeOpen} onOpenChange={(open) => { if (!open) declineNotice(); }}>
-        <SheetContent side="bottom" data-testid="sheet-read-aloud-notice">
-          <SheetHeader>
+        <SheetContent side="bottom" className="rounded-t-2xl px-4 pb-4 pt-5 [&>button]:hidden" data-testid="sheet-read-aloud-notice">
+          <SheetHeader className="text-left">
             <SheetTitle>Before you read aloud</SheetTitle>
             <SheetDescription>
               To check the reading, your browser may send the recording to its speech service (on iPhone, that's Apple). This app never keeps it.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-4 flex flex-col gap-2">
-            <Button onClick={acceptNotice} data-testid="button-notice-ok">OK, start</Button>
-            <Button variant="outline" onClick={declineNotice} data-testid="button-notice-not-now">Not now</Button>
+            <Button className={WIDE_BUTTON} onClick={acceptNotice} data-testid="button-notice-ok">OK, start</Button>
+            <Button variant="outline" className={WIDE_BUTTON} onClick={declineNotice} data-testid="button-notice-not-now">Not now</Button>
           </div>
         </SheetContent>
       </Sheet>
