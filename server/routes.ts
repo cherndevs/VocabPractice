@@ -15,6 +15,7 @@ import {
 } from "@shared/schema";
 import { applyGrades } from "./grades";
 import { needsReview } from "./scheduling";
+import { drillWords } from "./drill";
 import {
   extractSpellingLists,
   ExtractionServiceError,
@@ -104,7 +105,14 @@ export async function registerRoutes(
         sessions.map(async (session) => {
           const words = session.words.map((w) => w.trim());
           const tested = await storage.getReviewStates(session.subject, session.sessionType, words);
-          return { ...(await withLesson(session)), testedCount: new Set(tested.map((s) => s.word)).size };
+          const at = now();
+          const found = new Set(tested.map((s) => s.word));
+          const due = new Set(words.filter((w) => needsReview(tested.find((s) => s.word === w) ?? null, at)));
+          return {
+            ...(await withLesson(session)),
+            testedCount: found.size,
+            needsReviewCount: due.size,
+          };
         }),
       );
       res.json(withTested);
@@ -166,6 +174,25 @@ export async function registerRoutes(
       res.json(await withLesson(session));
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch session" });
+    }
+  });
+
+  // The words to drill: those needing review in the session's skill, most
+  // overdue first then never-graded; scope=all appends the rest in list order.
+  app.get("/api/sessions/:id/drill", async (req, res) => {
+    const scope = req.query.scope ?? "due";
+    if (scope !== "due" && scope !== "all") {
+      return res.status(400).json({ message: "scope must be due or all" });
+    }
+    try {
+      const session = await storage.getSession(req.params.id);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      const states = await storage.getReviewStates(session.subject, session.sessionType, session.words.map((w) => w.trim()));
+      res.json({ words: drillWords(session.words, states, scope, now()) });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch drill" });
     }
   });
 
