@@ -79,12 +79,12 @@ export default function Library() {
     >
       <Link href={`/practice/${session.id}`}>
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h3 className="flex min-w-0 items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
               <SessionTypeIcon sessionType={session.sessionType} className="w-4 h-4" data-testid={`icon-session-type-${session.id}`} />
-              {session.title}
+              <span className="truncate">{session.title}</span>
             </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
@@ -97,8 +97,8 @@ export default function Library() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [&>span]:whitespace-nowrap">
               <span className="flex items-center space-x-1">
                 <Calendar className="w-3 h-3" />
                 <span data-testid={`text-session-date-${session.id}`}>
@@ -115,7 +115,7 @@ export default function Library() {
                 {session.needsReviewCount} to review
               </span>
             </div>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4 shrink-0" />
           </div>
         </CardContent>
       </Link>
