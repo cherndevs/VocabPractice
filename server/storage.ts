@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, users, sessions, lessons, settings, reviewStates, gradeLog } from "@shared/schema";
+import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, users, sessions, lessons, settings, reviewStates, gradeLog } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -56,6 +56,7 @@ export class MemStorage implements IStorage {
       dataSync: false,
       enablePauseButton: true,
       activeSubject: null,
+      refresherSize: DEFAULT_REFRESHER_SIZE,
     };
   }
 
@@ -351,6 +352,7 @@ class PgStorage implements IStorage {
         dataSync: false,
         enablePauseButton: true,
         activeSubject: null,
+        refresherSize: DEFAULT_REFRESHER_SIZE,
       } as Settings;
     }
   }

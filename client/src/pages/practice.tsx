@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Pin } from "lucide-react";
+import { BookOpen, PenLine, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
@@ -8,9 +8,11 @@ import { usePinSession } from "@/hooks/use-pin-session";
 import SessionTypeIcon from "@/components/session-type-icon";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { formatDueDate, localToday } from "@/lib/due-date";
-import type { SessionWithLesson } from "@shared/schema";
+import type { Skill, SessionWithLesson } from "@shared/schema";
 
 interface PracticeData {
+  /** Words needing review per skill, before the Refresher size cap. */
+  refreshers: Record<Skill, number>;
   thisWeek: SessionWithLesson | null;
   pinned: SessionWithLesson[];
 }
@@ -61,6 +63,49 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
   );
 }
 
+const REFRESHERS: { skill: Skill; title: string; Icon: typeof PenLine; tint: string }[] = [
+  { skill: "spelling", title: "Spelling refresher", Icon: PenLine, tint: "bg-blue-100 text-blue-600" },
+  { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-purple-100 text-purple-600" },
+];
+
+function Refreshers({ counts }: { counts: Record<Skill, number> }) {
+  const offered = REFRESHERS.filter(({ skill }) => counts[skill] > 0);
+  if (offered.length === 0) {
+    return (
+      <Card data-testid="card-all-caught-up">
+        <CardContent className="px-3 py-8 text-center">
+          <div className="text-base font-bold text-foreground">All caught up for today</div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            No words need review right now. Check back tomorrow, or browse the Library to get ahead.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+  return (
+    <div className="space-y-2" data-testid="section-refreshers">
+      {offered.map(({ skill, title, Icon, tint }) => (
+        <Card key={skill} data-testid={`card-refresher-${skill}`}>
+          <CardContent className="flex items-center gap-3.5 p-4">
+            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] ${tint}`}>
+              <Icon className="w-[22px] h-[22px]" />
+            </div>
+            <div className="flex-1">
+              <div className="text-[15px] font-bold text-foreground">{title}</div>
+              <div className="mt-0.5 text-xs text-muted-foreground" data-testid={`text-refresher-count-${skill}`}>
+                {counts[skill]} {counts[skill] === 1 ? "word needs" : "words need"} review
+              </div>
+            </div>
+            <Link href={`/refresher/${skill}`}>
+              <Button size="sm" data-testid={`button-start-refresher-${skill}`}>Start</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function Practice() {
   const { subject } = useActiveSubject();
   // The client's own local date decides which due dates are still upcoming.
@@ -101,6 +146,7 @@ export default function Practice() {
           </Card>
         ) : (
           <>
+            {data && <Refreshers counts={data.refreshers} />}
             <section data-testid="section-this-week">
               <h2 className={heading}>This week</h2>
               {data?.thisWeek ? (

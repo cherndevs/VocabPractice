@@ -114,6 +114,8 @@ export const gradeLog = pgTable("grade_log", {
   sessionId: text("session_id"),
 });
 
+export const DEFAULT_REFRESHER_SIZE = 20;
+
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   pin: varchar("pin").default("111111"), // 6-digit PIN
@@ -125,6 +127,8 @@ export const settings = pgTable("settings", {
   enablePauseButton: boolean("enable_pause_button").default(true),
   // null means "never chosen"; the API reports DEFAULT_SUBJECT in that case.
   activeSubject: text("active_subject").$type<Subject>(),
+  // How many words one Refresher holds at most (CONTEXT.md: Refresher).
+  refresherSize: integer("refresher_size").notNull().default(DEFAULT_REFRESHER_SIZE),
 });
 
 export const insertSessionSchema = createInsertSchema(sessions, {
@@ -144,6 +148,7 @@ export const lessonNameSchema = z.string().nullable();
 
 export const insertSettingsSchema = createInsertSchema(settings, {
   activeSubject: subjectSchema.optional(),
+  refresherSize: z.number().int().min(1).optional(),
 }).omit({
   id: true,
 });

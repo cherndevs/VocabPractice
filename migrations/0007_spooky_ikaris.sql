@@ -1,0 +1,1 @@
+ALTER TABLE "settings" ADD COLUMN "refresher_size" integer DEFAULT 20 NOT NULL;
