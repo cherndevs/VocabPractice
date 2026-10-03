@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { LessonPicker } from "@/components/lesson-picker";
+import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
 import type { SessionWithLesson } from "@shared/schema";
 
@@ -18,6 +19,7 @@ export default function EditSession() {
   const [sessionTitle, setSessionTitle] = useState("");
   const [words, setWords] = useState<string[]>([""]);
   const [lessonName, setLessonName] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
   // Fetch the existing session
@@ -32,11 +34,12 @@ export default function EditSession() {
       setSessionTitle(session.title);
       setWords(session.words.length > 0 ? session.words : [""]);
       setLessonName(session.lesson?.name ?? null);
+      setDueDate(session.dueDate);
     }
   }, [session]);
 
   const updateSessionMutation = useMutation({
-    mutationFn: async (payload: { title: string; words: string[]; wordCount: number; lessonName: string | null }) => {
+    mutationFn: async (payload: { title: string; words: string[]; wordCount: number; lessonName: string | null; dueDate: string | null }) => {
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -108,7 +111,7 @@ export default function EditSession() {
       return;
     }
     const title = sessionTitle.trim() || `Spelling Session ${new Date().toLocaleDateString()}`;
-    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length, lessonName });
+    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length, lessonName, dueDate });
   };
 
   if (isLoading) {
@@ -193,6 +196,10 @@ export default function EditSession() {
             <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} />
           </div>
         )}
+
+        <div className="mb-6">
+          <DueDateField value={dueDate} onChange={setDueDate} />
+        </div>
 
         {/* Word List */}
         <div className="space-y-3 mb-6">

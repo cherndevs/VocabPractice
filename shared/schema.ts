@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb, boolean, doublePrecision, primaryKey, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, date, jsonb, boolean, doublePrecision, primaryKey, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -50,6 +50,17 @@ export const lessons = pgTable(
   (t) => [uniqueIndex("lessons_subject_name_unique").on(t.subject, t.name)],
 );
 
+// A Due date is a calendar day (YYYY-MM-DD): no time, no time zone, so it
+// reads back as the exact day it was set. Kept as a string end to end.
+export const dueDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((v) => {
+    const d = new Date(`${v}T00:00:00Z`);
+    return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+  }, "Not a real calendar date")
+  .nullable();
+
 export const sessions = pgTable("sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -61,6 +72,7 @@ export const sessions = pgTable("sessions", {
   progress: integer("progress").default(0), // number of words completed
   timeSpent: integer("time_spent").default(0), // in seconds
   lessonId: varchar("lesson_id").references(() => lessons.id),
+  dueDate: date("due_date", { mode: "string" }),
   pinnedAt: timestamp("pinned_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -118,6 +130,7 @@ export const settings = pgTable("settings", {
 export const insertSessionSchema = createInsertSchema(sessions, {
   subject: subjectSchema,
   sessionType: sessionTypeSchema,
+  dueDate: dueDateSchema.optional(),
 }).omit({
   id: true,
   lessonId: true,

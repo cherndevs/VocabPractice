@@ -20,6 +20,7 @@ import { useActiveSubject } from "@/hooks/use-active-subject";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { LessonPicker } from "@/components/lesson-picker";
+import { DueDateField } from "@/components/due-date-field";
 import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
@@ -75,6 +76,7 @@ export default function CreateSession() {
   // Optional Lesson tag, filled from the sheet when it names one and loaded
   // afresh for each candidate in a multi-unit batch.
   const [lessonName, setLessonName] = useState<string | null>(null);
+  const [dueDate, setDueDate] = useState<string | null>(null);
 
   // Multi-candidate selection state. `queue` holds the candidates the user
   // chose to create, one at a time through the same edit-words screen used
@@ -95,7 +97,7 @@ export default function CreateSession() {
   const [extractionError, setExtractionError] = useState<"api-error" | "empty" | null>(null);
 
   const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: InsertSession & { lessonName: string | null }) => {
+    mutationFn: async (sessionData: InsertSession & { lessonName: string | null; dueDate: string | null }) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
       return response.json();
     },
@@ -156,6 +158,7 @@ export default function CreateSession() {
     setWords([""]);
     setSessionTitle("");
     setLessonName(null);
+    setDueDate(null);
     setExtractionError(null);
     setCurrentStep("edit-words");
   };
@@ -169,6 +172,7 @@ export default function CreateSession() {
     setWords([""]);
     setSessionTitle("");
     setLessonName(null);
+    setDueDate(null);
     setMultiCandidates([]);
     setSelected([]);
     setQueue([]);
@@ -263,6 +267,7 @@ export default function CreateSession() {
         subject,
         sessionType,
         lessonName,
+        dueDate,
         words: filteredWords,
         wordCount: filteredWords.length,
         status: "new",
@@ -511,6 +516,10 @@ export default function CreateSession() {
               <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />
             </div>
           )}
+
+          <div className="mb-6">
+            <DueDateField value={dueDate} onChange={setDueDate} />
+          </div>
 
           {/* Word List */}
           <div className="space-y-3 mb-6">
