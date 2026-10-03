@@ -1,10 +1,12 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
-import Sessions from "@/pages/sessions";
+import Practice from "@/pages/practice";
+import Library from "@/pages/library";
+import Progress from "@/pages/progress";
 import Settings from "@/pages/settings";
 import CreateSession from "@/pages/create-session";
 import PracticeSession from "@/pages/practice-session";
@@ -25,8 +27,12 @@ function Router() {
     <div className="mobile-container max-w-sm mx-auto min-h-screen bg-background">
       <div className={showBottomNavigation ? "pb-20" : undefined}>
         <Switch>
-          <Route path="/" component={Sessions} />
-          <Route path="/sessions" component={Sessions} />
+          <Route path="/" component={Practice} />
+          <Route path="/library" component={Library} />
+          <Route path="/sessions">
+            <Redirect to="/library" replace />
+          </Route>
+          <Route path="/progress" component={Progress} />
           <Route path="/settings" component={Settings} />
           <Route path="/create-session" component={CreateSession} />
           <Route path="/practice/:id" component={PracticeSession} />

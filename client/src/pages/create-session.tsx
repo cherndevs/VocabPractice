@@ -103,6 +103,7 @@ export default function CreateSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
     },
   });
@@ -302,13 +303,13 @@ export default function CreateSession() {
     setQueueIndex(0);
     setCurrentStep("session-created");
     setTimeout(() => {
-      navigate("/sessions");
+      navigate("/library");
     }, 2000);
   };
 
   const goBack = () => {
     if (currentStep === "type") {
-      navigate("/sessions");
+      navigate("/library");
     } else if (currentStep === "camera") {
       setCurrentStep("type");
     } else if (currentStep === "selection") {
@@ -591,7 +592,7 @@ export default function CreateSession() {
           </p>
           
           <Button
-            onClick={() => navigate("/sessions")}
+            onClick={() => navigate("/library")}
             className="w-full max-w-xs"
             data-testid="button-go-to-sessions"
           >

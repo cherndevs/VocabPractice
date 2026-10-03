@@ -50,11 +50,12 @@ export default function EditSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
       queryClient.invalidateQueries({ queryKey: [`/api/sessions/${id}`] });
       setIsSaved(true);
       setTimeout(() => {
-        navigate("/sessions");
+        navigate("/library");
       }, 1500);
     },
     onError: () => {
@@ -119,7 +120,7 @@ export default function EditSession() {
       <div className="fade-in">
         <div className="px-4 py-6 bg-card border-b border-border">
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/sessions")} className="p-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/library")} className="p-2">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-xl font-semibold text-foreground">Edit Session</h1>
@@ -161,7 +162,7 @@ export default function EditSession() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/sessions")}
+            onClick={() => navigate("/library")}
             className="p-2"
             data-testid="button-edit-go-back"
           >

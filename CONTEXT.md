@@ -94,7 +94,7 @@ A word noticed in a Speaking session that isn't yet in the Lesson's reading list
 ### Workspaces
 
 **Workspace**:
-The operating context for learning one Subject — the sessions page and everything reached from it. Today there are two: Chinese and English.
+The operating context for learning one Subject — the Practice and Library screens and everything reached from them. Today there are two: Chinese and English.
 _Avoid_: Space, page
 
 **Subject**:

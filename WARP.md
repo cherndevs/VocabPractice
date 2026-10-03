@@ -57,6 +57,7 @@ Code architecture (high-level)
     - Grades: POST /api/grades `{grades:[…]}` logs each grade (client id = primary key, replays are no-ops) and moves the word's review state through FSRS (server/scheduling.ts wraps `ts-fsrs`; server/grades.ts applies a batch oldest-first). GET /api/review-states?subject=&skill=&words= reports state and `needsReview`. GET /api/sessions adds `testedCount`. `registerRoutes` takes an injectable clock (`{now}`); the test harness has `setNow`.
     - Lessons: POST/PUT /api/sessions accept `lessonName` (string tags, creating the Lesson if new to the Subject; null clears); sessions come back with `lesson: {id, name} | null`. GET /api/lessons?subject= lists a Subject's Lessons by name. No management screen.
     - Due date: POST/PUT /api/sessions accept `dueDate` (`YYYY-MM-DD` string or null; else 400); a date-only `date` column returned as the same string. It never affects review scheduling.
+    - Practice: GET /api/practice?subject=&today=YYYY-MM-DD (client's local date) returns `{thisWeek, pinned}`: thisWeek is the session with the smallest `dueDate >= today` (null if none); pinned excludes it. Client: `/` Practice, `/library` (old `/sessions` redirects), `/progress` placeholder.
     - Settings: GET /api/settings, PUT /api/settings (`activeSubject` reads as "english" until chosen)
   - Storage (server/storage.ts): IStorage interface with MemStorage (dev) and PgStorage (prod)
     - PgStorage uses drizzle-orm/postgres-js; schema and zod types from shared/schema.ts
