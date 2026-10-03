@@ -17,7 +17,7 @@ import {
   type Subject,
 } from "@shared/schema";
 import { applyGrades } from "./grades";
-import { needsReview } from "./scheduling";
+import { needsReview, sessionRetrievability } from "./scheduling";
 import { drillWords } from "./drill";
 import {
   extractSpellingLists,
@@ -87,6 +87,13 @@ export async function registerRoutes(
     return { ...session, lesson: lesson ? { id: lesson.id, name: lesson.name } : null };
   };
 
+  // How well the session's words are retained (null until one is graded), for the card ring.
+  const withRetrievability = async <T extends Session>(session: T): Promise<T & { retrievability: number | null }> => {
+    const words = session.words.map((w) => w.trim());
+    const states = await storage.getReviewStates(session.subject, session.sessionType, words);
+    return { ...session, retrievability: sessionRetrievability(session.sessionType, words, states, now()) };
+  };
+
   // Resolves a lessonName to a lessonId: null (or blank) clears the tag, a
   // name new to the Subject creates its Lesson, otherwise the existing one is reused.
   const resolveLessonId = async (subject: Subject, lessonName: string | null) => {
@@ -112,6 +119,7 @@ export async function registerRoutes(
             ...(await withLesson(session)),
             testedCount: new Set(tested.map((s) => s.word)).size,
             needsReviewCount: drillWords(session.words, tested, "due", now()).length,
+            retrievability: sessionRetrievability(session.sessionType, words, tested, now()),
           };
         }),
       );
@@ -156,8 +164,8 @@ export async function registerRoutes(
         refreshers: Object.fromEntries(
           await Promise.all(SKILLS.map(async (skill) => [skill, (await dueWords(subject.data, skill)).length] as const)),
         ),
-        thisWeek: thisWeek ? await withLesson(thisWeek) : null,
-        pinned: await Promise.all(pinned.map(withLesson)),
+        thisWeek: thisWeek ? await withRetrievability(await withLesson(thisWeek)) : null,
+        pinned: await Promise.all(pinned.map(async (s) => withRetrievability(await withLesson(s)))),
       });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch practice" });

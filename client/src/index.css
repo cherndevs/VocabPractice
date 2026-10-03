@@ -17,7 +17,7 @@
   --muted-foreground: hsl(215.4, 16.3%, 46.9%);
   --accent: hsl(210, 40%, 96%);
   --accent-foreground: hsl(222.2, 84%, 4.9%);
-  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive: hsl(0, 72%, 51%);
   --destructive-foreground: hsl(210, 40%, 98%);
   --border: hsl(214.3, 31.8%, 91.4%);
   --input: hsl(214.3, 31.8%, 91.4%);
@@ -39,6 +39,15 @@
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: 8px;
+  --primary-tint: hsl(221.2, 83.2%, 53.3%, 0.1);
+  --success: hsl(142, 71%, 40%);
+  --warning: hsl(38, 92%, 46%);
+  --skill-writing: hsl(221.2, 83.2%, 53.3%);
+  --skill-writing-bg: hsl(221.2, 83.2%, 53.3%, 0.1);
+  --skill-reading: hsl(262, 60%, 55%);
+  --skill-reading-bg: hsl(262, 60%, 55%, 0.1);
+  --skill-speaking: hsl(172, 66%, 38%);
+  --skill-speaking-bg: hsl(172, 66%, 38%, 0.1);
 }
 
 .dark {
@@ -56,11 +65,20 @@
   --muted-foreground: hsl(215, 20.2%, 65.1%);
   --accent: hsl(217.2, 32.6%, 17.5%);
   --accent-foreground: hsl(210, 40%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive: hsl(0, 70%, 60%);
   --destructive-foreground: hsl(210, 40%, 98%);
   --border: hsl(217.2, 32.6%, 17.5%);
   --input: hsl(217.2, 32.6%, 17.5%);
   --ring: hsl(224.3, 76.3%, 94.1%);
+  --primary-tint: hsl(217.2, 91.2%, 59.8%, 0.16);
+  --success: hsl(142, 60%, 48%);
+  --warning: hsl(38, 92%, 55%);
+  --skill-writing: hsl(217.2, 91.2%, 65%);
+  --skill-writing-bg: hsl(217.2, 91.2%, 65%, 0.16);
+  --skill-reading: hsl(262, 70%, 72%);
+  --skill-reading-bg: hsl(262, 70%, 72%, 0.16);
+  --skill-speaking: hsl(172, 55%, 55%);
+  --skill-speaking-bg: hsl(172, 55%, 55%, 0.16);
 }
 
 @layer base {

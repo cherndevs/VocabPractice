@@ -40,7 +40,7 @@ export function LessonPicker({ subject, value, onChange }: LessonPickerProps) {
 
   return (
     <div data-testid="lesson-picker">
-      <div className="mb-2 text-sm font-medium text-foreground">Group with other sessions? (optional)</div>
+      <div className="mb-2 text-xs font-semibold text-muted-foreground">Group with other sessions? (optional)</div>
       <div className="flex flex-wrap gap-2">
         {chips.map((name) => {
           const selected = name === value;
@@ -49,8 +49,10 @@ export function LessonPicker({ subject, value, onChange }: LessonPickerProps) {
               key={name}
               type="button"
               size="sm"
-              variant={selected ? "default" : "outline"}
-              className="rounded-full"
+              variant="outline"
+              className={`h-9 rounded-full border-[1.5px] px-3.5 ${
+                selected ? "border-primary bg-primary-tint text-primary hover:bg-primary-tint hover:text-primary" : ""
+              }`}
               aria-pressed={selected}
               onClick={() => onChange(selected ? null : name)}
               data-testid={`chip-lesson-${name}`}
@@ -63,7 +65,7 @@ export function LessonPicker({ subject, value, onChange }: LessonPickerProps) {
           type="button"
           size="sm"
           variant="outline"
-          className="rounded-full border-dashed"
+          className="h-9 rounded-full border-[1.5px] border-dashed px-3.5 text-muted-foreground"
           onClick={() => setNewOpen((open) => !open)}
           data-testid="chip-lesson-new"
         >
@@ -71,7 +73,7 @@ export function LessonPicker({ subject, value, onChange }: LessonPickerProps) {
         </Button>
       </div>
       {newOpen && (
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2.5 flex gap-2">
           <Input
             autoFocus
             value={draft}

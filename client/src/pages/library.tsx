@@ -1,11 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
+import { Plus, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
 import { usePinSession } from "@/hooks/use-pin-session";
+import SkillRing from "@/components/skill-ring";
 import SessionTypeIcon from "@/components/session-type-icon";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META } from "@/lib/subjects";
@@ -15,7 +16,7 @@ import type { SessionWithLesson } from "@shared/schema";
 import { groupSessionsByLesson } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
-type SessionWithTested = SessionWithLesson & { needsReviewCount: number };
+type SessionWithTested = SessionWithLesson & { needsReviewCount: number; retrievability: number | null };
 
 export default function Library() {
   const queryClient = useQueryClient();
@@ -78,39 +79,35 @@ export default function Library() {
       onEdit={() => navigate(`/edit-session/${session.id}`)}
     >
       <Link href={`/practice/${session.id}`}>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <h3 className="flex min-w-0 items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
-              <SessionTypeIcon sessionType={session.sessionType} className="w-4 h-4" data-testid={`icon-session-type-${session.id}`} />
-              <span className="truncate">{session.title}</span>
+        <CardContent className="flex items-center gap-3 px-3.5 py-3">
+          <div
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+              session.sessionType === "reading" ? "bg-skill-reading-bg" : "bg-skill-writing-bg"
+            }`}
+          >
+            <SessionTypeIcon sessionType={session.sessionType} className="w-[18px] h-[18px]" data-testid={`icon-session-type-${session.id}`} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-sm font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
+              {session.title}
             </h3>
-            <div className="flex shrink-0 items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className={session.pinnedAt ? 'text-primary' : 'text-muted-foreground'}
-                aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}
-                onClick={(e) => handleTogglePin(e, session)}
-                data-testid={`button-pin-${session.id}`}
-              >
-                <Pin className="w-4 h-4" />
-              </Button>
-            </div>
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              <span data-testid={`text-session-date-${session.id}`}>{formatDueDate(session.dueDate)}</span>
+              {" · "}
+              <span data-testid={`text-session-needs-review-${session.id}`}>{session.needsReviewCount} due to review</span>
+            </p>
           </div>
-          <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [&>span]:whitespace-nowrap">
-              <span className="flex items-center space-x-1">
-                <Calendar className="w-3 h-3" />
-                <span data-testid={`text-session-date-${session.id}`}>
-                  {formatDueDate(session.dueDate)}
-                </span>
-              </span>
-              <span data-testid={`text-session-needs-review-${session.id}`}>
-                {session.needsReviewCount} due to review
-              </span>
-            </div>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={session.pinnedAt ? 'text-primary' : 'text-muted-foreground'}
+            aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}
+            onClick={(e) => handleTogglePin(e, session)}
+            data-testid={`button-pin-${session.id}`}
+          >
+            <Pin className="w-4 h-4" />
+          </Button>
+          <SkillRing retrievability={session.retrievability} data-testid={`ring-session-${session.id}`} />
         </CardContent>
       </Link>
     </SwipeableCard>

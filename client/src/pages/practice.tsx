@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { BookOpen, PenLine, Pin } from "lucide-react";
+import { BookOpen, SquarePen, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { usePinSession } from "@/hooks/use-pin-session";
 import SessionTypeIcon from "@/components/session-type-icon";
+import SkillRing from "@/components/skill-ring";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { formatDueDate, localToday } from "@/lib/due-date";
 import type { Skill, SessionWithLesson } from "@shared/schema";
@@ -13,11 +14,14 @@ import type { Skill, SessionWithLesson } from "@shared/schema";
 interface PracticeData {
   /** Words needing review per skill, before the Refresher size cap. */
   refreshers: Record<Skill, number>;
-  thisWeek: SessionWithLesson | null;
-  pinned: SessionWithLesson[];
+  thisWeek: PracticeSession | null;
+  pinned: PracticeSession[];
 }
 
-function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onTogglePin: () => void }) {
+// The practice endpoint adds how well a session's words are retained (null until one is graded).
+type PracticeSession = SessionWithLesson & { retrievability: number | null };
+
+function SessionCard({ session, onTogglePin }: { session: PracticeSession; onTogglePin: () => void }) {
   const reading = session.sessionType === "reading";
   const meta = `${formatDueDate(session.dueDate)} · ${session.wordCount} ${session.wordCount === 1 ? "word" : "words"}`;
   return (
@@ -26,7 +30,7 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
         <CardContent className="flex items-center gap-3 px-3.5 py-3 cursor-pointer">
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-              reading ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"
+              reading ? "bg-skill-reading-bg text-skill-reading" : "bg-skill-writing-bg text-skill-writing"
             }`}
           >
             <SessionTypeIcon
@@ -43,6 +47,7 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
               {meta}
             </p>
           </div>
+          <SkillRing retrievability={session.retrievability} data-testid={`ring-session-${session.id}`} />
           <Button
             variant="ghost"
             size="icon"
@@ -63,9 +68,9 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
   );
 }
 
-export const REFRESHERS: { skill: Skill; title: string; Icon: typeof PenLine; tint: string }[] = [
-  { skill: "spelling", title: "Spelling refresher", Icon: PenLine, tint: "bg-blue-100 text-blue-600" },
-  { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-purple-100 text-purple-600" },
+export const REFRESHERS: { skill: Skill; title: string; Icon: typeof SquarePen; tint: string }[] = [
+  { skill: "spelling", title: "Spelling refresher", Icon: SquarePen, tint: "bg-skill-writing-bg text-skill-writing" },
+  { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-skill-reading-bg text-skill-reading" },
 ];
 
 function Refreshers({ counts }: { counts: Record<Skill, number> }) {

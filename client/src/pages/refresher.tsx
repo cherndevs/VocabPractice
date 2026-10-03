@@ -67,7 +67,7 @@ export default function Refresher() {
   if (words.length === 0) {
     return (
       <div className="px-4 py-12 text-center space-y-4" data-testid="section-nothing-due">
-        <CheckCircle2 className="w-10 h-10 mx-auto text-green-600" />
+        <CheckCircle2 className="w-10 h-10 mx-auto text-success" />
         <p className="text-xl font-semibold text-foreground">Nothing needs review</p>
         <Button variant="outline" onClick={() => navigate("/")}>Back to Practice</Button>
       </div>

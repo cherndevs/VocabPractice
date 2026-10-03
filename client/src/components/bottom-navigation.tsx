@@ -1,11 +1,11 @@
 import { useLocation } from "wouter";
-import { Dumbbell, Library, BarChart3, Settings } from "lucide-react";
+import { Zap, Layers, TrendingUp, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const TABS = [
-  { path: "/", label: "Practice", testId: "nav-practice", Icon: Dumbbell },
-  { path: "/library", label: "Library", testId: "nav-library", Icon: Library },
-  { path: "/progress", label: "Progress", testId: "nav-progress", Icon: BarChart3 },
+  { path: "/", label: "Practice", testId: "nav-practice", Icon: Zap },
+  { path: "/library", label: "Library", testId: "nav-library", Icon: Layers },
+  { path: "/progress", label: "Progress", testId: "nav-progress", Icon: TrendingUp },
   { path: "/settings", label: "Settings", testId: "nav-settings", Icon: Settings },
 ];
 
