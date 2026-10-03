@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Pin, PartyPopper, CheckCircle2, Mic, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { usePinSession } from "@/hooks/use-pin-session";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { gradeOutbox } from "@/lib/grade-sync";
 import {
@@ -79,23 +80,13 @@ export default function PracticeSession() {
     pauseBetweenWords: settings?.pauseBetweenWords ?? 1500,
     enablePauseButton: settings?.enablePauseButton ?? true,
   };
-  const updateSessionMutation = useMutation({
-    mutationFn: async (updates: Partial<Session>) => {
-      const response = await apiRequest("PUT", `/api/sessions/${id}`, updates);
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
-    },
-  });
+  const pinSession = usePinSession();
 
   const togglePin = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!session) return;
-    const nextPinnedAt = session.pinnedAt ? null : new Date().toISOString();
-    await updateSessionMutation.mutateAsync({ pinnedAt: nextPinnedAt as unknown as any });
+    await pinSession.mutateAsync(session);
   };
 
   // Make sure stopAllPlayback logs what it's doing

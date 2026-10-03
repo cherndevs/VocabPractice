@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Plus, ChevronRight, Calendar, FileText, Pin, Pencil, BookOpen } from "lucide-react";
+import { Plus, ChevronRight, Calendar, FileText, Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
+import { usePinSession } from "@/hooks/use-pin-session";
+import SessionTypeIcon from "@/components/session-type-icon";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META } from "@/lib/subjects";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
@@ -56,29 +58,12 @@ export default function Library() {
     deleteSessionMutation.mutate(sessionId);
   };
 
-  const pinMutation = useMutation({
-    mutationFn: async ({ id, pinnedAt }: { id: string; pinnedAt: string | null }) => {
-      const response = await fetch(`/api/sessions/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pinnedAt }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update pin state');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
-    },
-  });
+  const pinSession = usePinSession();
 
   const handleTogglePin = (e: React.MouseEvent, session: SessionWithTested) => {
     e.preventDefault();
     e.stopPropagation();
-    const nextPinnedAt = session.pinnedAt ? null : new Date().toISOString();
-    pinMutation.mutate({ id: session.id, pinnedAt: nextPinnedAt });
+    pinSession.mutate(session);
   };
 
   // Lesson headings first, then untagged sessions; pinned-first within each group.
@@ -96,11 +81,7 @@ export default function Library() {
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="flex items-center gap-2 font-medium text-foreground" data-testid={`text-session-title-${session.id}`}>
-              {session.sessionType === "reading" ? (
-                <BookOpen className="w-4 h-4 shrink-0 text-purple-600" aria-label="Reading session" data-testid={`icon-session-type-${session.id}`} />
-              ) : (
-                <Pencil className="w-4 h-4 shrink-0 text-blue-600" aria-label="Spelling session" data-testid={`icon-session-type-${session.id}`} />
-              )}
+              <SessionTypeIcon sessionType={session.sessionType} className="w-4 h-4" data-testid={`icon-session-type-${session.id}`} />
               {session.title}
             </h3>
             <div className="flex items-center gap-2">

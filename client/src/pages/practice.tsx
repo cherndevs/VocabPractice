@@ -1,9 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Pin, Pencil, BookOpen } from "lucide-react";
+import { Pin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
+import { usePinSession } from "@/hooks/use-pin-session";
+import SessionTypeIcon from "@/components/session-type-icon";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { formatDueDate, localToday } from "@/lib/due-date";
 import type { SessionWithLesson } from "@shared/schema";
@@ -15,7 +17,6 @@ interface PracticeData {
 
 function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onTogglePin: () => void }) {
   const reading = session.sessionType === "reading";
-  const Icon = reading ? BookOpen : Pencil;
   const meta = `${formatDueDate(session.dueDate)} · ${session.wordCount} ${session.wordCount === 1 ? "word" : "words"}`;
   return (
     <Card className="word-card hover:shadow-md transition-shadow" data-testid={`card-session-${session.id}`}>
@@ -26,9 +27,9 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
               reading ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"
             }`}
           >
-            <Icon
+            <SessionTypeIcon
+              sessionType={session.sessionType}
               className="w-[18px] h-[18px]"
-              aria-label={reading ? "Reading session" : "Spelling session"}
               data-testid={`icon-session-type-${session.id}`}
             />
           </div>
@@ -61,7 +62,6 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
 }
 
 export default function Practice() {
-  const queryClient = useQueryClient();
   const { subject } = useActiveSubject();
   // The client's own local date decides which due dates are still upcoming.
   const today = localToday();
@@ -76,22 +76,7 @@ export default function Practice() {
   });
   const isLoading = !subject || loading;
 
-  const pinMutation = useMutation({
-    mutationFn: async (session: SessionWithLesson) => {
-      const pinnedAt = session.pinnedAt ? null : new Date().toISOString();
-      const response = await fetch(`/api/sessions/${session.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pinnedAt }),
-      });
-      if (!response.ok) throw new Error("Failed to update pin state");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
-    },
-  });
+  const pinSession = usePinSession();
 
   const heading = "text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3";
 
@@ -119,7 +104,7 @@ export default function Practice() {
             <section data-testid="section-this-week">
               <h2 className={heading}>This week</h2>
               {data?.thisWeek ? (
-                <SessionCard session={data.thisWeek} onTogglePin={() => pinMutation.mutate(data.thisWeek!)} />
+                <SessionCard session={data.thisWeek} onTogglePin={() => pinSession.mutate(data.thisWeek!)} />
               ) : (
                 <p className="text-sm text-muted-foreground" data-testid="text-no-this-week">
                   No sessions with an upcoming due date.
@@ -131,7 +116,7 @@ export default function Practice() {
               {data?.pinned.length ? (
                 <div className="space-y-3">
                   {data.pinned.map((session) => (
-                    <SessionCard key={session.id} session={session} onTogglePin={() => pinMutation.mutate(session)} />
+                    <SessionCard key={session.id} session={session} onTogglePin={() => pinSession.mutate(session)} />
                   ))}
                 </div>
               ) : (
