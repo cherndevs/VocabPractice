@@ -15,7 +15,7 @@ import type { SessionWithLesson } from "@shared/schema";
 import { groupSessionsByLesson } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
-type SessionWithTested = SessionWithLesson & { testedCount: number; needsReviewCount: number };
+type SessionWithTested = SessionWithLesson & { needsReviewCount: number };
 
 export default function Library() {
   const queryClient = useQueryClient();
@@ -105,14 +105,8 @@ export default function Library() {
                   {formatDueDate(session.dueDate)}
                 </span>
               </span>
-              <span data-testid={`text-session-word-count-${session.id}`}>
-                {session.wordCount} Words
-              </span>
-              <span data-testid={`text-session-tested-${session.id}`}>
-                {session.testedCount} / {session.wordCount} tested
-              </span>
               <span data-testid={`text-session-needs-review-${session.id}`}>
-                {session.needsReviewCount} to review
+                {session.needsReviewCount} due to review
               </span>
             </div>
             <ChevronRight className="w-4 h-4 shrink-0" />
