@@ -1,5 +1,7 @@
 export interface ExtractedCandidate {
   title: string;
+  /** The Lesson (school unit) the sheet says this list belongs to, if any. */
+  lesson: string | null;
   words: string[];
 }
 
@@ -37,11 +39,12 @@ export function sanitizeExtractedCandidates(
   const fallbackCount = cleaned.filter((c) => c.title === null).length;
   let fallbackIndex = 0;
 
-  const candidates = cleaned.map(({ title, words }) => {
-    if (title !== null) return { title, words };
+  const candidates = cleaned.map(({ title, lesson, words }) => {
+    if (title !== null) return { title, lesson, words };
     fallbackIndex += 1;
     return {
       title: fallbackCount > 1 ? `${defaultTitle} (${fallbackIndex})` : defaultTitle,
+      lesson,
       words,
     };
   });
@@ -50,7 +53,9 @@ export function sanitizeExtractedCandidates(
 }
 
 /** Sanitizes one candidate, or returns null if it has no valid words left. */
-function sanitizeOne(candidate: unknown): { title: string | null; words: string[] } | null {
+function sanitizeOne(
+  candidate: unknown,
+): { title: string | null; lesson: string | null; words: string[] } | null {
   if (!isRecord(candidate)) return null;
 
   const words = Array.isArray(candidate.words)
@@ -60,7 +65,8 @@ function sanitizeOne(candidate: unknown): { title: string | null; words: string[
   if (words.length === 0) return null;
 
   const title = typeof candidate.title === "string" ? candidate.title.trim() : "";
-  return { title: title.length > 0 ? title : null, words };
+  const lesson = typeof candidate.lesson === "string" ? candidate.lesson.trim() : "";
+  return { title: title.length > 0 ? title : null, lesson: lesson.length > 0 ? lesson : null, words };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

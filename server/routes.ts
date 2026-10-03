@@ -6,8 +6,11 @@ import {
   gradeBatchSchema,
   insertSessionSchema,
   insertSettingsSchema,
+  lessonNameSchema,
   skillSchema,
   subjectSchema,
+  type Session,
+  type Subject,
 } from "@shared/schema";
 import { applyGrades } from "./grades";
 import { needsReview } from "./scheduling";
@@ -72,6 +75,19 @@ export async function registerRoutes(
     },
   );
 
+  // The Lesson a session is tagged with, as the API reports it.
+  const withLesson = async <T extends Session>(session: T): Promise<T & { lesson: { id: string; name: string } | null }> => {
+    const lesson = session.lessonId ? await storage.getLesson(session.lessonId) : undefined;
+    return { ...session, lesson: lesson ? { id: lesson.id, name: lesson.name } : null };
+  };
+
+  // Resolves a lessonName to a lessonId: null (or blank) clears the tag, a
+  // name new to the Subject creates its Lesson, otherwise the existing one is reused.
+  const resolveLessonId = async (subject: Subject, lessonName: string | null) => {
+    const name = lessonName?.trim();
+    return name ? (await storage.findOrCreateLesson(subject, name)).id : null;
+  };
+
   // Sessions routes
   app.get("/api/sessions", async (req, res) => {
     const subject = subjectSchema.safeParse(req.query.subject);
@@ -86,12 +102,24 @@ export async function registerRoutes(
         sessions.map(async (session) => {
           const words = session.words.map((w) => w.trim());
           const tested = await storage.getReviewStates(session.subject, session.sessionType, words);
-          return { ...session, testedCount: new Set(tested.map((s) => s.word)).size };
+          return { ...(await withLesson(session)), testedCount: new Set(tested.map((s) => s.word)).size };
         }),
       );
       res.json(withTested);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch sessions" });
+    }
+  });
+
+  app.get("/api/lessons", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    if (!subject.success) {
+      return res.status(400).json({ message: "A valid subject is required" });
+    }
+    try {
+      res.json(await storage.getLessons(subject.data));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch lessons" });
     }
   });
 
@@ -101,7 +129,7 @@ export async function registerRoutes(
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
-      res.json(session);
+      res.json(await withLesson(session));
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch session" });
     }
@@ -110,8 +138,10 @@ export async function registerRoutes(
   app.post("/api/sessions", async (req, res) => {
     try {
       const sessionData = insertSessionSchema.parse(req.body);
-      const session = await storage.createSession(sessionData);
-      res.json(session);
+      const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
+      const lessonId = await resolveLessonId(sessionData.subject, lessonName);
+      const session = await storage.createSession({ ...sessionData, lessonId });
+      res.json(await withLesson(session));
     } catch (error) {
       res.status(400).json({ message: "Invalid session data" });
     }
@@ -120,7 +150,13 @@ export async function registerRoutes(
   app.put("/api/sessions/:id", async (req, res) => {
     try {
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
-      const updates = { ...req.body } as any;
+      const { lessonName, ...updates } = req.body as any;
+      if (lessonName !== undefined && !lessonNameSchema.safeParse(lessonName).success) {
+        return res.status(400).json({ message: "lessonName must be a string or null" });
+      }
+      // A client can't set the foreign key directly; the tag goes by name.
+      delete updates.lessonId;
+      delete updates.lesson;
 
       // A session's Subject (ADR-0005) and Session Type (ADR-0008) are fixed
       // at creation. Repeating the current value is harmless.
@@ -140,11 +176,19 @@ export async function registerRoutes(
         updates.pinnedAt = updates.pinnedAt ? new Date(updates.pinnedAt) : null;
       }
 
+      if (lessonName !== undefined) {
+        const existing = await storage.getSession(req.params.id);
+        if (!existing) {
+          return res.status(404).json({ message: "Session not found" });
+        }
+        updates.lessonId = await resolveLessonId(existing.subject, lessonName);
+      }
+
       const session = await storage.updateSession(req.params.id, updates);
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
-      res.json(session);
+      res.json(await withLesson(session));
     } catch (error) {
       console.error("Failed to update session", error);
       res.status(500).json({ message: "Failed to update session" });

@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { LessonPicker } from "@/components/lesson-picker";
 import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
@@ -55,9 +56,9 @@ function defaultSessionTitle(type: SessionType): string {
   return `${label} Session ${new Date().toLocaleDateString()}`;
 }
 
-/** Splits a candidate's `words`/`title` back into the two pieces of state the edit-words screen edits. */
-function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; title: string } {
-  return { words: candidate.words, title: candidate.title };
+/** Splits a candidate into the pieces of state the edit-words screen edits. */
+function loadCandidateFields(candidate: ExtractedCandidate): { words: string[]; title: string; lesson: string | null } {
+  return { words: candidate.words, title: candidate.title, lesson: candidate.lesson };
 }
 
 export default function CreateSession() {
@@ -71,6 +72,9 @@ export default function CreateSession() {
   const [sessionType, setSessionType] = useState<SessionType | null>(null);
   const [words, setWords] = useState<string[]>([""]); // Initialize with one empty word
   const [sessionTitle, setSessionTitle] = useState("");
+  // Optional Lesson tag, filled from the sheet when it names one and loaded
+  // afresh for each candidate in a multi-unit batch.
+  const [lessonName, setLessonName] = useState<string | null>(null);
 
   // Multi-candidate selection state. `queue` holds the candidates the user
   // chose to create, one at a time through the same edit-words screen used
@@ -91,12 +95,13 @@ export default function CreateSession() {
   const [extractionError, setExtractionError] = useState<"api-error" | "empty" | null>(null);
 
   const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: InsertSession) => {
+    mutationFn: async (sessionData: InsertSession & { lessonName: string | null }) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
     },
   });
   const handleImageCapture = async (imageData: string) => {
@@ -118,9 +123,10 @@ export default function CreateSession() {
       }
 
       if (candidates.length === 1) {
-        const { words, title } = loadCandidateFields(candidates[0]);
+        const { words, title, lesson } = loadCandidateFields(candidates[0]);
         setWords(words);
         setSessionTitle(title);
+        setLessonName(lesson);
         setCurrentStep("edit-words");
         return;
       }
@@ -149,6 +155,7 @@ export default function CreateSession() {
   const handleEnterWordsManually = () => {
     setWords([""]);
     setSessionTitle("");
+    setLessonName(null);
     setExtractionError(null);
     setCurrentStep("edit-words");
   };
@@ -161,6 +168,7 @@ export default function CreateSession() {
   const handleRetake = () => {
     setWords([""]);
     setSessionTitle("");
+    setLessonName(null);
     setMultiCandidates([]);
     setSelected([]);
     setQueue([]);
@@ -178,11 +186,12 @@ export default function CreateSession() {
     const chosen = multiCandidates.filter((_, i) => selected[i]);
     if (chosen.length === 0) return;
 
-    const { words, title } = loadCandidateFields(chosen[0]);
+    const { words, title, lesson } = loadCandidateFields(chosen[0]);
     setQueue(chosen);
     setQueueIndex(0);
     setWords(words);
     setSessionTitle(title);
+    setLessonName(lesson);
     setCurrentStep("edit-words");
   };
 
@@ -253,6 +262,7 @@ export default function CreateSession() {
         title,
         subject,
         sessionType,
+        lessonName,
         words: filteredWords,
         wordCount: filteredWords.length,
         status: "new",
@@ -272,10 +282,11 @@ export default function CreateSession() {
     // than treating this one creation as the end of the flow.
     const nextIndex = queueIndex + 1;
     if (nextIndex < queue.length) {
-      const { words: nextWords, title: nextTitle } = loadCandidateFields(queue[nextIndex]);
+      const { words: nextWords, title: nextTitle, lesson: nextLesson } = loadCandidateFields(queue[nextIndex]);
       setQueueIndex(nextIndex);
       setWords(nextWords);
       setSessionTitle(nextTitle);
+      setLessonName(nextLesson);
       return;
     }
 
@@ -494,6 +505,12 @@ export default function CreateSession() {
               data-testid="input-session-title"
             />
           </div>
+
+          {subject && (
+            <div className="mb-6">
+              <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />
+            </div>
+          )}
 
           {/* Word List */}
           <div className="space-y-3 mb-6">
