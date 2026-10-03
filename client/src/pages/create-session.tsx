@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, SquarePen, Plus, Trash2, Check } from "lucide-react";
+import { BookOpen, SquarePen, Plus, Trash2, Check, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -87,6 +86,8 @@ export default function CreateSession() {
   const [selected, setSelected] = useState<boolean[]>([]);
   const [queue, setQueue] = useState<ExtractedCandidate[]>([]);
   const [queueIndex, setQueueIndex] = useState(0);
+  // What the Created screen reports: the last session saved, and how many this run made.
+  const [created, setCreated] = useState<{ title: string; wordCount: number; sessions: number } | null>(null);
 
   // The most recently captured photo, kept so a failed extraction can be
   // retried without asking the user to recapture. Cleared on retake.
@@ -299,12 +300,10 @@ export default function CreateSession() {
       return;
     }
 
+    setCreated({ title, wordCount: filteredWords.length, sessions: Math.max(queue.length, 1) });
     setQueue([]);
     setQueueIndex(0);
     setCurrentStep("session-created");
-    setTimeout(() => {
-      navigate("/library");
-    }, 2000);
   };
 
   const goBack = () => {
@@ -336,269 +335,260 @@ export default function CreateSession() {
     }
   };
 
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case "type":
-        return "Create New Session - Step 1";
-      case "camera":
-        return "Create New Session - Step 2";
-      case "selection":
-        return "Create New Session - Step 3";
-      case "processing":
-        return "Create New Session - Step 4";
-      case "edit-words":
-        return "Create New Session - Step 5";
-      case "session-created":
-        return "Session Created!";
-      default:
-        return "Create New Session";
-    }
+  // Numbering follows the design canvas ("Step N/6"); the last step, Created, has no header.
+  const STEP_LABELS: Partial<Record<CreateSessionStep, string>> = {
+    type: "Step 1/6 · Session type",
+    camera: "Step 2/6 · Capture",
+    selection: "Step 3/6 · Select lists",
+    processing: "Step 4/6 · Processing",
+    "edit-words": "Step 5/6 · Review",
   };
 
+  const stepLabel = STEP_LABELS[currentStep];
+  const canGoBack = currentStep !== "processing";
+  // One pinned footer per step, so the primary action never scrolls away.
+  const footer = "flex shrink-0 flex-col gap-2 border-t border-border p-4";
+  const fieldLabel = "mb-2 block text-xs font-semibold text-muted-foreground";
+
   return (
-    <div className="fade-in">
-      {/* Header */}
-      <div className="px-4 py-6 bg-card border-b border-border">
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+    <div className="fade-in flex h-[100dvh] flex-col">
+      {stepLabel && (
+        <div className="flex shrink-0 items-center px-3 pt-4">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={goBack}
-            className="p-2"
+            disabled={!canGoBack}
+            aria-label={currentStep === "type" ? "Cancel" : "Back"}
+            className="h-11 w-11 text-muted-foreground"
             data-testid="button-go-back"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <X className="h-4 w-4" />
           </Button>
-          <h1 className="text-xl font-semibold text-foreground">{getStepTitle()}</h1>
+          <h1 className="ml-1 text-xs font-bold uppercase tracking-wider text-muted-foreground" data-testid="text-step-label">
+            {stepLabel}
+          </h1>
         </div>
-      </div>
+      )}
 
-      {/* Step Content */}
       {currentStep === "type" && (
-        <div className="px-4 py-6">
-          <h2 className="text-xl font-bold text-foreground mb-1">What are you creating?</h2>
-          <p className="text-sm text-muted-foreground mb-5">This decides which list the words go into.</p>
-          <div role="radiogroup" aria-label="Session type" className="space-y-3">
-            {SESSION_TYPE_OPTIONS.map(({ type, title, description, Icon, iconClass }) => {
-              const isSelected = sessionType === type;
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  onClick={() => setSessionType(type)}
-                  data-testid={`option-session-type-${type}`}
-                  className={`flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${
-                    isSelected ? "border-primary bg-primary/10" : "border-input bg-card"
-                  }`}
-                >
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${iconClass}`}>
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="flex-1">
-                    <span className="block font-semibold text-foreground">{title}</span>
-                    <span className="block text-xs text-muted-foreground">{description}</span>
-                  </span>
-                  <span
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                      isSelected ? "border-primary" : "border-input"
+        <>
+          <div className="flex-1 overflow-y-auto">
+            <h2 className="mx-5 mb-1 mt-2 text-xl font-bold text-foreground">What are you creating?</h2>
+            <p className="mx-5 mb-5 text-[13px] leading-snug text-muted-foreground">This decides which list the words go into.</p>
+            <div role="radiogroup" aria-label="Session type" className="space-y-3 px-5">
+              {SESSION_TYPE_OPTIONS.map(({ type, title, description, Icon, iconClass }) => {
+                const isSelected = sessionType === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => setSessionType(type)}
+                    data-testid={`option-session-type-${type}`}
+                    className={`flex w-full items-center gap-3.5 rounded-xl border-[1.5px] p-4 text-left ${
+                      isSelected ? "border-primary bg-primary-tint" : "border-input bg-card"
                     }`}
                   >
-                    {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
-                  </span>
-                </button>
+                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] ${iconClass}`}>
+                      <Icon className="h-[22px] w-[22px]" />
+                    </span>
+                    <span className="flex-1">
+                      <span className="block text-[15px] font-semibold text-foreground">{title}</span>
+                      <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{description}</span>
+                    </span>
+                    <span
+                      className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] ${
+                        isSelected ? "border-primary" : "border-input"
+                      }`}
+                    >
+                      {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className={footer}>
+            <Button className="h-[46px] w-full" disabled={!sessionType} onClick={() => setCurrentStep("camera")} data-testid="button-continue-session-type">
+              Continue
+            </Button>
+          </div>
+        </>
+      )}
+
+      {currentStep === "camera" && <CameraCapture onImageCapture={handleImageCapture} onSkip={handleSkipCamera} />}
+
+      {currentStep === "selection" && (
+        <>
+          <h2 className="mx-5 mb-1 mt-3 shrink-0 text-xl font-bold text-foreground">
+            We found {multiCandidates.length} {multiCandidates.length === 1 ? "list" : "lists"} in this photo
+          </h2>
+          <p className="mx-5 mb-4 shrink-0 text-[13px] leading-snug text-muted-foreground">
+            Pick which ones to add. Each is processed one at a time in the next steps.
+          </p>
+          <div className="flex-1 space-y-2.5 overflow-y-auto px-5">
+            {multiCandidates.map((candidate, index) => {
+              const checked = selected[index] ?? false;
+              const meta = [candidate.lesson, `${candidate.words.length} ${candidate.words.length === 1 ? "word" : "words"}`]
+                .filter(Boolean)
+                .join(" · ");
+              return (
+                <div
+                  key={index}
+                  role="checkbox"
+                  aria-checked={checked}
+                  tabIndex={0}
+                  onClick={() => handleToggleCandidate(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleToggleCandidate(index);
+                    }
+                  }}
+                  className={`flex cursor-pointer items-center gap-3 rounded-[10px] border-[1.5px] p-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                    checked ? "border-primary bg-primary-tint" : "border-input bg-card"
+                  }`}
+                  data-testid={`candidate-${index}`}
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                    <FileText className="h-5 w-5" strokeWidth={1.5} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-foreground">{candidate.title}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">{meta}</div>
+                  </div>
+                  <div
+                    className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-md border-[1.5px] ${
+                      checked ? "border-primary bg-primary text-primary-foreground" : "border-input bg-card"
+                    }`}
+                    data-testid={`checkbox-candidate-${index}`}
+                  >
+                    {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                  </div>
+                </div>
               );
             })}
           </div>
-          <Button
-            className="mt-6 w-full"
-            disabled={!sessionType}
-            onClick={() => setCurrentStep("camera")}
-            data-testid="button-continue-session-type"
-          >
-            Continue
-          </Button>
-        </div>
-      )}
-
-      {currentStep === "camera" && (
-        <CameraCapture
-          onImageCapture={handleImageCapture}
-          onSkip={handleSkipCamera}
-        />
-      )}
-
-      {currentStep === "selection" && (
-        <div className="px-4 py-6">
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-foreground mb-2">Multiple Units Found</h2>
-            <p className="text-sm text-muted-foreground">
-              This worksheet has more than one spelling list. Choose which ones to create.
-            </p>
+          <div className={footer}>
+            <Button onClick={handleConfirmSelection} className="h-[46px] w-full" disabled={!selected.some(Boolean)} data-testid="button-confirm-selection">
+              Continue with {selected.filter(Boolean).length}
+            </Button>
+            <Button variant="outline" onClick={handleRetake} className="h-[46px] w-full" data-testid="button-retake-photo">
+              Retake Photo
+            </Button>
           </div>
-
-          <div className="space-y-3 mb-6">
-            {multiCandidates.map((candidate, index) => (
-              <label
-                key={index}
-                className="flex items-center space-x-3 p-3 bg-card rounded-lg border border-border cursor-pointer"
-                data-testid={`candidate-${index}`}
-              >
-                <Checkbox
-                  checked={selected[index] ?? false}
-                  onCheckedChange={() => handleToggleCandidate(index)}
-                  data-testid={`checkbox-candidate-${index}`}
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-foreground">{candidate.title}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {candidate.words.length} {candidate.words.length === 1 ? "word" : "words"}
-                  </div>
-                </div>
-              </label>
-            ))}
-          </div>
-
-          <Button
-            onClick={handleConfirmSelection}
-            className="w-full mb-4"
-            disabled={!selected.some(Boolean)}
-            data-testid="button-confirm-selection"
-          >
-            Continue
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleRetake}
-            className="w-full"
-            data-testid="button-retake-photo"
-          >
-            Retake Photo
-          </Button>
-        </div>
+        </>
       )}
 
       {currentStep === "processing" && (
-        <div className="px-4 py-12 flex flex-col items-center justify-center">
-          <div className="status-indicator w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-primary-foreground animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-          </div>
-          <div className="text-xl font-medium text-foreground mb-2">Analyzing image...</div>
-          <div className="text-sm text-muted-foreground">This can take a few seconds.</div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-3.5 px-8">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary" />
+          <div className="text-lg font-semibold text-foreground">Reading the worksheet…</div>
+          <div className="text-sm text-muted-foreground">This usually takes a few seconds.</div>
         </div>
       )}
 
       {currentStep === "edit-words" && (
-        <div className="px-4 py-6">
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-foreground mb-2">Review & Edit Your Word List</h2>
-            <p className="text-sm text-muted-foreground">Make any necessary changes to the extracted words or add new ones.</p>
+        <>
+          <div className="flex-1 space-y-6 overflow-y-auto px-5 pb-6 pt-3">
             {queue.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="-mb-2 text-xs text-muted-foreground">
                 Session {queueIndex + 1} of {queue.length}
               </p>
             )}
-          </div>
 
-          {/* Session Title */}
-          <div className="mb-6">
-            <Input
-              placeholder="Session title (optional)"
-              value={sessionTitle}
-              onChange={(e) => setSessionTitle(e.target.value)}
-              className="w-full"
-              data-testid="input-session-title"
-            />
-          </div>
-
-          {subject && (
-            <div className="mb-6">
-              <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />
+            <div>
+              <label htmlFor="session-title" className={fieldLabel}>
+                Session title (optional)
+              </label>
+              <Input
+                id="session-title"
+                placeholder={sessionType ? `e.g. ${defaultSessionTitle(sessionType)}` : "Session title"}
+                value={sessionTitle}
+                onChange={(e) => setSessionTitle(e.target.value)}
+                className="h-[42px] w-full border-[1.5px] text-[15px]"
+                data-testid="input-session-title"
+              />
             </div>
-          )}
 
-          <div className="mb-6">
+            {subject && <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />}
+
             <DueDateField value={dueDate} onChange={setDueDate} />
-          </div>
 
-          {/* Word List */}
-          <div className="space-y-3 mb-6">
-            {words.map((word, index) => (
-              <div key={index} className="flex items-center space-x-3 p-3 bg-card rounded-lg border border-border">
-                <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
-                <Input
-                  value={word}
-                  onChange={(e) => handleWordChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, index)} /* NEW: Added onKeyDown handler */
-                  className="flex-1 bg-transparent border-none outline-none"
-                  data-testid={`input-word-${index}`}
-                  placeholder="Enter word..." /* NEW: Added placeholder */
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveWord(index)}
-                  className="p-1 text-destructive hover:bg-destructive/10"
-                  data-testid={`button-remove-word-${index}`}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+            <div>
+              <div className={fieldLabel}>Words ({words.length})</div>
+              <div className="space-y-3">
+                {words.map((word, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="w-5 shrink-0 text-right text-[13px] font-semibold text-muted-foreground">{index + 1}</span>
+                    <Input
+                      value={word}
+                      onChange={(e) => handleWordChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      className="h-[42px] flex-1 border-[1.5px] text-[15px]"
+                      data-testid={`input-word-${index}`}
+                      placeholder="Word"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveWord(index)}
+                      aria-label="Remove word"
+                      className="text-muted-foreground hover:bg-transparent hover:text-destructive"
+                      data-testid={`button-remove-word-${index}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ))}
+              <Button
+                variant="ghost"
+                onClick={handleAddWord}
+                className="mt-1 h-10 gap-1.5 px-1 font-semibold text-primary hover:bg-transparent hover:text-primary"
+                data-testid="button-add-word"
+              >
+                <Plus className="h-4 w-4" />
+                Add word
+              </Button>
+            </div>
           </div>
-
-          <Button
-            variant="outline"
-            onClick={handleAddWord}
-            className="w-full mb-4"
-            data-testid="button-add-word"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Word
-          </Button>
-
-          <Button
-            onClick={handleConfirmWordList}
-            className="w-full mb-4"
-            disabled={createSessionMutation.isPending}
-            data-testid="button-confirm-word-list"
-          >
-            {createSessionMutation.isPending ? "Creating..." : "Confirm Word List"}
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleRetake}
-            className="w-full"
-            data-testid="button-retake-photo"
-          >
-            Retake Photo
-          </Button>
-        </div>
+          <div className={footer}>
+            <Button onClick={handleConfirmWordList} className="h-[46px] w-full" disabled={createSessionMutation.isPending} data-testid="button-confirm-word-list">
+              {createSessionMutation.isPending ? "Creating..." : "Confirm Word List"}
+            </Button>
+            <Button variant="outline" onClick={handleRetake} className="h-[46px] w-full" data-testid="button-retake-photo">
+              Retake Photo
+            </Button>
+          </div>
+        </>
       )}
 
       {currentStep === "session-created" && (
-        <div className="px-4 py-12 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6">
-            <Check className="w-8 h-8 text-primary-foreground" />
+        <>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3.5 px-8 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success text-primary-foreground">
+              <Check className="h-[30px] w-[30px]" />
+            </div>
+            <h1 className="text-xl font-bold text-foreground">Session created</h1>
+            {created && (
+              <p className="text-sm text-muted-foreground" data-testid="text-created-summary">
+                <strong className="font-semibold text-foreground">{created.title}</strong>
+                <br />
+                {created.sessions > 1
+                  ? `${created.sessions} sessions added to your Library`
+                  : `${created.wordCount} ${created.wordCount === 1 ? "word" : "words"} added to your Library`}
+              </p>
+            )}
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Session Created Successfully!</h1>
-          <p className="text-muted-foreground mb-8 max-w-sm">
-            Your new spelling session is ready. You will be redirected shortly to the sessions list.
-          </p>
-          
-          <Button
-            onClick={() => navigate("/library")}
-            className="w-full max-w-xs"
-            data-testid="button-go-to-sessions"
-          >
-            Go to Sessions List
-          </Button>
-        </div>
+          <div className={footer}>
+            <Button onClick={() => navigate("/library")} className="h-[46px] w-full" data-testid="button-go-to-sessions">
+              Go to Library
+            </Button>
+          </div>
+        </>
       )}
 
       <AlertDialog

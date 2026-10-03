@@ -53,50 +53,31 @@ export default function CameraCapture({ onImageCapture, onSkip }: CameraCaptureP
   };
 
   return (
-    <div
-      className={
-        isCameraActive
-          ? "px-4 py-4 flex flex-col items-center"
-          : "px-4 py-8 flex flex-col items-center justify-center min-h-[60vh]"
-      }
-    >
+    <div className="flex min-h-0 flex-1 flex-col">
       {!isCameraActive ? (
         <>
-          <div className="camera-frame w-64 h-48 flex flex-col items-center justify-center mb-6 border-2 border-dashed border-border rounded-lg bg-muted">
-            <Camera className="w-16 h-16 text-muted-foreground mb-4" strokeWidth={1.5} />
-            <div className="text-center">
-              <div className="font-medium text-foreground mb-1">Tap to capture worksheet</div>
-              <div className="text-sm text-muted-foreground">Align your worksheet within the frame to extract words</div>
+          <div className="camera-frame mx-5 my-4 flex flex-1 flex-col items-center justify-center gap-3.5 rounded-2xl border-2 border-dashed border-border bg-muted px-6">
+            <Camera className="h-11 w-11 text-muted-foreground" strokeWidth={1.5} />
+            <div className="text-center text-[15px] font-semibold text-foreground">Tap to capture worksheet</div>
+            <div className="text-center text-[13px] leading-snug text-muted-foreground">
+              Align your worksheet within the frame to extract words
             </div>
           </div>
-          
-          <Button 
-            onClick={handleStartCamera} 
-            className="w-full max-w-xs mb-4"
-            data-testid="button-start-camera"
-          >
-            <Camera className="w-4 h-4 mr-2" />
-            Start Camera
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            onClick={onSkip} 
-            className="w-full max-w-xs"
-            data-testid="button-skip-camera"
-          >
-            Skip for now
-          </Button>
-          
-          {error && (
-            <p className="text-destructive text-sm mt-2 text-center max-w-xs">
-              {error}
-            </p>
-          )}
+
+          <div className="flex shrink-0 flex-col gap-2.5 px-5 pb-6 pt-2">
+            <Button onClick={handleStartCamera} className="h-[46px] w-full" data-testid="button-start-camera">
+              <Camera className="mr-2 h-4 w-4" />
+              Start Camera
+            </Button>
+            <Button variant="outline" onClick={onSkip} className="h-[46px] w-full" data-testid="button-skip-camera">
+              Skip for now
+            </Button>
+            {error && <p className="text-center text-sm text-destructive">{error}</p>}
+          </div>
         </>
       ) : (
-        <>
-          <div className="relative w-full max-w-sm mb-4">
+        <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-4">
+          <div className="relative mb-4 w-full max-w-sm">
             {/* A portrait phone stream is far taller than it is wide, so cap the
                 height — unconstrained it pushes the capture button off screen.
                 Width stays fixed rather than hugging the video: `w-auto` has no
@@ -134,9 +115,9 @@ export default function CameraCapture({ onImageCapture, onSkip }: CameraCaptureP
               Capture Photo
             </Button>
           </div>
-        </>
+        </div>
       )}
-      
+
       <canvas ref={canvasRef} className="hidden" />
     </div>
   );

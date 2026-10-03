@@ -12,7 +12,7 @@ interface DueDateFieldProps {
 export function DueDateField({ value, onChange }: DueDateFieldProps) {
   return (
     <div>
-      <label htmlFor="due-date" className="block text-sm font-medium text-foreground mb-2">
+      <label htmlFor="due-date" className="mb-2 block text-xs font-semibold text-muted-foreground">
         Due date (optional)
       </label>
       <div className="flex items-center gap-2">
@@ -21,7 +21,7 @@ export function DueDateField({ value, onChange }: DueDateFieldProps) {
           type="date"
           value={value ?? ""}
           onChange={(e) => onChange(e.target.value || null)}
-          className="flex-1"
+          className="h-[42px] flex-1 border-[1.5px] text-[15px]"
           data-testid="input-due-date"
         />
         {value && (
@@ -30,7 +30,7 @@ export function DueDateField({ value, onChange }: DueDateFieldProps) {
           </Button>
         )}
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="mt-1.5 text-xs leading-snug text-muted-foreground">
         The day of the test or homework. The session with the nearest due date shows under This week on Practice.
       </p>
     </div>
