@@ -234,12 +234,12 @@ export default function Sessions() {
                   className="space-y-3"
                   data-testid={group.lesson ? `group-lesson-${group.lesson.id}` : "group-untagged"}
                 >
-                  {group.lesson && (
+                  {(group.lesson || groups.length > 1) && (
                     <h2
                       className="pt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-                      data-testid={`heading-lesson-${group.lesson.id}`}
+                      data-testid={group.lesson ? `heading-lesson-${group.lesson.id}` : "heading-untagged"}
                     >
-                      {group.lesson.name}
+                      {group.lesson ? group.lesson.name : "No lesson"}
                     </h2>
                   )}
                   {group.sessions.map(renderSession)}
