@@ -147,7 +147,7 @@ export default function SettingsPage() {
       <PinModal 
         open={showPinModal} 
         onVerify={handlePinVerify} 
-        onClose={() => navigate("/sessions")} 
+        onClose={() => navigate("/library")} 
         isLoading={isPinLoading} 
       />
 

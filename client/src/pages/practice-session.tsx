@@ -86,6 +86,7 @@ export default function PracticeSession() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
     },
   });
 
@@ -545,7 +546,7 @@ export default function PracticeSession() {
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground">Session not found</p>
-            <Button onClick={() => navigate("/sessions")} className="mt-4">
+            <Button onClick={() => navigate("/library")} className="mt-4">
               Back to Sessions
             </Button>
           </CardContent>
@@ -571,7 +572,7 @@ export default function PracticeSession() {
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate("/sessions")}
+              onClick={() => navigate("/library")}
               className="p-2"
               data-testid="button-go-back"
             >
@@ -825,7 +826,7 @@ export default function PracticeSession() {
           <p className="text-xl font-semibold text-foreground">Session complete</p>
           <div className="flex flex-col gap-2">
             <Button onClick={dictateAgain} data-testid="button-review-again">Review again</Button>
-            <Button variant="outline" onClick={() => navigate("/sessions")} data-testid="button-back-to-sessions">
+            <Button variant="outline" onClick={() => navigate("/library")} data-testid="button-back-to-sessions">
               Back to sessions
             </Button>
           </div>

@@ -1,18 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
-import { Plus, ChevronRight, ChevronDown, Calendar, FileText, Pin, Pencil, BookOpen } from "lucide-react";
+import { Plus, ChevronRight, Calendar, FileText, Pin, Pencil, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwipeableCard } from "@/components/swipeable-card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useActiveSubject } from "@/hooks/use-active-subject";
-import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
+import { SUBJECT_META } from "@/lib/subjects";
+import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { formatDueDate } from "@/lib/due-date";
 import type { SessionWithLesson } from "@shared/schema";
 import { groupSessionsByLesson } from "@/lib/group-sessions";
@@ -20,21 +15,10 @@ import { groupSessionsByLesson } from "@/lib/group-sessions";
 // The list endpoint adds how many of a session's words have ever been graded.
 type SessionWithTested = SessionWithLesson & { testedCount: number };
 
-function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary ${className}`}
-    >
-      {text}
-    </span>
-  );
-}
-
 export default function Sessions() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
-  const { subject, setSubject } = useActiveSubject();
+  const { subject } = useActiveSubject();
   // Only the active Workspace's sessions are listed (ADR-0005). The list waits
   // for settings so it never flashes the wrong Workspace on startup.
   const { data: sessions = [], isLoading: sessionsLoading } = useQuery<SessionWithTested[]>({
@@ -64,6 +48,7 @@ export default function Sessions() {
     onSuccess: () => {
       // Invalidate and refetch sessions
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
     },
   });
 
@@ -85,6 +70,7 @@ export default function Sessions() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
     },
   });
 
@@ -157,36 +143,10 @@ export default function Sessions() {
       {/* Header */}
       <div className="px-4 py-6 bg-card">
         <div className="mb-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="gap-1 px-2"
-                disabled={!subject}
-                aria-label="Switch workspace"
-                data-testid="button-workspace-switcher"
-              >
-                <SubjectBadge text={active?.badge} />
-                <span className="text-sm font-medium">{active?.shortName}</span>
-                <ChevronDown className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {SUBJECT_OPTIONS.map((option) => (
-                <DropdownMenuItem
-                  key={option.key}
-                  onSelect={() => setSubject(option.key)}
-                  data-testid={`workspace-option-${option.key}`}
-                >
-                  <SubjectBadge text={option.badge} className="mr-2" />
-                  {option.menuLabel}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <WorkspaceSwitcher />
         </div>
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-foreground">Mber Spelling Pro</h1>
+          <h1 className="text-2xl font-bold text-foreground">Library</h1>
           <Button
             asChild
             variant="default"

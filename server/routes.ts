@@ -113,6 +113,38 @@ export async function registerRoutes(
     }
   });
 
+  // The Practice screen: This week (the nearest due date that is today or
+  // later) and the Pinned sessions. The client passes its own local date, so
+  // "today" is the user's, not the server's. A session never appears twice.
+  app.get("/api/practice", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    if (!subject.success) {
+      return res.status(400).json({ message: "A valid subject is required" });
+    }
+    const today = dueDateSchema.safeParse(req.query.today);
+    if (!today.success || !today.data) {
+      return res.status(400).json({ message: "today must be a YYYY-MM-DD date" });
+    }
+    try {
+      const sessions = await storage.getSessions(subject.data);
+      const time = (value: unknown) => (value ? new Date(value as string).getTime() : 0);
+      // YYYY-MM-DD strings sort chronologically; ties go to the older session.
+      const thisWeek =
+        sessions
+          .filter((s) => s.dueDate && s.dueDate >= today.data!)
+          .sort((a, b) => (a.dueDate! < b.dueDate! ? -1 : a.dueDate! > b.dueDate! ? 1 : time(a.createdAt) - time(b.createdAt)))[0] ?? null;
+      const pinned = sessions
+        .filter((s) => s.pinnedAt && s.id !== thisWeek?.id)
+        .sort((a, b) => time(b.pinnedAt) - time(a.pinnedAt));
+      res.json({
+        thisWeek: thisWeek ? await withLesson(thisWeek) : null,
+        pinned: await Promise.all(pinned.map(withLesson)),
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch practice" });
+    }
+  });
+
   app.get("/api/lessons", async (req, res) => {
     const subject = subjectSchema.safeParse(req.query.subject);
     if (!subject.success) {
