@@ -1,7 +1,11 @@
+import { dueDateSchema } from "@shared/schema";
+
 export interface ExtractedCandidate {
   title: string;
   /** The Lesson (school unit) the sheet says this list belongs to, if any. */
   lesson: string | null;
+  /** The day the sheet says the list is for (YYYY-MM-DD), if it names one. */
+  dueDate: string | null;
   words: string[];
 }
 
@@ -39,12 +43,13 @@ export function sanitizeExtractedCandidates(
   const fallbackCount = cleaned.filter((c) => c.title === null).length;
   let fallbackIndex = 0;
 
-  const candidates = cleaned.map(({ title, lesson, words }) => {
-    if (title !== null) return { title, lesson, words };
+  const candidates = cleaned.map(({ title, lesson, dueDate, words }) => {
+    if (title !== null) return { title, lesson, dueDate, words };
     fallbackIndex += 1;
     return {
       title: fallbackCount > 1 ? `${defaultTitle} (${fallbackIndex})` : defaultTitle,
       lesson,
+      dueDate,
       words,
     };
   });
@@ -55,7 +60,7 @@ export function sanitizeExtractedCandidates(
 /** Sanitizes one candidate, or returns null if it has no valid words left. */
 function sanitizeOne(
   candidate: unknown,
-): { title: string | null; lesson: string | null; words: string[] } | null {
+): { title: string | null; lesson: string | null; dueDate: string | null; words: string[] } | null {
   if (!isRecord(candidate)) return null;
 
   const words = Array.isArray(candidate.words)
@@ -66,9 +71,21 @@ function sanitizeOne(
 
   const title = typeof candidate.title === "string" ? candidate.title.trim() : "";
   const lesson = typeof candidate.lesson === "string" ? candidate.lesson.trim() : "";
-  return { title: title.length > 0 ? title : null, lesson: lesson.length > 0 ? lesson : null, words };
+  return {
+    title: title.length > 0 ? title : null,
+    lesson: lesson.length > 0 ? lesson : null,
+    dueDate: cleanDueDate(candidate.dueDate),
+    words,
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+/** A real YYYY-MM-DD date, or null: the model's guess is only kept if the API would accept it. */
+function cleanDueDate(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed && dueDateSchema.safeParse(trimmed).success ? trimmed : null;
 }
