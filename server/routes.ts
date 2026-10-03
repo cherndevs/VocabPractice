@@ -105,13 +105,10 @@ export async function registerRoutes(
         sessions.map(async (session) => {
           const words = session.words.map((w) => w.trim());
           const tested = await storage.getReviewStates(session.subject, session.sessionType, words);
-          const at = now();
-          const found = new Set(tested.map((s) => s.word));
-          const due = new Set(words.filter((w) => needsReview(tested.find((s) => s.word === w) ?? null, at)));
           return {
             ...(await withLesson(session)),
-            testedCount: found.size,
-            needsReviewCount: due.size,
+            testedCount: new Set(tested.map((s) => s.word)).size,
+            needsReviewCount: drillWords(session.words, tested, "due", now()).length,
           };
         }),
       );

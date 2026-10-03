@@ -80,10 +80,12 @@ describe("GET /api/sessions/:id/drill", () => {
     const s = await make(["apple", "pear"], { dueDate: "2026-01-06" });
     await grade("apple", "good", T0);
     const before = (await drill(s.id, "all")).body.words;
+    const countBefore = await needsReviewCount(s.id);
     await api.request("PUT", `/api/sessions/${s.id}`, { dueDate: "2026-03-01" });
     expect((await drill(s.id, "due")).body.words).toEqual(["pear"]);
     expect((await drill(s.id, "all")).body.words).toEqual(before);
-    expect(await needsReviewCount(s.id)).toBe(1);
+    expect(await needsReviewCount(s.id)).toBe(countBefore);
+    expect(countBefore).toBe(1);
   });
 });
 
