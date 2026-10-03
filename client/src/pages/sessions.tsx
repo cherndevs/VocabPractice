@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META, SUBJECT_OPTIONS } from "@/lib/subjects";
+import { formatDueDate } from "@/lib/due-date";
 import type { SessionWithLesson } from "@shared/schema";
 import { groupSessionsByLesson } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
 type SessionWithTested = SessionWithLesson & { testedCount: number };
-import { format } from "date-fns";
 
 function SubjectBadge({ text, className = "" }: { text?: string; className?: string }) {
   return (
@@ -135,7 +135,7 @@ export default function Sessions() {
               <span className="flex items-center space-x-1">
                 <Calendar className="w-3 h-3" />
                 <span data-testid={`text-session-date-${session.id}`}>
-                  {session.createdAt ? format(new Date(session.createdAt), 'MMM d, yyyy') : 'Unknown date'}
+                  {formatDueDate(session.dueDate)}
                 </span>
               </span>
               <span data-testid={`text-session-word-count-${session.id}`}>

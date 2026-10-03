@@ -7,6 +7,7 @@ import {
   insertSessionSchema,
   insertSettingsSchema,
   lessonNameSchema,
+  dueDateSchema,
   skillSchema,
   subjectSchema,
   type Session,
@@ -153,6 +154,9 @@ export async function registerRoutes(
       const { lessonName, ...updates } = req.body as any;
       if (lessonName !== undefined && !lessonNameSchema.safeParse(lessonName).success) {
         return res.status(400).json({ message: "lessonName must be a string or null" });
+      }
+      if (updates.dueDate !== undefined && !dueDateSchema.safeParse(updates.dueDate).success) {
+        return res.status(400).json({ message: "dueDate must be a YYYY-MM-DD date or null" });
       }
       // A client can't set the foreign key directly; the tag goes by name.
       delete updates.lessonId;
