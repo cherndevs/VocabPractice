@@ -13,7 +13,7 @@ import { useVoices, VoiceInfo } from "@/hooks/use-voices";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import PinModal from "@/components/pin-modal";
-import type { Settings } from "@shared/schema";
+import { DEFAULT_REFRESHER_SIZE, type Settings } from "@shared/schema";
 
 const SELECTED_VOICES_KEY = 'selectedVoices';
 
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                 min={1}
                 step={1}
                 className="w-20"
-                value={refresherSizeDraft ?? String(currentSettings.refresherSize ?? 20)}
+                value={refresherSizeDraft ?? String(currentSettings.refresherSize ?? DEFAULT_REFRESHER_SIZE)}
                 onChange={(e) => setRefresherSizeDraft(e.target.value)}
                 onBlur={() => {
                   const size = Number(refresherSizeDraft);

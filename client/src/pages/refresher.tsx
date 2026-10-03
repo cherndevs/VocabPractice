@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useActiveSubject } from "@/hooks/use-active-subject";
+import { REFRESHERS } from "@/pages/practice";
 import { PracticeDrill } from "@/pages/practice-session";
 import { skillSchema } from "@shared/schema";
 
@@ -77,7 +78,7 @@ export default function Refresher() {
     <PracticeDrill
       session={{
         id: null,
-        title: skill.data === "spelling" ? "Spelling refresher" : "Reading refresher",
+        title: REFRESHERS.find((r) => r.skill === skill.data)!.title,
         subject,
         sessionType: skill.data,
         pinnedAt: null,

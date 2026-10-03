@@ -4,6 +4,7 @@ import type { IStorage } from "./storage";
 import {
   DEFAULT_REFRESHER_SIZE,
   DEFAULT_SUBJECT,
+  SKILLS,
   gradeBatchSchema,
   insertSessionSchema,
   insertSettingsSchema,
@@ -152,10 +153,9 @@ export async function registerRoutes(
         .filter((s) => s.pinnedAt && s.id !== thisWeek?.id)
         .sort((a, b) => time(b.pinnedAt) - time(a.pinnedAt));
       res.json({
-        refreshers: {
-          spelling: (await dueWords(subject.data, "spelling")).length,
-          reading: (await dueWords(subject.data, "reading")).length,
-        },
+        refreshers: Object.fromEntries(
+          await Promise.all(SKILLS.map(async (skill) => [skill, (await dueWords(subject.data, skill)).length] as const)),
+        ),
         thisWeek: thisWeek ? await withLesson(thisWeek) : null,
         pinned: await Promise.all(pinned.map(withLesson)),
       });

@@ -63,7 +63,7 @@ function SessionCard({ session, onTogglePin }: { session: SessionWithLesson; onT
   );
 }
 
-const REFRESHERS: { skill: Skill; title: string; Icon: typeof PenLine; tint: string }[] = [
+export const REFRESHERS: { skill: Skill; title: string; Icon: typeof PenLine; tint: string }[] = [
   { skill: "spelling", title: "Spelling refresher", Icon: PenLine, tint: "bg-blue-100 text-blue-600" },
   { skill: "reading", title: "Reading refresher", Icon: BookOpen, tint: "bg-purple-100 text-purple-600" },
 ];
