@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight, Pin, PartyPopper, CheckCircle2, Mic, Loader2 } from "lucide-react";
+import { Play, Pause, Volume2, ChevronRight, Pin, PartyPopper, CheckCircle2, Mic, Loader2, X, MoreVertical, BookOpen, SquarePen, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
 import { useSpeech } from "@/hooks/use-speech";
@@ -166,8 +165,6 @@ export function PracticeDrill({
   if (recogniserRef.current === null) recogniserRef.current = createRecogniser();
   const recogniser = recogniserRef.current;
   const [noticeOpen, setNoticeOpen] = useState(false);
-  const [timeSpent, setTimeSpent] = useState(0);
-  const [sessionStartTime] = useState(Date.now());
   const [isMuted, setIsMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
@@ -246,15 +243,6 @@ export function PracticeDrill({
   }, [cancel]);
 
   
-  // Update time spent every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeSpent(Math.floor((Date.now() - sessionStartTime) / 1000));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [sessionStartTime]);
-
   // Peek has nothing to show for a word with no pinyin (e.g. English words
   // in a mixed-language session) - fall back to Read if the word changes
   // out from under an open Peek tab.
@@ -271,6 +259,13 @@ export function PracticeDrill({
   const mode = resolveSessionViewMode(baseMode, currentWordPinyin !== null);
   // Peek shows the pinyin, and so does the third miss in Read Aloud.
   const showPinyin = currentWordPinyin !== null && (mode === "peek" || (readFlow !== null && isPinyinRevealed(readFlow)));
+
+  // Peek belongs to one showing: the next word starts back on Read Aloud, now
+  // that the Read / Peek tabs (the other way back) are gone.
+  const showingKey = showing ? `${readFlow?.done}-${showing.word}` : null;
+  useEffect(() => {
+    setPickedMode((picked) => (picked === "peek" ? "read" : picked));
+  }, [showingKey]);
 
   // ✅ ADD THE DEBUGGING useEffect RIGHT HERE:
   useEffect(() => {
@@ -616,13 +611,13 @@ export function PracticeDrill({
     void speak(word, { lang }).catch(() => {});
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const readProgress = readFlow ? progress(readFlow) : { position: 0, total: 0, percent: 0 };
+  const readProgress = readFlow ? { ...progress(readFlow), done: readFlow.done } : { position: 0, total: 0, percent: 0, done: 0 };
+  const headerTotal = isReading ? readProgress.total : words.length;
+  const spellingPosition = spellingPhase === "dictation" ? currentWordIndex + 1 : words.length;
+  const headerPosition = isReading ? readProgress.position : Math.min(spellingPosition, headerTotal);
+  const headerPercent = isReading
+    ? readProgress.percent
+    : headerTotal > 0 ? Math.round((headerPosition / headerTotal) * 100) : 0;
   const gradeButtons: { grade: Grade; label: string; tone: string }[] = [
     { grade: "again", label: "Oops", tone: "text-destructive" },
     { grade: "hard", label: "Hard", tone: "text-warning" },
@@ -632,55 +627,68 @@ export function PracticeDrill({
 
   return (
     <div className="fade-in">
-      {/* Header */}
-      <div className="px-4 py-6 bg-card border-b border-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate(session.exitTo)}
-              className="p-2"
-              data-testid="button-go-back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-xl font-semibold text-foreground" data-testid="text-session-title">
-              {session.title}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {session.id && (
-              <Button variant="ghost" size="sm" className="p-2" onClick={togglePin} aria-label={session.pinnedAt ? 'Unpin session' : 'Pin session'}>
-                <Pin className={`w-5 h-5 ${session.pinnedAt ? 'text-primary' : ''}`} />
-              </Button>
-            )}
-          </div>
+      {/* Header: end session, progress, count, options (design canvas) */}
+      <div className="flex items-center px-3 pt-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(session.exitTo)}
+          aria-label="End session"
+          className="text-muted-foreground"
+          data-testid="button-go-back"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+        <div className="mx-3 h-1.5 flex-1 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={headerPercent} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full rounded-full bg-primary transition-[width]" style={{ width: `${headerPercent}%` }} data-testid="progress-fill" />
         </div>
-
-        {scope && onScopeChange && (
-          <div className="mt-3 flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onScopeChange(scope === "due" ? "all" : "due")}
-              data-testid="button-toggle-scope"
-            >
-              {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
-            </Button>
-          </div>
+        <span className="whitespace-nowrap text-xs font-semibold text-muted-foreground" data-testid="text-progress">
+          {headerPosition} / {headerTotal}
+        </span>
+        {session.id && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`ml-1 ${session.pinnedAt ? "text-primary" : "text-muted-foreground"}`}
+            onClick={togglePin}
+            aria-label={session.pinnedAt ? "Unpin session" : "Pin session"}
+            data-testid="button-pin-session"
+          >
+            <Pin className="w-4 h-4" />
+          </Button>
         )}
+        {scope && onScopeChange && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Session options" data-testid="button-session-menu">
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => onScopeChange(scope === "due" ? "all" : "due")} data-testid="button-toggle-scope">
+                {scope === "due" ? "Switch to Revise all" : "Switch to due only"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
 
-        {/* Mode Toggle: Spelling sessions have a single view, so no toggle */}
-        {offeredViews.length > 1 && (
-          <Tabs value={mode} onValueChange={(value) => switchMode(value as SessionViewMode)} className="mt-4">
-            <TabsList className={`grid w-full ${currentWordPinyin ? "grid-cols-2" : "grid-cols-1"}`}>
-              <TabsTrigger value="read" data-testid="tab-read">Read</TabsTrigger>
-              {currentWordPinyin && (
-                <TabsTrigger value="peek" data-testid="tab-peek">Peek</TabsTrigger>
-              )}
-            </TabsList>
-          </Tabs>
+      <h1 className="sr-only" data-testid="text-session-title">{session.title}</h1>
+      <div className="mx-auto mt-4 flex w-fit items-center gap-2">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-bold ${
+            isReading ? "bg-skill-reading-bg text-skill-reading" : "bg-skill-writing-bg text-skill-writing"
+          }`}
+          data-testid="badge-modality"
+        >
+          {isReading ? <BookOpen className="w-3 h-3" /> : <SquarePen className="w-3 h-3" />}
+          {isReading ? "Reading" : "Writing"}
+        </span>
+        {scope === "all" && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1.5 text-xs font-bold text-muted-foreground" data-testid="badge-revise-all">
+            <RotateCw className="w-3 h-3" />
+            Revise all
+          </span>
         )}
       </div>
 
@@ -792,11 +800,6 @@ export function PracticeDrill({
                 </div>
               )}
 
-              {/* Progress Indicator: repeats are counted in */}
-              <div className="text-sm text-muted-foreground mb-8" data-testid="text-progress">
-                {readProgress.position}/{readProgress.total} words
-              </div>
-
               <div className="flex gap-2" data-testid="grade-row">
                 {gradeButtons.map(({ grade, label, tone }) => (
                   <Button
@@ -819,30 +822,21 @@ export function PracticeDrill({
             </div>
           )}
 
-          {/* Session Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Session Overview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Time Spent:</span>
-                <span className="font-medium text-foreground" data-testid="text-time-spent">
-                  {formatTime(timeSpent)}
-                </span>
-              </div>
-
-              <div className="mt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-muted-foreground">Progress:</span>
-                  <span className="font-medium text-foreground" data-testid="text-progress-percentage">
-                    {readProgress.percent}%
-                  </span>
-                </div>
-                <Progress value={readProgress.percent} className="w-full" />
-              </div>
-            </CardContent>
-          </Card>
+          {/* Up next: one dot per word in the queue, filled as it is graded */}
+          {showing && (
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 px-6" data-testid="up-next">
+              {Array.from({ length: readProgress.total }, (_, i) => {
+                const done = i < readProgress.done;
+                const current = i === readProgress.done;
+                return (
+                  <span
+                    key={i}
+                    className={`h-1.5 w-1.5 rounded-full ${done ? "bg-skill-reading" : "bg-border"} ${current ? "ring-[3px] ring-primary-tint" : ""}`}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
