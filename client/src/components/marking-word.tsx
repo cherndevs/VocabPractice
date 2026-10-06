@@ -21,7 +21,7 @@ export function MarkingWord({ word, index, onHear }: MarkingWordProps) {
     >
       <span className="block text-xl font-bold text-foreground">{word}</span>
       {pinyin && (
-        <span className="block text-[13px] font-medium text-muted-foreground" data-testid={`text-marking-pinyin-${index}`}>
+        <span className="block text-[15px] font-medium text-muted-foreground" data-testid={`text-marking-pinyin-${index}`}>
           {pinyin}
         </span>
       )}
