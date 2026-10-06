@@ -108,7 +108,8 @@ export default function PracticeSession() {
         if (!cancelled) setLearnWords(body.words);
       })
       .catch(() => {
-        if (!cancelled) setDrillFailed(true);
+        // Learn is optional: without its words, go straight to the test.
+        if (!cancelled) setStage("test");
       });
     return () => {
       cancelled = true;
