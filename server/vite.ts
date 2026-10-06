@@ -67,19 +67,33 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
-export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+// index.html and sw.js must be revalidated on every load, or a refresh can show
+// the previous deploy. The hashed bundles they point at can cache as usual.
+const NO_CACHE_FILES = new Set(["index.html", "sw.js"]);
 
+export function serveStatic(
+  app: Express,
+  distPath = path.resolve(import.meta.dirname, "public"),
+) {
   if (!fs.existsSync(distPath)) {
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`,
     );
   }
 
-  app.use(express.static(distPath));
+  app.use(
+    express.static(distPath, {
+      setHeaders: (res, filePath) => {
+        if (NO_CACHE_FILES.has(path.basename(filePath))) {
+          res.setHeader("Cache-Control", "no-cache");
+        }
+      },
+    }),
+  );
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
+    res.setHeader("Cache-Control", "no-cache");
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

@@ -46,12 +46,12 @@ Code architecture (high-level)
 - Client (client/)
   - React 18 + Vite + TypeScript; routing with wouter; server state via TanStack Query
   - Tailwind CSS with shadcn/ui-style components under client/src/components/ui
-  - PWA assets under client/public (manifest.json, sw.js)
+  - PWA assets under client/public (manifest.json). No service worker: sw.js is a kill-switch that removes the old cache-first worker from devices; delete it once none remain.
   - Entry: client/index.html -> client/src/main.tsx -> client/src/App.tsx
 - Server (server/)
   - Entrypoint server/index.ts initializes Express, JSON middleware, API logging, error handler, and HTTP server
   - Development: setupVite (server/vite.ts) attaches Vite middlewares; serves transformed index.html with cache-busted main.tsx
-  - Production: serveStatic (server/vite.ts) serves dist/public with an SPA fallback to index.html
+  - Production: serveStatic (server/vite.ts) serves dist/public with an SPA fallback to index.html; index.html and sw.js are sent `Cache-Control: no-cache` so a reload gets the latest deploy
   - Routes (server/routes.ts): `registerRoutes(app, storage)` takes the storage instance, so tests mount the real routes over `MemStorage` (see server/test-harness.ts)
     - Sessions: GET /api/sessions?subject= (subject required), GET /api/sessions/:id, POST /api/sessions (subject and sessionType required), PUT /api/sessions/:id (subject and sessionType immutable), DELETE /api/sessions/:id
     - Grades: POST /api/grades `{grades:[…]}` logs each grade (client id = primary key, replays are no-ops) and moves the word's review state through FSRS (server/scheduling.ts wraps `ts-fsrs`; server/grades.ts applies a batch oldest-first). GET /api/review-states?subject=&skill=&words= reports state and `needsReview`. GET /api/sessions adds `testedCount`. `registerRoutes` takes an injectable clock (`{now}`); the test harness has `setNow`.
