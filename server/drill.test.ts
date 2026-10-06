@@ -99,3 +99,29 @@ describe("GET /api/sessions needsReviewCount", () => {
     expect(await needsReviewCount(s.id)).toBe(3);
   });
 });
+
+describe("GET /api/sessions/:id/drill?scope=learn", () => {
+  it("offers never-graded and last-graded-Oops words, not ones last graded right", async () => {
+    const s = await make(["new", "missed", "known", "recovered"]);
+    await grade("missed", "good", T0);
+    await grade("missed", "again", days(1));
+    await grade("known", "good", T0);
+    await grade("recovered", "again", T0);
+    await grade("recovered", "good", days(1));
+    expect((await drill(s.id, "learn")).body.words).toEqual(["new", "missed"]);
+  });
+
+  it("ignores reading grades", async () => {
+    const s = await make(["apple", "pear"]);
+    await grade("apple", "again", T0, "reading");
+    await grade("pear", "good", T0, "reading");
+    await grade("apple", "good", days(1));
+    expect((await drill(s.id, "learn")).body.words).toEqual(["pear"]);
+  });
+
+  it("leaves scope all returning every word", async () => {
+    const s = await make(["apple", "pear"]);
+    await grade("apple", "good", T0);
+    expect((await drill(s.id, "all")).body.words).toEqual(["pear", "apple"]);
+  });
+});

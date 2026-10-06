@@ -1,4 +1,4 @@
-import type { ReviewState } from "@shared/schema";
+import type { Grade, ReviewState } from "@shared/schema";
 import { needsReview } from "./scheduling";
 
 /**
@@ -21,4 +21,19 @@ export function drillWords(
   const fresh = due.filter((w) => !byWord.has(w));
   const ordered = [...overdue, ...fresh];
   return scope === "all" ? [...ordered, ...words.filter((w) => !ordered.includes(w))] : ordered;
+}
+
+/**
+ * The words Learn offers by default, in list order: new (no review state in
+ * the skill) and missed (latest grade Oops). Words are trimmed and listed once.
+ */
+export function learnWords(
+  sessionWords: string[],
+  states: Pick<ReviewState, "word">[],
+  latestGrades: Map<string, Grade>,
+): string[] {
+  const graded = new Set(states.map((s) => s.word));
+  return Array.from(new Set(sessionWords.map((w) => w.trim()).filter(Boolean))).filter(
+    (w) => !graded.has(w) || latestGrades.get(w) === "again",
+  );
 }

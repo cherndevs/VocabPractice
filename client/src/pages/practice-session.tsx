@@ -12,6 +12,7 @@ import { queryClient } from "@/lib/queryClient";
 import { usePinSession } from "@/hooks/use-pin-session";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { MarkingWord } from "@/components/marking-word";
+import { LearnHandover, LearnRun, LearnStart } from "@/components/learn-stage";
 import { gradeOutbox } from "@/lib/grade-sync";
 import {
   captionFor,
@@ -65,10 +66,15 @@ export interface DrillSource {
 // Loads the session and its drill (the words to practise now), and keys the
 // drill by scope so switching restarts it. The words are held as loaded: grades
 // refresh review states mid-drill, and the list must not shift under the child.
+// Spelling sessions open with the Learn stage (start choice, learn, hand-over)
+// before the drill; nothing in it is recorded.
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const [scope, setScope] = useState<DrillScope>("due");
+  const [stage, setStage] = useState<"choose" | "learn" | "handover" | "test">("choose");
+  const [learnWords, setLearnWords] = useState<string[] | null>(null);
+  const [learning, setLearning] = useState<string[]>([]);
   const [drill, setDrill] = useState<{ scope: DrillScope; words: string[] } | null>(null);
   const [drillFailed, setDrillFailed] = useState(false);
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
@@ -92,13 +98,65 @@ export default function PracticeSession() {
     };
   }, [id, scope]);
 
-  if (sessionLoading || (!drill && !drillFailed && session)) {
+  const isSpelling = session?.sessionType === "spelling";
+  useEffect(() => {
+    if (!isSpelling) return;
+    let cancelled = false;
+    fetch(`/api/sessions/${id}/drill?scope=learn`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .then((body: { words: string[] }) => {
+        if (!cancelled) setLearnWords(body.words);
+      })
+      .catch(() => {
+        if (!cancelled) setDrillFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isSpelling]);
+
+  const choosing = isSpelling && stage !== "test";
+  if (sessionLoading || (!drillFailed && session && (choosing ? !learnWords : !drill))) {
     return (
       <div className="animate-pulse px-4 pt-4">
         <div className="mx-auto h-1.5 w-2/3 rounded-full bg-muted"></div>
         <div className="mx-auto mt-6 h-6 w-24 rounded-full bg-muted"></div>
         <div className="mt-4 h-[260px] rounded-2xl bg-muted"></div>
       </div>
+    );
+  }
+
+  if (session && choosing && learnWords && !drillFailed) {
+    const allWords = Array.from(new Set(session.words.map((w) => w.trim()).filter(Boolean)));
+    const exit = () => navigate("/library");
+    if (stage === "choose") {
+      return (
+        <LearnStart
+          title={session.title}
+          learnCount={learnWords.length}
+          allCount={allWords.length}
+          onClose={exit}
+          onStart={(choice) => {
+            if (choice === "skip") return setStage("test");
+            setLearning(choice === "all" ? allWords : learnWords);
+            setStage("learn");
+          }}
+        />
+      );
+    }
+    if (stage === "learn") {
+      return <LearnRun words={learning} onClose={exit} onFinished={() => setStage("handover")} />;
+    }
+    return (
+      <LearnHandover
+        learned={learning.length}
+        testCount={allWords.length}
+        onStartTest={() => {
+          setScope("all");
+          setStage("test");
+        }}
+        onDone={exit}
+      />
     );
   }
 
