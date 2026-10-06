@@ -18,6 +18,10 @@ _Avoid_: Session mode, tab
 The Session View where a word is played aloud (dictation), hidden from view, and the user writes it down off-app. Repeats the word per the configured repetition count. The word stays hidden throughout — the writing happens on paper, not on screen. Grading is a separate step afterwards (see Offline Grading). Because grades only arrive once dictation is over, each word appears once per Spelling session; a missed word comes back in a later session.
 _Avoid_: Test, test mode
 
+**Learn**:
+The stage that opens a Spelling session (but not the spelling Refresher, whose words have all been graded before), before Write Mode dictation, where the child studies words alone — no parent needed. Each word runs Glance → Cover → Write → Check: the word is shown with audio (and its Pinyin Annotation, for Chinese), then hidden while the child writes it on paper from memory, then shown again for the child to compare and tap "Got it" or "Not yet". A word is done after two "Got it"s, with other words in between; "Not yet" brings it back after a few others, with no cap. The child chooses up front: new & missed words (the default), all words, or skip straight to the test. A word is *new* if it has no spelling review state yet, and *missed* if its latest spelling grade was Oops. Learn records nothing — "Got it" and "Not yet" only steer repetition within Learn, and only dictation grades move review state. When Learn ends, a hand-over screen asks for a grown-up to start the test now, or ends the session for now.
+_Avoid_: Study mode, practice (ambiguous with the Practice screen), Learn Mode (it is a stage, not a Session View)
+
 **Read Mode**:
 The Session View where the word is displayed on screen for the user to read aloud, with no pinyin, no audio playback, and no repetition — a recall test. The learner grades each word here on the four-point AHGE scale, after a Read Aloud check. A word can come back later in the same session — after an "Oops", or while it is still new and hasn't yet been got right twice. A returning word is labelled "Try once more".
 _Avoid_: Practice, practice mode
@@ -31,7 +35,7 @@ The Session View where the word is displayed alongside its Pinyin Annotation and
 _Avoid_: Test, test mode, Check mode
 
 **Pinyin Annotation**:
-The auto-detected, auto-generated romanization line shown below a word in Peek Mode, and on the Write Mode marking page ("Mark the writing"), whenever the word contains Chinese characters. Computed at render time from the word's stored text — never typed in by the user or persisted.
+The auto-detected, auto-generated romanization line shown below a word in Peek Mode, in Learn, and on the Write Mode marking page ("Mark the writing"), whenever the word contains Chinese characters. Computed at render time from the word's stored text — never typed in by the user or persisted.
 _Avoid_: Translation, transliteration
 
 **AHGE Grading**:
