@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { usePinSession } from "@/hooks/use-pin-session";
 import { getPinyinAnnotation } from "@/lib/pinyin";
+import { MarkingWord } from "@/components/marking-word";
 import { gradeOutbox } from "@/lib/grade-sync";
 import {
   captionFor,
@@ -848,15 +849,7 @@ export function PracticeDrill({
           <ul className="flex flex-col px-4 py-1">
             {words.map((word, index) => (
               <li key={index} className="flex items-center gap-2 border-b border-border py-2">
-                <button
-                  type="button"
-                  className="min-w-0 flex-1 text-left text-xl font-bold text-foreground"
-                  onClick={() => speakWord(word)}
-                  aria-label={`Hear ${word}`}
-                  data-testid={`button-hear-word-${index}`}
-                >
-                  {word}
-                </button>
+                <MarkingWord word={word} index={index} onHear={() => speakWord(word)} />
                 <div className="flex shrink-0 gap-2">
                   <button
                     type="button"

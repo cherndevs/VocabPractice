@@ -31,7 +31,7 @@ The Session View where the word is displayed alongside its Pinyin Annotation and
 _Avoid_: Test, test mode, Check mode
 
 **Pinyin Annotation**:
-The auto-detected, auto-generated romanization line shown below a word in Peek Mode whenever the word contains Chinese characters. Computed at render time from the word's stored text — never typed in by the user or persisted.
+The auto-detected, auto-generated romanization line shown below a word in Peek Mode, and on the Write Mode marking page ("Mark the writing"), whenever the word contains Chinese characters. Computed at render time from the word's stored text — never typed in by the user or persisted.
 _Avoid_: Translation, transliteration
 
 **AHGE Grading**:
