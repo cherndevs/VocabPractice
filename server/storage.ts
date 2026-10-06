@@ -31,6 +31,8 @@ export interface IStorage {
   saveReviewState(state: ReviewState): Promise<void>;
   /** Each word's most recent logged grade in this skill; words never graded are absent. */
   getLatestGrades(subject: Subject, skill: Skill, words: string[]): Promise<Map<string, Grade>>;
+  /** Whether any grade has been logged as part of this session. */
+  hasSessionGrades(sessionId: string): Promise<boolean>;
 
   // Settings
   getSettings(): Promise<Settings | undefined>;
@@ -179,6 +181,10 @@ export class MemStorage implements IStorage {
     return latestByWord(
       Array.from(this.grades.values()).filter((g) => g.subject === subject && g.skill === skill && wanted.has(g.word)),
     );
+  }
+
+  async hasSessionGrades(sessionId: string): Promise<boolean> {
+    return Array.from(this.grades.values()).some((g) => g.sessionId === sessionId);
   }
 
   private reviewKey(subject: Subject, word: string, skill: Skill) {
@@ -352,6 +358,11 @@ class PgStorage implements IStorage {
       .from(gradeLog)
       .where(and(eq(gradeLog.subject, subject), eq(gradeLog.skill, skill), inArray(gradeLog.word, words)));
     return latestByWord(rows);
+  }
+
+  async hasSessionGrades(sessionId: string): Promise<boolean> {
+    const rows = await this.db.select({ id: gradeLog.id }).from(gradeLog).where(eq(gradeLog.sessionId, sessionId)).limit(1);
+    return rows.length > 0;
   }
 
   async getSettings(): Promise<Settings | undefined> {

@@ -71,7 +71,8 @@ export interface DrillSource {
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
-  const [scope, setScope] = useState<DrillScope>("due");
+  // "test" asks the server: every word until the session is first tested, then due.
+  const [scope, setScope] = useState<DrillScope | "test">("test");
   const [stage, setStage] = useState<"choose" | "learn" | "handover" | "test">("choose");
   const [learnWords, setLearnWords] = useState<string[] | null>(null);
   const [learning, setLearning] = useState<string[]>([]);
@@ -87,8 +88,8 @@ export default function PracticeSession() {
     setDrillFailed(false);
     fetch(`/api/sessions/${id}/drill?scope=${scope}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
-      .then((body: { words: string[] }) => {
-        if (!cancelled) setDrill({ scope, words: body.words });
+      .then((body: { words: string[]; scope: DrillScope }) => {
+        if (!cancelled) setDrill({ scope: body.scope, words: body.words });
       })
       .catch(() => {
         if (!cancelled) setDrillFailed(true);
@@ -151,11 +152,8 @@ export default function PracticeSession() {
     return (
       <LearnHandover
         learned={learning.length}
-        testCount={allWords.length}
-        onStartTest={() => {
-          setScope("all");
-          setStage("test");
-        }}
+        testCount={drill?.words.length ?? allWords.length}
+        onStartTest={() => setStage("test")}
         onDone={exit}
       />
     );

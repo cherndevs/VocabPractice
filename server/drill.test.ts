@@ -45,7 +45,7 @@ describe("GET /api/sessions/:id/drill", () => {
 
   it("defaults to due, and a never-graded session drills every word", async () => {
     const s = await make(["apple", "pear"]);
-    expect((await drill(s.id)).body).toEqual({ words: ["apple", "pear"] });
+    expect((await drill(s.id)).body).toEqual({ words: ["apple", "pear"], scope: "due" });
   });
 
   it("excludes a word graded Good until the clock passes its due time; all always has every word", async () => {
@@ -123,5 +123,27 @@ describe("GET /api/sessions/:id/drill?scope=learn", () => {
     const s = await make(["apple", "pear"]);
     await grade("apple", "good", T0);
     expect((await drill(s.id, "all")).body.words).toEqual(["pear", "apple"]);
+  });
+});
+
+describe("GET /api/sessions/:id/drill?scope=test", () => {
+  const gradeIn = (sessionId: string, word: string, g: string, at: Date) =>
+    api.request("POST", "/api/grades", {
+      grades: [{ id: `g${++nextId}`, subject: "english", word, skill: "spelling", grade: g, gradedAt: at.toISOString(), sessionId }],
+    });
+
+  it("tests every word while the session has never been tested, even words passed on another list", async () => {
+    const earlier = await make(["apple"]);
+    await gradeIn(earlier.id, "apple", "good", T0);
+    const s = await make(["apple", "pear"]);
+    expect((await drill(s.id, "test")).body.words).toEqual(["pear", "apple"]);
+  });
+
+  it("tests only due words once the session has been tested", async () => {
+    const s = await make(["apple", "pear"]);
+    await gradeIn(s.id, "apple", "good", T0);
+    await gradeIn(s.id, "pear", "again", T0);
+    api.setNow(days(1));
+    expect((await drill(s.id, "test")).body.words).toEqual(["pear"]);
   });
 });

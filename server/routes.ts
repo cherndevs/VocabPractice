@@ -215,11 +215,13 @@ export async function registerRoutes(
 
   // The words to drill: those needing review in the session's skill, most
   // overdue first then never-graded; scope=all appends the rest in list order.
-  // scope=learn gives Learn's new and missed words instead.
+  // scope=learn gives Learn's new and missed words instead. scope=test is the
+  // test a session opens with: all while the session has never been tested,
+  // then due.
   app.get("/api/sessions/:id/drill", async (req, res) => {
     const scope = req.query.scope ?? "due";
-    if (scope !== "due" && scope !== "all" && scope !== "learn") {
-      return res.status(400).json({ message: "scope must be due, all or learn" });
+    if (scope !== "due" && scope !== "all" && scope !== "learn" && scope !== "test") {
+      return res.status(400).json({ message: "scope must be due, all, learn or test" });
     }
     try {
       const session = await storage.getSession(req.params.id);
@@ -232,7 +234,8 @@ export async function registerRoutes(
         const latest = await storage.getLatestGrades(session.subject, session.sessionType, words);
         return res.json({ words: learnWords(session.words, states, latest) });
       }
-      res.json({ words: drillWords(session.words, states, scope, now()) });
+      const drillScope = scope === "test" ? ((await storage.hasSessionGrades(session.id)) ? "due" : "all") : scope;
+      res.json({ words: drillWords(session.words, states, drillScope, now()), scope: drillScope });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch drill" });
     }
