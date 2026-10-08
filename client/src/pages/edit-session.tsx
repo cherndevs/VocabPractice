@@ -9,7 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { LessonPicker } from "@/components/lesson-picker";
 import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
-import type { SessionWithLesson } from "@shared/schema";
+import { MEANING_SUBJECTS, type SessionWithLesson } from "@shared/schema";
+import { meaningOf, useEditMeaning, useMeanings } from "@/hooks/use-meanings";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,9 @@ export default function EditSession() {
     queryKey: [`/api/sessions/${id}`],
     enabled: !!id,
   });
+  const meanings = useMeanings(session?.subject, words);
+  const editMeaning = useEditMeaning(session?.subject);
+  const showMeanings = !!session && MEANING_SUBJECTS.includes(session.subject);
 
   // Pre-populate form once session loads
   useEffect(() => {
@@ -205,28 +209,35 @@ export default function EditSession() {
         {/* Word List */}
         <div className="space-y-3 mb-6">
           {words.map((word, index) => (
-            <div
-              key={index}
-              className="flex items-center space-x-3 p-3 bg-card rounded-lg border border-border"
-            >
-              <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
-              <Input
-                value={word}
-                onChange={(e) => handleWordChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className="flex-1 bg-transparent border-none outline-none"
-                placeholder="Enter word…"
-                data-testid={`edit-input-word-${index}`}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRemoveWord(index)}
-                className="p-1 text-destructive hover:bg-destructive/10"
-                data-testid={`edit-button-remove-word-${index}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+            <div key={index} className="p-3 bg-card rounded-lg border border-border">
+              <div className="flex items-center space-x-3">
+                <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
+                <Input
+                  value={word}
+                  onChange={(e) => handleWordChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  className="flex-1 bg-transparent border-none outline-none"
+                  placeholder="Enter word…"
+                  data-testid={`edit-input-word-${index}`}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveWord(index)}
+                  className="p-1 text-destructive hover:bg-destructive/10"
+                  data-testid={`edit-button-remove-word-${index}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              {showMeanings && word.trim() && (
+                <MeaningField
+                  key={word.trim()}
+                  meaning={meaningOf(meanings, word) ?? ""}
+                  onSave={(meaning) => editMeaning.mutate({ word: word.trim(), meaning })}
+                  testId={`edit-input-meaning-${index}`}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -251,5 +262,25 @@ export default function EditSession() {
         </Button>
       </div>
     </div>
+  );
+}
+
+// A word's Meaning, edited in place and saved when the field loses focus. An
+// edit sticks: it is never regenerated, and a blank one stays blank.
+function MeaningField({ meaning, onSave, testId }: { meaning: string; onSave: (meaning: string) => void; testId: string }) {
+  const [draft, setDraft] = useState(meaning);
+  useEffect(() => setDraft(meaning), [meaning]);
+  return (
+    <Input
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        if (draft.trim() !== meaning) onSave(draft);
+      }}
+      className="mt-1 ml-9 w-[calc(100%-2.25rem)] h-8 bg-transparent border-none text-sm text-muted-foreground"
+      placeholder="Meaning…"
+      aria-label="Meaning"
+      data-testid={testId}
+    />
   );
 }

@@ -1,4 +1,4 @@
-import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, type Grade, users, sessions, lessons, settings, reviewStates, gradeLog } from "@shared/schema";
+import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, type Grade, type WordRow, users, sessions, lessons, settings, reviewStates, gradeLog, words } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -34,6 +34,14 @@ export interface IStorage {
   /** Whether any grade has been logged as part of this session. */
   hasSessionGrades(sessionId: string): Promise<boolean>;
 
+  // Words and their Meanings (ADR-0011). Words are trimmed by the caller.
+  /** The rows that exist for these words. */
+  getWords(subject: Subject, words: string[]): Promise<WordRow[]>;
+  /** Adds generated meanings for words with no row yet; never touches an existing row. */
+  addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void>;
+  /** A parent's edit: creates or replaces the row and marks it edited. */
+  setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow>;
+
   // Settings
   getSettings(): Promise<Settings | undefined>;
   updateSettings(settings: Partial<Settings>): Promise<Settings>;
@@ -56,6 +64,7 @@ export class MemStorage implements IStorage {
   private settings: Settings | undefined;
   private grades = new Map<string, GradeInput>();
   private reviewStates = new Map<string, ReviewState>();
+  private wordRows = new Map<string, WordRow>();
 
   constructor() {
     this.users = new Map();
@@ -206,6 +215,27 @@ export class MemStorage implements IStorage {
 
   async saveReviewState(state: ReviewState): Promise<void> {
     this.reviewStates.set(this.reviewKey(state.subject, state.word, state.skill), state);
+  }
+
+  private wordKey(subject: Subject, word: string) {
+    return JSON.stringify([subject, word]);
+  }
+
+  async getWords(subject: Subject, words: string[]): Promise<WordRow[]> {
+    return Array.from(new Set(words)).flatMap((word) => this.wordRows.get(this.wordKey(subject, word)) ?? []);
+  }
+
+  async addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void> {
+    for (const [word, meaning] of Object.entries(meanings)) {
+      const key = this.wordKey(subject, word);
+      if (!this.wordRows.has(key)) this.wordRows.set(key, { subject, word, meaning, edited: false });
+    }
+  }
+
+  async setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow> {
+    const row: WordRow = { subject, word, meaning, edited: true };
+    this.wordRows.set(this.wordKey(subject, word), row);
+    return row;
   }
 
   async getSettings(): Promise<Settings | undefined> {
@@ -363,6 +393,27 @@ class PgStorage implements IStorage {
   async hasSessionGrades(sessionId: string): Promise<boolean> {
     const rows = await this.db.select({ id: gradeLog.id }).from(gradeLog).where(eq(gradeLog.sessionId, sessionId)).limit(1);
     return rows.length > 0;
+  }
+
+  async getWords(subject: Subject, wanted: string[]): Promise<WordRow[]> {
+    if (wanted.length === 0) return [];
+    return this.db.select().from(words).where(and(eq(words.subject, subject), inArray(words.word, wanted)));
+  }
+
+  async addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void> {
+    const rows = Object.entries(meanings).map(([word, meaning]) => ({ subject, word, meaning, edited: false }));
+    if (rows.length === 0) return;
+    await this.db.insert(words).values(rows).onConflictDoNothing();
+  }
+
+  async setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow> {
+    const row = { subject, word, meaning, edited: true };
+    const result = await this.db
+      .insert(words)
+      .values(row)
+      .onConflictDoUpdate({ target: [words.subject, words.word], set: { meaning, edited: true } })
+      .returning();
+    return result[0]!;
   }
 
   async getSettings(): Promise<Settings | undefined> {

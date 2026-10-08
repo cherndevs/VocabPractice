@@ -16,6 +16,8 @@ export const SUBJECTS = ["chinese", "english"] as const;
 export type Subject = (typeof SUBJECTS)[number];
 export const DEFAULT_SUBJECT: Subject = "english";
 export const subjectSchema = z.enum(SUBJECTS);
+// The Subjects whose words get a Meaning (CONTEXT.md, ADR-0011).
+export const MEANING_SUBJECTS: readonly Subject[] = ["chinese"];
 
 // A Session Type says what a session is for, and so which skill it practises
 // (ADR-0008). Fixed at creation; the in-session Write/Read/Peek view is a
@@ -100,6 +102,19 @@ export const reviewStates = pgTable(
   (t) => [primaryKey({ columns: [t.subject, t.word, t.skill] })],
 );
 
+// One row per word, keyed like review_states (ADR-0011). Holds the word's
+// Meaning: generated once, never regenerated after a parent edits it.
+export const words = pgTable(
+  "words",
+  {
+    subject: text("subject").notNull().$type<Subject>(),
+    word: text("word").notNull(), // trimmed
+    meaning: text("meaning"),
+    edited: boolean("edited").notNull().default(false),
+  },
+  (t) => [primaryKey({ columns: [t.subject, t.word] })],
+);
+
 // Append-only record of every grade, kept raw so FSRS weights can be fitted
 // later. The client generates the id, which makes a replayed POST a no-op.
 // There is deliberately no source column: an Offline Grading grade is stored
@@ -167,6 +182,7 @@ export const gradeBatchSchema = z.object({
 });
 export type GradeInput = z.infer<typeof gradeInputSchema>;
 export type ReviewState = typeof reviewStates.$inferSelect;
+export type WordRow = typeof words.$inferSelect;
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
