@@ -12,7 +12,9 @@ import { useActiveSubject } from "@/hooks/use-active-subject";
 import { SUBJECT_META } from "@/lib/subjects";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { formatDueDate } from "@/lib/due-date";
-import type { SessionWithLesson } from "@shared/schema";
+import { MEANING_SUBJECTS, type SessionWithLesson } from "@shared/schema";
+import { useFillMeanings } from "@/hooks/use-meanings";
+import { useToast } from "@/hooks/use-toast";
 import { groupSessionsByLesson } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
@@ -36,6 +38,14 @@ export default function Library() {
     enabled: !!subject,
   });
   const isLoading = !subject || sessionsLoading;
+  const { toast } = useToast();
+  const fillMeanings = useFillMeanings(subject);
+  const fill = () =>
+    fillMeanings.mutate(undefined, {
+      onSuccess: ({ filled }) =>
+        toast({ title: filled ? `Added ${filled} meaning${filled === 1 ? "" : "s"}` : "Every word already has a meaning" }),
+      onError: () => toast({ title: "Couldn't fill meanings", description: "Try again later.", variant: "destructive" }),
+    });
   const active = subject ? SUBJECT_META[subject] : undefined;
 
   const deleteSessionMutation = useMutation({
@@ -134,7 +144,17 @@ export default function Library() {
             </Link>
           </Button>
         </div>
-
+        {subject && MEANING_SUBJECTS.includes(subject) && sessions.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fill}
+            disabled={fillMeanings.isPending}
+            data-testid="button-fill-meanings"
+          >
+            {fillMeanings.isPending ? "Filling meanings…" : "Fill missing meanings"}
+          </Button>
+        )}
       </div>
 
       {/* Content */}

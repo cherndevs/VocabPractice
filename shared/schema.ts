@@ -16,6 +16,8 @@ export const SUBJECTS = ["chinese", "english"] as const;
 export type Subject = (typeof SUBJECTS)[number];
 export const DEFAULT_SUBJECT: Subject = "english";
 export const subjectSchema = z.enum(SUBJECTS);
+// The Subjects whose words get a Meaning (CONTEXT.md, ADR-0011).
+export const MEANING_SUBJECTS: readonly Subject[] = ["chinese"];
 
 // A Session Type says what a session is for, and so which skill it practises
 // (ADR-0008). Fixed at creation; the in-session Write/Read/Peek view is a

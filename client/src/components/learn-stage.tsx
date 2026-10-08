@@ -87,7 +87,18 @@ export function LearnStart({
 }
 
 /** Glance → Cover → Check per word, until every word is learned. */
-export function LearnRun({ words, onClose, onFinished }: { words: string[]; onClose: () => void; onFinished: () => void }) {
+export function LearnRun({
+  words,
+  meanings = {},
+  onClose,
+  onFinished,
+}: {
+  words: string[];
+  /** Each word's Meaning, shown on the Glance step when it has one. */
+  meanings?: Record<string, string>;
+  onClose: () => void;
+  onFinished: () => void;
+}) {
   const [flow, setFlow] = useState<LearnFlow>(() => startLearnFlow(words));
   const { speak } = useSpeech();
   const word = currentWord(flow);
@@ -97,6 +108,7 @@ export function LearnRun({ words, onClose, onFinished }: { words: string[]; onCl
   const pinyin = getPinyinAnnotation(word);
   const chinese = CJK_CHAR.test(word);
   const gots = flow.gotCount[word] ?? 0;
+  const meaning = meanings[word.trim()];
 
   const hear = () => {
     void speak(word, { lang: chinese ? "zh-CN" : "en-US" }).catch(() => {});
@@ -150,6 +162,11 @@ export function LearnRun({ words, onClose, onFinished }: { words: string[]; onCl
             <div className={`${pinyin ? "" : "mt-10"} ${chinese ? "text-[72px] font-bold leading-none tracking-[8px]" : "text-5xl font-extrabold tracking-[1px]"} break-all`} data-testid="text-learn-word">
               {word}
             </div>
+            {meaning && (
+              <div className="max-w-[280px] text-center text-[15px] text-muted-foreground" data-testid="text-learn-meaning">
+                {meaning}
+              </div>
+            )}
             {hearButton}
           </>
         )}

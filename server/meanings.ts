@@ -1,10 +1,8 @@
-import type { Subject } from "@shared/schema";
+import { MEANING_SUBJECTS, type Subject } from "@shared/schema";
 import type { IStorage } from "./storage";
 
 // Meanings (CONTEXT.md, ADR-0011): a child-level English rendering of each
-// list item, generated once per word by one cheap text-only call. Chinese only
-// for now.
-export const MEANING_SUBJECTS: readonly Subject[] = ["chinese"];
+// list item, generated once per word by one cheap text-only call.
 
 /**
  * The AI call: given the whole list (context for picking the right sense) and
