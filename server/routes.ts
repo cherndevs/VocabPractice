@@ -25,6 +25,7 @@ import {
   SUPPORTED_MEDIA_TYPES,
   type SupportedMediaType,
 } from "./spelling-extraction";
+import { fillMeanings, generateMeaningsWithOpenRouter, type GenerateMeanings } from "./meanings";
 
 // Storage is injected rather than imported so tests can mount these routes on
 // in-memory storage (CHE-29: the HTTP API is the testing seam).
@@ -37,13 +38,30 @@ function withActiveSubject<T extends { activeSubject: string | null }>(settings:
 export interface RouteOptions {
   /** The server's clock; tests inject their own to move past due dates. */
   now?: () => Date;
+  /** The AI call behind Meanings; tests inject a fake. */
+  generateMeanings?: GenerateMeanings;
+  /**
+   * Runs work the response should not wait for (generating Meanings after a
+   * save). Tests inject one they can await.
+   */
+  background?: (work: Promise<unknown>) => void;
 }
 
 export async function registerRoutes(
   app: Express,
   storage: IStorage,
-  { now = () => new Date() }: RouteOptions = {},
+  { now = () => new Date(), generateMeanings = generateMeaningsWithOpenRouter, background = () => {} }: RouteOptions = {},
 ): Promise<Server> {
+  // Gives a saved list's new words their Meanings without holding up the
+  // save; a failure only leaves them blank until "Fill missing meanings".
+  const meaningsInBackground = (subject: Subject, words: string[]) => {
+    background(
+      fillMeanings(storage, generateMeanings, subject, words).catch((error) =>
+        console.error("[meanings] Generation failed", error),
+      ),
+    );
+  };
+
   // Spelling list extraction — relays a worksheet photo to Claude and returns
   // the sessions it reads off the page. Takes the image as raw bytes rather
   // than JSON so the global express.json() limit stays small for every other
@@ -247,6 +265,7 @@ export async function registerRoutes(
       const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
       const lessonId = await resolveLessonId(sessionData.subject, lessonName);
       const session = await storage.createSession({ ...sessionData, lessonId });
+      meaningsInBackground(session.subject, session.words);
       res.json(await withLesson(session));
     } catch (error) {
       res.status(400).json({ message: "Invalid session data" });
@@ -297,6 +316,7 @@ export async function registerRoutes(
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
+      if (updates.words !== undefined) meaningsInBackground(session.subject, session.words);
       res.json(await withLesson(session));
     } catch (error) {
       console.error("Failed to update session", error);
@@ -354,6 +374,57 @@ export async function registerRoutes(
       );
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch review states" });
+    }
+  });
+
+  // Meanings (ADR-0011). GET returns {word: meaning} for the given words
+  // (comma-separated) that have one.
+  app.get("/api/meanings", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    if (!subject.success || typeof req.query.words !== "string") {
+      return res.status(400).json({ message: "subject and words are required" });
+    }
+    try {
+      const words = req.query.words.split(",").map((w) => w.trim()).filter(Boolean);
+      const rows = await storage.getWords(subject.data, words);
+      res.json(Object.fromEntries(rows.filter((r) => r.meaning).map((r) => [r.word, r.meaning])));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch meanings" });
+    }
+  });
+
+  // A parent's edit. Blank clears the meaning; either way it is never regenerated.
+  app.put("/api/meanings", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.body?.subject);
+    const word = typeof req.body?.word === "string" ? req.body.word.trim() : "";
+    const meaning = req.body?.meaning;
+    if (!subject.success || !word || (meaning !== null && typeof meaning !== "string")) {
+      return res.status(400).json({ message: "subject, word and meaning are required" });
+    }
+    try {
+      const row = await storage.setEditedMeaning(subject.data, word, meaning?.trim() || null);
+      res.json(row);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to save meaning" });
+    }
+  });
+
+  // Retries every list in the Subject whose words are missing meanings: covers
+  // failed generations and lists saved before Meanings existed.
+  app.post("/api/meanings/fill", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.body?.subject);
+    if (!subject.success) {
+      return res.status(400).json({ message: "A valid subject is required" });
+    }
+    try {
+      let filled = 0;
+      for (const session of await storage.getSessions(subject.data)) {
+        filled += await fillMeanings(storage, generateMeanings, subject.data, session.words);
+      }
+      res.json({ filled });
+    } catch (error) {
+      console.error("[meanings] Fill failed", error);
+      res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
     }
   });
 

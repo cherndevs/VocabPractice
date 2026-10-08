@@ -100,6 +100,19 @@ export const reviewStates = pgTable(
   (t) => [primaryKey({ columns: [t.subject, t.word, t.skill] })],
 );
 
+// One row per word, keyed like review_states (ADR-0011). Holds the word's
+// Meaning: generated once, never regenerated after a parent edits it.
+export const words = pgTable(
+  "words",
+  {
+    subject: text("subject").notNull().$type<Subject>(),
+    word: text("word").notNull(), // trimmed
+    meaning: text("meaning"),
+    edited: boolean("edited").notNull().default(false),
+  },
+  (t) => [primaryKey({ columns: [t.subject, t.word] })],
+);
+
 // Append-only record of every grade, kept raw so FSRS weights can be fitted
 // later. The client generates the id, which makes a replayed POST a no-op.
 // There is deliberately no source column: an Offline Grading grade is stored
@@ -167,6 +180,7 @@ export const gradeBatchSchema = z.object({
 });
 export type GradeInput = z.infer<typeof gradeInputSchema>;
 export type ReviewState = typeof reviewStates.$inferSelect;
+export type WordRow = typeof words.$inferSelect;
 
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
