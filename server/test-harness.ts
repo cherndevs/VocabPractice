@@ -3,7 +3,7 @@ import type { AddressInfo } from "net";
 import type { Server } from "http";
 import { registerRoutes } from "./routes";
 import { MemStorage } from "./storage";
-import type { GenerateMeanings } from "./meanings";
+import type { GenerateMeanings, MeaningRequest } from "./meanings";
 
 export interface TestApi {
   url: string;
@@ -16,7 +16,7 @@ export interface TestApi {
    */
   setGenerateMeanings(generate: GenerateMeanings): void;
   /** Every call made to the default meanings generator, oldest first. */
-  meaningCalls: { items: string[]; missing: string[] }[];
+  meaningCalls: MeaningRequest[];
   /** Waits for background work started by a request (meaning generation). */
   settle(): Promise<void>;
   request(method: string, path: string, body?: unknown): Promise<{ status: number; body: any }>;
@@ -29,14 +29,15 @@ export async function startTestApi(): Promise<TestApi> {
   app.use(express.json());
   let now = new Date("2026-01-05T09:00:00Z");
   const meaningCalls: TestApi["meaningCalls"] = [];
-  let generate: GenerateMeanings = async (items, missing) => {
-    meaningCalls.push({ items, missing });
+  let generate: GenerateMeanings = async (request) => {
+    meaningCalls.push(request);
+    const { missing } = request;
     return Object.fromEntries(missing.map((m) => [m, `meaning of ${m}`]));
   };
   const pending = new Set<Promise<unknown>>();
   const server: Server = await registerRoutes(app, new MemStorage(), {
     now: () => now,
-    generateMeanings: (items, missing) => generate(items, missing),
+    generateMeanings: (request) => generate(request),
     background: (work) => {
       pending.add(work);
       work.finally(() => pending.delete(work));

@@ -6,15 +6,18 @@ import { apiRequest } from "@/lib/queryClient";
 // one. Generated in the background after a save, so a fresh list may come
 // back partly empty; words without a meaning simply show none.
 export function useMeanings(subject: Subject | undefined, words: string[]): Record<string, string> {
-  const trimmed = Array.from(new Set(words.map((w) => w.trim()).filter(Boolean))).sort();
+  // Trimmed, deduplicated and sorted, so the query key is stable.
+  const wordKeys = Array.from(new Set(words.map((w) => w.trim()).filter(Boolean))).sort();
   const { data } = useQuery<Record<string, string>>({
-    queryKey: ["/api/meanings", subject, trimmed],
+    queryKey: ["/api/meanings", subject, wordKeys],
     queryFn: async () => {
-      const res = await fetch(`/api/meanings?subject=${subject}&words=${encodeURIComponent(trimmed.join(","))}`);
+      const params = new URLSearchParams({ subject: subject! });
+      for (const word of wordKeys) params.append("word", word);
+      const res = await fetch(`/api/meanings?${params}`);
       if (!res.ok) throw new Error("Failed to fetch meanings");
       return res.json();
     },
-    enabled: !!subject && trimmed.length > 0,
+    enabled: !!subject && wordKeys.length > 0,
   });
   return data ?? {};
 }
@@ -42,7 +45,7 @@ export function useEditMeaning(subject: Subject | undefined) {
 export function useFillMeanings(subject: Subject | undefined) {
   const refresh = useRefreshMeanings();
   return useMutation({
-    mutationFn: async () => (await apiRequest("POST", "/api/meanings/fill", { subject })).json() as Promise<{ filled: number }>,
+    mutationFn: async () => (await apiRequest("POST", "/api/meanings/fill", { subject })).json() as Promise<{ filled: number; failed: number }>,
     onSuccess: refresh,
   });
 }

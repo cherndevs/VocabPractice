@@ -42,8 +42,11 @@ export default function Library() {
   const fillMeanings = useFillMeanings(subject);
   const fill = () =>
     fillMeanings.mutate(undefined, {
-      onSuccess: ({ filled }) =>
-        toast({ title: filled ? `Added ${filled} meaning${filled === 1 ? "" : "s"}` : "Every word already has a meaning" }),
+      onSuccess: ({ filled, failed }) =>
+        toast({
+          title: filled ? `Added ${filled} meaning${filled === 1 ? "" : "s"}` : "Every word already has a meaning",
+          description: failed ? "Some lists couldn't be done. Try again later." : undefined,
+        }),
       onError: () => toast({ title: "Couldn't fill meanings", description: "Try again later.", variant: "destructive" }),
     });
   const active = subject ? SUBJECT_META[subject] : undefined;

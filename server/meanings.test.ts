@@ -18,8 +18,11 @@ const chineseSession = (words: string[], overrides: Record<string, unknown> = {}
   ...overrides,
 });
 
-const meanings = async (subject: string, words: string[]) =>
-  (await api.request("GET", `/api/meanings?subject=${subject}&words=${encodeURIComponent(words.join(","))}`)).body;
+const meanings = async (subject: string, words: string[]) => {
+  const params = new URLSearchParams({ subject });
+  for (const word of words) params.append("word", word);
+  return (await api.request("GET", `/api/meanings?${params}`)).body;
+};
 
 describe("generating Meanings when a list is saved", () => {
   it("gives every item in a new Chinese list a meaning, in one call", async () => {
@@ -38,7 +41,7 @@ describe("generating Meanings when a list is saved", () => {
     await api.settle();
     await api.request("POST", "/api/sessions", chineseSession(["长城", "大海"]));
     await api.settle();
-    expect(api.meaningCalls[1]).toEqual({ items: ["长城", "大海"], missing: ["大海"] });
+    expect(api.meaningCalls[1]).toEqual({ items: ["长城", "大海"], missing: ["大海"], topic: null });
   });
 
   it("makes no call when every word already has a meaning", async () => {
@@ -80,6 +83,12 @@ describe("generating Meanings when a list is saved", () => {
     await api.settle();
     expect(await meanings("chinese", ["长城", "别的"])).toEqual({ 长城: "Great Wall" });
   });
+});
+
+it("finds the meaning of a sentence that contains a comma", async () => {
+  await api.request("POST", "/api/sessions", chineseSession(["你好, 老师。"]));
+  await api.settle();
+  expect(await meanings("chinese", ["你好, 老师。"])).toEqual({ "你好, 老师。": "meaning of 你好, 老师。" });
 });
 
 describe("editing a Meaning", () => {
@@ -124,13 +133,13 @@ describe("filling missing Meanings", () => {
     await api.settle();
 
     const calls: string[][] = [];
-    api.setGenerateMeanings(async (_items, missing) => {
+    api.setGenerateMeanings(async ({ missing }) => {
       calls.push(missing);
       return Object.fromEntries(missing.map((m) => [m, `meaning of ${m}`]));
     });
     const res = await api.request("POST", "/api/meanings/fill", { subject: "chinese" });
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ filled: 3 });
+    expect(res.body).toEqual({ filled: 3, failed: 0 });
     expect(await meanings("chinese", ["长城", "大海", "高山"])).toEqual({
       长城: "meaning of 长城",
       大海: "meaning of 大海",
@@ -139,6 +148,23 @@ describe("filling missing Meanings", () => {
     // One call per list that still had gaps; 大海 is not asked for twice.
     expect(calls).toHaveLength(2);
     expect(calls.flat().sort()).toEqual(["大海", "长城", "高山"].sort());
+  });
+
+  it("carries on past a list whose call fails, and reports it", async () => {
+    api.setGenerateMeanings(async () => {
+      throw new Error("provider down");
+    });
+    await api.request("POST", "/api/sessions", chineseSession(["长城"]));
+    await api.request("POST", "/api/sessions", chineseSession(["大海"]));
+    await api.settle();
+    api.setGenerateMeanings(async ({ missing }) => {
+      if (missing.includes("大海")) throw new Error("provider down");
+      return Object.fromEntries(missing.map((m) => [m, `meaning of ${m}`]));
+    });
+    const res = await api.request("POST", "/api/meanings/fill", { subject: "chinese" });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ filled: 1, failed: 1 });
+    expect(await meanings("chinese", ["长城", "大海"])).toEqual({ 长城: "meaning of 长城" });
   });
 
   it("reports a failed retry so the user can try again", async () => {

@@ -10,7 +10,7 @@ import { LessonPicker } from "@/components/lesson-picker";
 import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
 import { MEANING_SUBJECTS, type SessionWithLesson } from "@shared/schema";
-import { useEditMeaning, useMeanings } from "@/hooks/use-meanings";
+import { meaningOf, useEditMeaning, useMeanings } from "@/hooks/use-meanings";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -210,34 +210,34 @@ export default function EditSession() {
         <div className="space-y-3 mb-6">
           {words.map((word, index) => (
             <div key={index} className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center space-x-3">
-              <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
-              <Input
-                value={word}
-                onChange={(e) => handleWordChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className="flex-1 bg-transparent border-none outline-none"
-                placeholder="Enter word…"
-                data-testid={`edit-input-word-${index}`}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRemoveWord(index)}
-                className="p-1 text-destructive hover:bg-destructive/10"
-                data-testid={`edit-button-remove-word-${index}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-            {showMeanings && word.trim() && (
-              <MeaningField
-                key={word.trim()}
-                meaning={meanings[word.trim()] ?? ""}
-                onSave={(meaning) => editMeaning.mutate({ word: word.trim(), meaning })}
-                testId={`edit-input-meaning-${index}`}
-              />
-            )}
+              <div className="flex items-center space-x-3">
+                <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
+                <Input
+                  value={word}
+                  onChange={(e) => handleWordChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  className="flex-1 bg-transparent border-none outline-none"
+                  placeholder="Enter word…"
+                  data-testid={`edit-input-word-${index}`}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveWord(index)}
+                  className="p-1 text-destructive hover:bg-destructive/10"
+                  data-testid={`edit-button-remove-word-${index}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              {showMeanings && word.trim() && (
+                <MeaningField
+                  key={word.trim()}
+                  meaning={meaningOf(meanings, word) ?? ""}
+                  onSave={(meaning) => editMeaning.mutate({ word: word.trim(), meaning })}
+                  testId={`edit-input-meaning-${index}`}
+                />
+              )}
             </div>
           ))}
         </div>

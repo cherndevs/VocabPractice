@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { meaningOf } from "@/hooks/use-meanings";
 import { Check, EyeOff, Pencil, Users, Volume2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSpeech } from "@/hooks/use-speech";
@@ -108,7 +109,7 @@ export function LearnRun({
   const pinyin = getPinyinAnnotation(word);
   const chinese = CJK_CHAR.test(word);
   const gots = flow.gotCount[word] ?? 0;
-  const meaning = meanings[word.trim()];
+  const meaning = meaningOf(meanings, word);
 
   const hear = () => {
     void speak(word, { lang: chinese ? "zh-CN" : "en-US" }).catch(() => {});

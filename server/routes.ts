@@ -25,7 +25,7 @@ import {
   SUPPORTED_MEDIA_TYPES,
   type SupportedMediaType,
 } from "./spelling-extraction";
-import { fillMeanings, generateMeaningsWithOpenRouter, type GenerateMeanings } from "./meanings";
+import { fillMeanings, generateMeaningsWithOpenRouter, normalizeWords, type GenerateMeanings } from "./meanings";
 
 // Storage is injected rather than imported so tests can mount these routes on
 // in-memory storage (CHE-29: the HTTP API is the testing seam).
@@ -54,12 +54,12 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Gives a saved list's new words their Meanings without holding up the
   // save; a failure only leaves them blank until "Fill missing meanings".
-  const meaningsInBackground = (subject: Subject, words: string[]) => {
-    background(
-      fillMeanings(storage, generateMeanings, subject, words).catch((error) =>
-        console.error("[meanings] Generation failed", error),
-      ),
-    );
+  const fillSessionMeanings = async (session: Session) => {
+    const topic = session.lessonId ? ((await storage.getLesson(session.lessonId))?.topic ?? null) : null;
+    return fillMeanings(storage, generateMeanings, session.subject, session.words, topic);
+  };
+  const meaningsInBackground = (session: Session) => {
+    background(fillSessionMeanings(session).catch((error) => console.error("[meanings] Generation failed", error)));
   };
 
   // Spelling list extraction — relays a worksheet photo to Claude and returns
@@ -265,7 +265,7 @@ export async function registerRoutes(
       const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
       const lessonId = await resolveLessonId(sessionData.subject, lessonName);
       const session = await storage.createSession({ ...sessionData, lessonId });
-      meaningsInBackground(session.subject, session.words);
+      meaningsInBackground(session);
       res.json(await withLesson(session));
     } catch (error) {
       res.status(400).json({ message: "Invalid session data" });
@@ -316,7 +316,7 @@ export async function registerRoutes(
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
-      if (updates.words !== undefined) meaningsInBackground(session.subject, session.words);
+      if (updates.words !== undefined) meaningsInBackground(session);
       res.json(await withLesson(session));
     } catch (error) {
       console.error("Failed to update session", error);
@@ -377,16 +377,18 @@ export async function registerRoutes(
     }
   });
 
-  // Meanings (ADR-0011). GET returns {word: meaning} for the given words
-  // (comma-separated) that have one.
+  // Meanings (ADR-0011). GET returns {word: meaning} for the given words that
+  // have one. Words come as repeated ?word= params, not comma-separated: a
+  // sentence can contain a comma.
   app.get("/api/meanings", async (req, res) => {
     const subject = subjectSchema.safeParse(req.query.subject);
-    if (!subject.success || typeof req.query.words !== "string") {
-      return res.status(400).json({ message: "subject and words are required" });
+    const raw = req.query.word;
+    const words = typeof raw === "string" ? [raw] : Array.isArray(raw) ? raw.filter((w): w is string => typeof w === "string") : null;
+    if (!subject.success || !words) {
+      return res.status(400).json({ message: "subject and word are required" });
     }
     try {
-      const words = req.query.words.split(",").map((w) => w.trim()).filter(Boolean);
-      const rows = await storage.getWords(subject.data, words);
+      const rows = await storage.getWords(subject.data, normalizeWords(words));
       res.json(Object.fromEntries(rows.filter((r) => r.meaning).map((r) => [r.word, r.meaning])));
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch meanings" });
@@ -410,7 +412,9 @@ export async function registerRoutes(
   });
 
   // Retries every list in the Subject whose words are missing meanings: covers
-  // failed generations and lists saved before Meanings existed.
+  // failed generations and lists saved before Meanings existed. One list's
+  // failure doesn't stop the rest; failed counts the lists that still have
+  // gaps. 502 only when nothing could be filled.
   app.post("/api/meanings/fill", async (req, res) => {
     const subject = subjectSchema.safeParse(req.body?.subject);
     if (!subject.success) {
@@ -418,13 +422,21 @@ export async function registerRoutes(
     }
     try {
       let filled = 0;
+      let failed = 0;
       for (const session of await storage.getSessions(subject.data)) {
-        filled += await fillMeanings(storage, generateMeanings, subject.data, session.words);
+        try {
+          filled += await fillSessionMeanings(session);
+        } catch (error) {
+          console.error("[meanings] Fill failed for a list", error);
+          failed += 1;
+        }
       }
-      res.json({ filled });
+      if (failed > 0 && filled === 0) {
+        return res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
+      }
+      res.json({ filled, failed });
     } catch (error) {
-      console.error("[meanings] Fill failed", error);
-      res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
+      res.status(500).json({ message: "Failed to fill meanings" });
     }
   });
 

@@ -320,6 +320,7 @@ export function PracticeDrill({
   const showing = readFlow && !isFinished(readFlow) ? currentShowing(readFlow) : null;
   const activeWord = showing ? showing.word : words[currentWordIndex];
   const currentMeaning = meaningOf(meanings, activeWord);
+  const lastMeaning = meaningOf(meanings, lastGraded ?? undefined);
   const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
   const offeredViews = viewsForSessionType(session.sessionType);
   const baseMode =
@@ -899,9 +900,9 @@ export function PracticeDrill({
           </div>
 
           {/* The last graded word's Meaning: only once it has been read, never before (CONTEXT.md: Meaning). */}
-          {lastGraded && meaningOf(meanings, lastGraded) && (
+          {lastGraded && lastMeaning && (
             <div className="mx-4 mt-3 rounded-lg bg-muted px-3 py-2 text-center text-[13px] text-muted-foreground" data-testid="text-last-meaning">
-              <span className="font-semibold text-foreground">{lastGraded}</span> means {meaningOf(meanings, lastGraded)}
+              <span className="font-semibold text-foreground">{lastGraded}</span> means {lastMeaning}
             </div>
           )}
 
