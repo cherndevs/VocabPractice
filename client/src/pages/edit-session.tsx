@@ -10,7 +10,7 @@ import { LessonPicker } from "@/components/lesson-picker";
 import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
 import { MEANING_SUBJECTS, type SessionWithLesson } from "@shared/schema";
-import { meaningOf, useEditMeaning, useMeanings } from "@/hooks/use-meanings";
+import { meaningOf, useEditMeaning, useFillMeanings, useMeanings } from "@/hooks/use-meanings";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +31,15 @@ export default function EditSession() {
   const meanings = useMeanings(session?.subject, words);
   const editMeaning = useEditMeaning(session?.subject);
   const showMeanings = !!session && MEANING_SUBJECTS.includes(session.subject);
+  // Fill works on the saved list, so it's offered only for saved words still
+  // without a meaning (normally none: saving generates them).
+  const fillMeanings = useFillMeanings(id);
+  const missingMeanings = showMeanings ? session.words.filter((w) => w.trim() && !meaningOf(meanings, w)).length : 0;
+  const fill = () =>
+    fillMeanings.mutate(undefined, {
+      onSuccess: ({ filled }) => toast({ title: filled ? `Added ${filled} meaning${filled === 1 ? "" : "s"}` : "No meanings to add" }),
+      onError: () => toast({ title: "Couldn't fill meanings", description: "Try again later.", variant: "destructive" }),
+    });
 
   // Pre-populate form once session loads
   useEffect(() => {
@@ -251,6 +260,18 @@ export default function EditSession() {
           <Plus className="w-4 h-4 mr-2" />
           Add Word
         </Button>
+
+        {missingMeanings > 0 && (
+          <Button
+            variant="outline"
+            onClick={fill}
+            disabled={fillMeanings.isPending}
+            className="w-full mb-4"
+            data-testid="edit-button-fill-meanings"
+          >
+            {fillMeanings.isPending ? "Filling meanings…" : `Fill ${missingMeanings} missing meaning${missingMeanings === 1 ? "" : "s"}`}
+          </Button>
+        )}
 
         <Button
           onClick={handleSave}

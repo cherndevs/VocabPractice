@@ -41,11 +41,11 @@ export function useEditMeaning(subject: Subject | undefined) {
   });
 }
 
-/** Retries every word in the Subject's lists that has no meaning yet. */
-export function useFillMeanings(subject: Subject | undefined) {
+/** Retries one list's words that have no meaning yet. */
+export function useFillMeanings(sessionId: string | undefined) {
   const refresh = useRefreshMeanings();
   return useMutation({
-    mutationFn: async () => (await apiRequest("POST", "/api/meanings/fill", { subject })).json() as Promise<{ filled: number; failed: number }>,
+    mutationFn: async () => (await apiRequest("POST", `/api/sessions/${sessionId}/meanings/fill`)).json() as Promise<{ filled: number }>,
     onSuccess: refresh,
   });
 }

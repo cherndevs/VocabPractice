@@ -4,7 +4,7 @@ A word's **Meaning** (CHE-32) is stored in a new `words` table with one row per 
 
 There's no single place a word lives today. A session holds plain strings, and FSRS (ADR-0010) treats (subject, text) as the word's identity. Hanging the meaning off that same identity keeps one meaning per word, matching the one review state per word per skill, so an edit fixes the meaning in every list. It also gives later per-word data a home.
 
-Meanings come from one text-only OpenRouter call made when a lesson is saved, to `qwen/qwen3-30b-a3b-instruct-2507`, pinned by exact ID. The call gets the whole list as context and asks only for words that don't have a row yet. If it fails, the save still goes through, and a Library "Fill missing meanings" action retries. Rows a parent has edited are never overwritten.
+Meanings come from one text-only OpenRouter call made when a lesson is saved, to `qwen/qwen3-30b-a3b-instruct-2507`, pinned by exact ID. The call gets the whole list as context and asks only for words that don't have a row yet. If it fails, the save still goes through, and a "Fill missing meanings" button on that list's edit page retries it. Rows a parent has edited are never overwritten.
 
 ## Considered Options
 

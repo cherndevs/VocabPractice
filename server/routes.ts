@@ -53,7 +53,7 @@ export async function registerRoutes(
   { now = () => new Date(), generateMeanings = generateMeaningsWithOpenRouter, background = () => {} }: RouteOptions = {},
 ): Promise<Server> {
   // Gives a saved list's new words their Meanings without holding up the
-  // save; a failure only leaves them blank until "Fill missing meanings".
+  // save; a failure only leaves them blank until the edit page's fill button.
   const fillSessionMeanings = async (session: Session) => {
     const topic = session.lessonId ? ((await storage.getLesson(session.lessonId))?.topic ?? null) : null;
     return fillMeanings(storage, generateMeanings, session.subject, session.words, topic);
@@ -411,32 +411,18 @@ export async function registerRoutes(
     }
   });
 
-  // Retries every list in the Subject whose words are missing meanings: covers
-  // failed generations and lists saved before Meanings existed. One list's
-  // failure doesn't stop the rest; failed counts the lists that still have
-  // gaps. 502 only when nothing could be filled.
-  app.post("/api/meanings/fill", async (req, res) => {
-    const subject = subjectSchema.safeParse(req.body?.subject);
-    if (!subject.success) {
-      return res.status(400).json({ message: "A valid subject is required" });
-    }
+  // Retries one list's words that are missing meanings (a failed generation,
+  // or a list saved before Meanings existed). The edit page offers it.
+  app.post("/api/sessions/:id/meanings/fill", async (req, res) => {
     try {
-      let filled = 0;
-      let failed = 0;
-      for (const session of await storage.getSessions(subject.data)) {
-        try {
-          filled += await fillSessionMeanings(session);
-        } catch (error) {
-          console.error("[meanings] Fill failed for a list", error);
-          failed += 1;
-        }
+      const session = await storage.getSession(req.params.id);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
       }
-      if (failed > 0 && filled === 0) {
-        return res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
-      }
-      res.json({ filled, failed });
+      res.json({ filled: await fillSessionMeanings(session) });
     } catch (error) {
-      res.status(500).json({ message: "Failed to fill meanings" });
+      console.error("[meanings] Fill failed", error);
+      res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
     }
   });
 
