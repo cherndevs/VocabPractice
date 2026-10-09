@@ -24,7 +24,9 @@ import CameraCapture from "@/components/camera-capture";
 import { prepareWorksheetImage } from "@/lib/prepare-worksheet-image";
 import { extractSpellingLists } from "@/lib/extract-spelling-lists";
 import { sanitizeExtractedCandidates, type ExtractedCandidate } from "@/lib/extraction-candidates";
-import type { InsertSession, SessionType } from "@shared/schema";
+import { MEANING_SUBJECTS, type InsertSession, type MeaningEntry, type SessionType } from "@shared/schema";
+import { useMeaningDrafts } from "@/hooks/use-meanings";
+import { FillMeaningsButton, MeaningField } from "@/components/meaning-field";
 
 type CreateSessionStep = "type" | "camera" | "selection" | "processing" | "edit-words" | "session-created";
 
@@ -97,8 +99,17 @@ export default function CreateSession() {
   // "empty" for a call that succeeded but found no usable word list.
   const [extractionError, setExtractionError] = useState<"api-error" | "empty" | null>(null);
 
+  // Meanings are previewed on the edit-words screen and saved with the list
+  // (CONTEXT.md: Meaning). An extracted list fills itself on arrival; a
+  // failure there stays quiet, and the Fill button offers the retry.
+  const showMeanings = !!subject && MEANING_SUBJECTS.includes(subject);
+  const drafts = useMeaningDrafts(subject, lessonName);
+  const previewExtracted = (list: string[], lesson: string | null) => {
+    if (showMeanings) drafts.fill(list, lesson).catch(() => {});
+  };
+
   const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: InsertSession & { lessonName: string | null; dueDate: string | null }) => {
+    mutationFn: async (sessionData: InsertSession & { lessonName: string | null; dueDate: string | null; meanings: MeaningEntry[] }) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
       return response.json();
     },
@@ -106,6 +117,7 @@ export default function CreateSession() {
       queryClient.invalidateQueries({ queryKey: ["/api/sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/meanings"] });
     },
   });
   const handleImageCapture = async (imageData: string) => {
@@ -133,6 +145,7 @@ export default function CreateSession() {
         setLessonName(lesson);
         setDueDate(due);
         setCurrentStep("edit-words");
+        previewExtracted(words, lesson);
         return;
       }
 
@@ -158,6 +171,7 @@ export default function CreateSession() {
   };
 
   const handleEnterWordsManually = () => {
+    drafts.reset();
     setWords([""]);
     setSessionTitle("");
     setLessonName(null);
@@ -172,6 +186,7 @@ export default function CreateSession() {
 
   /** Discards any extraction result in progress and returns to the camera for a fresh capture. */
   const handleRetake = () => {
+    drafts.reset();
     setWords([""]);
     setSessionTitle("");
     setLessonName(null);
@@ -201,6 +216,7 @@ export default function CreateSession() {
     setLessonName(lesson);
     setDueDate(due);
     setCurrentStep("edit-words");
+    previewExtracted(words, lesson);
   };
 
   const handleAddWord = () => {
@@ -274,6 +290,7 @@ export default function CreateSession() {
         dueDate,
         words: filteredWords,
         wordCount: filteredWords.length,
+        meanings: showMeanings ? drafts.entries(filteredWords) : [],
         status: "new",
         progress: 0,
         timeSpent: 0,
@@ -297,6 +314,7 @@ export default function CreateSession() {
       setSessionTitle(nextTitle);
       setLessonName(nextLesson);
       setDueDate(nextDue);
+      previewExtracted(nextWords, nextLesson);
       return;
     }
 
@@ -499,26 +517,31 @@ export default function CreateSession() {
               <div className={fieldLabel}>Words ({words.length})</div>
               <div className="space-y-3">
                 {words.map((word, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <span className="w-5 shrink-0 text-right text-[13px] font-semibold text-muted-foreground">{index + 1}</span>
-                    <Input
-                      value={word}
-                      onChange={(e) => handleWordChange(index, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="h-[42px] flex-1 border-[1.5px] text-[15px]"
-                      data-testid={`input-word-${index}`}
-                      placeholder="Word"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveWord(index)}
-                      aria-label="Remove word"
-                      className="text-muted-foreground hover:bg-transparent hover:text-destructive"
-                      data-testid={`button-remove-word-${index}`}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <div key={index}>
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 shrink-0 text-right text-[13px] font-semibold text-muted-foreground">{index + 1}</span>
+                      <Input
+                        value={word}
+                        onChange={(e) => handleWordChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        className="h-[42px] flex-1 border-[1.5px] text-[15px]"
+                        data-testid={`input-word-${index}`}
+                        placeholder="Word"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveWord(index)}
+                        aria-label="Remove word"
+                        className="text-muted-foreground hover:bg-transparent hover:text-destructive"
+                        data-testid={`button-remove-word-${index}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {showMeanings && word.trim() && (
+                      <MeaningField value={drafts.meaningOf(word)} onChange={(meaning) => drafts.edit(word, meaning)} testId={`input-meaning-${index}`} />
+                    )}
                   </div>
                 ))}
               </div>
@@ -531,6 +554,7 @@ export default function CreateSession() {
                 <Plus className="h-4 w-4" />
                 Add word
               </Button>
+              {showMeanings && <FillMeaningsButton drafts={drafts} words={words} />}
             </div>
           </div>
           <div className={footer}>

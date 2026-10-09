@@ -1,8 +1,9 @@
-import { MEANING_SUBJECTS, type Subject } from "@shared/schema";
+import { MEANING_SUBJECTS, type MeaningEntry, type Subject } from "@shared/schema";
 import type { IStorage } from "./storage";
 
 // Meanings (CONTEXT.md, ADR-0011): a child-level English rendering of each
-// list item, generated once per word by one cheap text-only call.
+// list item. Generated while a list is reviewed (one cheap text-only call),
+// shown for checking, and stored when the list is saved.
 
 /** Word → Meaning. */
 export type Meanings = Record<string, string>;
@@ -20,32 +21,56 @@ export type GenerateMeanings = (request: MeaningRequest) => Promise<Meanings>;
 export const normalizeWords = (words: string[]) => Array.from(new Set(words.map((w) => w.trim()).filter(Boolean)));
 
 /**
- * Generates meanings for the items in one list that have no word row yet.
- * Returns how many it added. Throws if the AI call fails; callers on the save
- * path swallow that, so a list always saves.
+ * The Meanings shown while a list is reviewed, before it is saved: stored
+ * meanings where they exist, the rest from one AI call. Stores nothing; the
+ * save does. Throws if the AI call fails.
  */
-export async function fillMeanings(
+export async function previewMeanings(
   storage: IStorage,
   generate: GenerateMeanings,
   subject: Subject,
   list: string[],
-  topic: string | null = null,
-): Promise<number> {
-  if (!MEANING_SUBJECTS.includes(subject)) return 0;
+  topic: string | null,
+  /** The words the caller still needs; the rest are context only. Defaults to the whole list. */
+  needed: string[] = list,
+): Promise<Meanings> {
+  if (!MEANING_SUBJECTS.includes(subject)) return {};
   const items = normalizeWords(list);
-  const known = new Set((await storage.getWords(subject, items)).map((r) => r.word));
-  const missing = items.filter((w) => !known.has(w));
-  if (missing.length === 0) return 0;
+  const wantedNow = new Set(normalizeWords(needed));
+  const rows = await storage.getWords(subject, items);
+  // A row with no meaning is a parent's clear, which is never regenerated.
+  const known = new Set(rows.map((r) => r.word));
+  const missing = items.filter((w) => wantedNow.has(w) && !known.has(w));
+  const stored = Object.fromEntries(rows.flatMap((r) => (r.meaning ? [[r.word, r.meaning]] : [])));
+  if (missing.length === 0) return stored;
 
   const generated = await generate({ items, missing, topic });
   const wanted = new Set(missing);
-  const meanings = Object.fromEntries(
-    Object.entries(generated)
-      .map(([word, meaning]) => [word.trim(), typeof meaning === "string" ? meaning.trim() : ""] as const)
-      .filter(([word, meaning]) => wanted.has(word) && meaning),
-  );
-  await storage.addGeneratedMeanings(subject, meanings);
-  return Object.keys(meanings).length;
+  return {
+    ...stored,
+    ...Object.fromEntries(
+      Object.entries(generated)
+        .map(([word, meaning]) => [word.trim(), typeof meaning === "string" ? meaning.trim() : ""] as const)
+        .filter(([word, meaning]) => wanted.has(word) && meaning),
+    ),
+  };
+}
+
+/**
+ * Stores the Meanings sent with a saved list, for words in that list only. An
+ * unedited (previewed) meaning never replaces a stored one; an edit always does.
+ */
+export async function saveMeanings(storage: IStorage, subject: Subject, list: string[], entries: MeaningEntry[]) {
+  if (!MEANING_SUBJECTS.includes(subject)) return;
+  const inList = new Set(normalizeWords(list));
+  const generated: Meanings = {};
+  for (const { word, meaning, edited } of entries) {
+    const key = word.trim();
+    if (!inList.has(key)) continue;
+    if (edited) await storage.setEditedMeaning(subject, key, meaning.trim() || null);
+    else if (meaning.trim()) generated[key] = meaning.trim();
+  }
+  await storage.addGeneratedMeanings(subject, generated);
 }
 
 // Text-only, no thinking step, strong at Chinese (chosen in CHE-32). Pin the
@@ -56,7 +81,7 @@ const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 const PROMPT = `You help a young child learning to read Chinese understand a school word list.
 
 You get the whole list (and its topic, if known) as context, and the items that need a meaning. For each item that needs a meaning, write it in simple English a 7-year-old understands:
-- a word or phrase: a short gloss, a few words at most (e.g. 长城 → "the Great Wall"). If it has several senses, give the one that fits this list.
+- a word or phrase: its plain English equivalent, not a definition (e.g. 长城 → "the Great Wall", 蝴蝶 → "butterfly", 游泳 → "to swim"). If it has several senses, give the one that fits this list. Explain only when no simple English word exists (e.g. 冲凉 → "to take a shower").
 - a sentence: a natural, full English translation.
 
 Reply with JSON only: {"meanings": {"<item exactly as given>": "<meaning>"}}`;

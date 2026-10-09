@@ -1,4 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { Subject } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -26,26 +27,63 @@ export function useMeanings(subject: Subject | undefined, words: string[]): Reco
 export const meaningOf = (meanings: Record<string, string>, word: string | undefined) =>
   word ? meanings[word.trim()] : undefined;
 
-function useRefreshMeanings() {
-  const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: ["/api/meanings"] });
-}
+/** A Meaning on a list being reviewed, not yet saved. */
+export type MeaningDraft = { meaning: string; edited: boolean };
 
-/** A parent's edit; blank clears it. Either way it is never regenerated. */
-export function useEditMeaning(subject: Subject | undefined) {
-  const refresh = useRefreshMeanings();
-  return useMutation({
-    mutationFn: ({ word, meaning }: { word: string; meaning: string }) =>
-      apiRequest("PUT", "/api/meanings", { subject, word, meaning }),
-    onSuccess: refresh,
-  });
-}
+const listOf = (words: string[]) => Array.from(new Set(words.map((w) => w.trim()).filter(Boolean)));
 
-/** Retries every word in the Subject's lists that has no meaning yet. */
-export function useFillMeanings(subject: Subject | undefined) {
-  const refresh = useRefreshMeanings();
-  return useMutation({
-    mutationFn: async () => (await apiRequest("POST", "/api/meanings/fill", { subject })).json() as Promise<{ filled: number; failed: number }>,
-    onSuccess: refresh,
+/**
+ * The Meanings of a list while it is created or edited. fill() previews the
+ * missing ones (stored where they exist, otherwise one AI call); edit() is a
+ * parent's change. Nothing is stored until the list is saved with entries().
+ */
+export function useMeaningDrafts(subject: Subject | undefined, lessonName: string | null) {
+  const [drafts, setDrafts] = useState<Record<string, MeaningDraft>>({});
+  // A word is missing a meaning unless it has one, or a parent cleared it on purpose.
+  const isMissing = (word: string) => !drafts[word]?.meaning && !drafts[word]?.edited;
+
+  const preview = useMutation({
+    mutationFn: async (body: { words: string[]; missing: string[]; lesson: string | null }) =>
+      (await apiRequest("POST", "/api/meanings/preview", { subject, words: body.words, missing: body.missing, lessonName: body.lesson })).json() as Promise<
+        Record<string, string>
+      >,
   });
+
+  /**
+   * Previews meanings for the words that lack one; resolves to how many were
+   * added. lesson overrides the current tag, for a list just loaded into state.
+   */
+  const fill = async (words: string[], lesson: string | null = lessonName) => {
+    const list = listOf(words);
+    if (!subject || !list.some(isMissing)) return 0;
+    // The whole list goes as context; only the missing words are generated.
+    const found = await preview.mutateAsync({ words: list, missing: list.filter(isMissing), lesson });
+    setDrafts((prev) => {
+      const next = { ...prev };
+      for (const word of list) {
+        if (found[word] && !next[word]?.meaning && !next[word]?.edited) next[word] = { meaning: found[word], edited: false };
+      }
+      return next;
+    });
+    return list.filter((word) => found[word] && isMissing(word)).length;
+  };
+
+  /** Starts from a saved list's stored meanings, keeping anything already drafted. */
+  const seed = (stored: Record<string, string>) =>
+    setDrafts((prev) => ({
+      ...Object.fromEntries(Object.entries(stored).map(([word, meaning]) => [word, { meaning, edited: false }])),
+      ...prev,
+    }));
+
+  return {
+    meaningOf: (word: string) => drafts[word.trim()]?.meaning ?? "",
+    edit: (word: string, meaning: string) => setDrafts((prev) => ({ ...prev, [word.trim()]: { meaning, edited: true } })),
+    missingCount: (words: string[]) => listOf(words).filter(isMissing).length,
+    fill,
+    filling: preview.isPending,
+    seed,
+    reset: () => setDrafts({}),
+    /** What to send with the save: a meaning for each word in the list that has one. */
+    entries: (words: string[]) => listOf(words).flatMap((word) => (drafts[word] ? [{ word, ...drafts[word] }] : [])),
+  };
 }

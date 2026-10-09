@@ -184,6 +184,12 @@ export type GradeInput = z.infer<typeof gradeInputSchema>;
 export type ReviewState = typeof reviewStates.$inferSelect;
 export type WordRow = typeof words.$inferSelect;
 
+// A Meaning sent with a list being saved: from the preview (edited false) or
+// typed by a parent (edited true, never regenerated; blank clears it).
+export const meaningEntrySchema = z.object({ word: z.string(), meaning: z.string(), edited: z.boolean() });
+export type MeaningEntry = z.infer<typeof meaningEntrySchema>;
+export const meaningEntriesSchema = z.array(meaningEntrySchema);
+
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
