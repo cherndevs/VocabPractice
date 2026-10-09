@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
+import { z } from "zod";
 import type { IStorage } from "./storage";
 import {
   DEFAULT_REFRESHER_SIZE,
@@ -9,6 +10,7 @@ import {
   insertSessionSchema,
   insertSettingsSchema,
   lessonNameSchema,
+  meaningEntriesSchema,
   dueDateSchema,
   skillSchema,
   subjectSchema,
@@ -25,7 +27,7 @@ import {
   SUPPORTED_MEDIA_TYPES,
   type SupportedMediaType,
 } from "./spelling-extraction";
-import { fillMeanings, generateMeaningsWithOpenRouter, normalizeWords, type GenerateMeanings } from "./meanings";
+import { generateMeaningsWithOpenRouter, normalizeWords, previewMeanings, saveMeanings, type GenerateMeanings } from "./meanings";
 
 // Storage is injected rather than imported so tests can mount these routes on
 // in-memory storage (CHE-29: the HTTP API is the testing seam).
@@ -40,28 +42,13 @@ export interface RouteOptions {
   now?: () => Date;
   /** The AI call behind Meanings; tests inject a fake. */
   generateMeanings?: GenerateMeanings;
-  /**
-   * Runs work the response should not wait for (generating Meanings after a
-   * save). Tests inject one they can await.
-   */
-  background?: (work: Promise<unknown>) => void;
 }
 
 export async function registerRoutes(
   app: Express,
   storage: IStorage,
-  { now = () => new Date(), generateMeanings = generateMeaningsWithOpenRouter, background = () => {} }: RouteOptions = {},
+  { now = () => new Date(), generateMeanings = generateMeaningsWithOpenRouter }: RouteOptions = {},
 ): Promise<Server> {
-  // Gives a saved list's new words their Meanings without holding up the
-  // save; a failure only leaves them blank until the edit page's fill button.
-  const fillSessionMeanings = async (session: Session) => {
-    const topic = session.lessonId ? ((await storage.getLesson(session.lessonId))?.topic ?? null) : null;
-    return fillMeanings(storage, generateMeanings, session.subject, session.words, topic);
-  };
-  const meaningsInBackground = (session: Session) => {
-    background(fillSessionMeanings(session).catch((error) => console.error("[meanings] Generation failed", error)));
-  };
-
   // Spelling list extraction — relays a worksheet photo to Claude and returns
   // the sessions it reads off the page. Takes the image as raw bytes rather
   // than JSON so the global express.json() limit stays small for every other
@@ -263,9 +250,10 @@ export async function registerRoutes(
     try {
       const sessionData = insertSessionSchema.parse(req.body);
       const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
+      const meanings = meaningEntriesSchema.optional().parse(req.body.meanings) ?? [];
       const lessonId = await resolveLessonId(sessionData.subject, lessonName);
       const session = await storage.createSession({ ...sessionData, lessonId });
-      meaningsInBackground(session);
+      await saveMeanings(storage, session.subject, session.words, meanings);
       res.json(await withLesson(session));
     } catch (error) {
       res.status(400).json({ message: "Invalid session data" });
@@ -275,9 +263,13 @@ export async function registerRoutes(
   app.put("/api/sessions/:id", async (req, res) => {
     try {
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
-      const { lessonName, ...updates } = req.body as any;
+      const { lessonName, meanings: rawMeanings, ...updates } = req.body as any;
       if (lessonName !== undefined && !lessonNameSchema.safeParse(lessonName).success) {
         return res.status(400).json({ message: "lessonName must be a string or null" });
+      }
+      const meanings = meaningEntriesSchema.optional().safeParse(rawMeanings);
+      if (!meanings.success) {
+        return res.status(400).json({ message: "meanings must be a list of {word, meaning, edited}" });
       }
       if (updates.dueDate !== undefined && !dueDateSchema.safeParse(updates.dueDate).success) {
         return res.status(400).json({ message: "dueDate must be a YYYY-MM-DD date or null" });
@@ -316,7 +308,7 @@ export async function registerRoutes(
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
-      if (updates.words !== undefined) meaningsInBackground(session);
+      await saveMeanings(storage, session.subject, session.words, meanings.data ?? []);
       res.json(await withLesson(session));
     } catch (error) {
       console.error("Failed to update session", error);
@@ -395,34 +387,24 @@ export async function registerRoutes(
     }
   });
 
-  // A parent's edit. Blank clears the meaning; either way it is never regenerated.
-  app.put("/api/meanings", async (req, res) => {
+  // The Meanings for a list under review, before it is saved: stored ones
+  // plus one AI call for the rest. Nothing is stored until the list is saved.
+  app.post("/api/meanings/preview", async (req, res) => {
     const subject = subjectSchema.safeParse(req.body?.subject);
-    const word = typeof req.body?.word === "string" ? req.body.word.trim() : "";
-    const meaning = req.body?.meaning;
-    if (!subject.success || !word || (meaning !== null && typeof meaning !== "string")) {
-      return res.status(400).json({ message: "subject, word and meaning are required" });
+    const words = z.array(z.string()).safeParse(req.body?.words);
+    const missing = z.array(z.string()).optional().safeParse(req.body?.missing);
+    const lessonName = lessonNameSchema.nullish().safeParse(req.body?.lessonName);
+    if (!subject.success || !words.success || !missing.success || !lessonName.success) {
+      return res.status(400).json({ message: "subject and words are required" });
     }
     try {
-      const row = await storage.setEditedMeaning(subject.data, word, meaning?.trim() || null);
-      res.json(row);
+      // The topic of an existing Lesson, if the list is tagged with one; never creates it.
+      const name = lessonName.data?.trim();
+      const topic = name ? ((await storage.getLessons(subject.data)).find((l) => l.name === name)?.topic ?? null) : null;
+      res.json(await previewMeanings(storage, generateMeanings, subject.data, words.data, topic, missing.data));
     } catch (error) {
-      res.status(500).json({ message: "Failed to save meaning" });
-    }
-  });
-
-  // Retries one list's words that are missing meanings (a failed generation,
-  // or a list saved before Meanings existed). The edit page offers it.
-  app.post("/api/sessions/:id/meanings/fill", async (req, res) => {
-    try {
-      const session = await storage.getSession(req.params.id);
-      if (!session) {
-        return res.status(404).json({ message: "Session not found" });
-      }
-      res.json({ filled: await fillSessionMeanings(session) });
-    } catch (error) {
-      console.error("[meanings] Fill failed", error);
-      res.status(502).json({ message: "Couldn't fill meanings. Try again later." });
+      console.error("[meanings] Preview failed", error);
+      res.status(502).json({ message: "Couldn't get meanings. Try again later." });
     }
   });
 

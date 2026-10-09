@@ -17,8 +17,6 @@ export interface TestApi {
   setGenerateMeanings(generate: GenerateMeanings): void;
   /** Every call made to the default meanings generator, oldest first. */
   meaningCalls: MeaningRequest[];
-  /** Waits for background work started by a request (meaning generation). */
-  settle(): Promise<void>;
   request(method: string, path: string, body?: unknown): Promise<{ status: number; body: any }>;
 }
 
@@ -34,14 +32,9 @@ export async function startTestApi(): Promise<TestApi> {
     const { missing } = request;
     return Object.fromEntries(missing.map((m) => [m, `meaning of ${m}`]));
   };
-  const pending = new Set<Promise<unknown>>();
   const server: Server = await registerRoutes(app, new MemStorage(), {
     now: () => now,
     generateMeanings: (request) => generate(request),
-    background: (work) => {
-      pending.add(work);
-      work.finally(() => pending.delete(work));
-    },
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -54,9 +47,6 @@ export async function startTestApi(): Promise<TestApi> {
     },
     setGenerateMeanings: (next) => {
       generate = next;
-    },
-    async settle() {
-      while (pending.size > 0) await Promise.allSettled(Array.from(pending));
     },
     close: () => new Promise<void>((resolve) => server.close(() => resolve())),
     async request(method, path, body) {

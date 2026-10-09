@@ -24,139 +24,127 @@ const meanings = async (subject: string, words: string[]) => {
   return (await api.request("GET", `/api/meanings?${params}`)).body;
 };
 
-describe("generating Meanings when a list is saved", () => {
-  it("gives every item in a new Chinese list a meaning, in one call", async () => {
-    const res = await api.request("POST", "/api/sessions", chineseSession(["长城", "我爱吃苹果。"]));
+const preview = (words: string[], extra: Record<string, unknown> = {}) =>
+  api.request("POST", "/api/meanings/preview", { subject: "chinese", words, ...extra });
+
+describe("previewing Meanings before a list is saved", () => {
+  it("generates every item's meaning in one call, without storing anything", async () => {
+    const res = await preview(["长城", "我爱吃苹果。"]);
     expect(res.status).toBe(200);
-    await api.settle();
-    expect(api.meaningCalls).toHaveLength(1);
-    expect(await meanings("chinese", ["长城", "我爱吃苹果。"])).toEqual({
-      长城: "meaning of 长城",
-      "我爱吃苹果。": "meaning of 我爱吃苹果。",
-    });
-  });
-
-  it("sends the whole list as context but asks only for words without a meaning", async () => {
-    await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    await api.settle();
-    await api.request("POST", "/api/sessions", chineseSession(["长城", "大海"]));
-    await api.settle();
-    expect(api.meaningCalls[1]).toEqual({ items: ["长城", "大海"], missing: ["大海"], topic: null });
-  });
-
-  it("makes no call when every word already has a meaning", async () => {
-    await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    await api.settle();
-    await api.request("POST", "/api/sessions", chineseSession([" 长城 "]));
-    await api.settle();
-    expect(api.meaningCalls).toHaveLength(1);
-  });
-
-  it("glosses words added when a list is edited", async () => {
-    const created = await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    await api.settle();
-    await api.request("PUT", `/api/sessions/${created.body.id}`, { words: ["长城", "大海"], wordCount: 2 });
-    await api.settle();
-    expect(api.meaningCalls.map((c) => c.missing)).toEqual([["长城"], ["大海"]]);
-  });
-
-  it("leaves English lists alone", async () => {
-    await api.request("POST", "/api/sessions", chineseSession(["apple"], { subject: "english" }));
-    await api.settle();
-    expect(api.meaningCalls).toEqual([]);
-    expect(await meanings("english", ["apple"])).toEqual({});
-  });
-
-  it("still saves the list when the AI call fails, leaving the words without meanings", async () => {
-    api.setGenerateMeanings(async () => {
-      throw new Error("provider down");
-    });
-    const res = await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    expect(res.status).toBe(200);
-    await api.settle();
+    expect(res.body).toEqual({ 长城: "meaning of 长城", "我爱吃苹果。": "meaning of 我爱吃苹果。" });
+    expect(api.meaningCalls).toEqual([{ items: ["长城", "我爱吃苹果。"], missing: ["长城", "我爱吃苹果。"], topic: null }]);
     expect(await meanings("chinese", ["长城"])).toEqual({});
   });
 
-  it("ignores meanings the AI returns for items it was not asked about", async () => {
-    api.setGenerateMeanings(async () => ({ 长城: "Great Wall", 别的: "something else" }));
-    await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    await api.settle();
-    expect(await meanings("chinese", ["长城", "别的"])).toEqual({ 长城: "Great Wall" });
-  });
-});
-
-it("finds the meaning of a sentence that contains a comma", async () => {
-  await api.request("POST", "/api/sessions", chineseSession(["你好, 老师。"]));
-  await api.settle();
-  expect(await meanings("chinese", ["你好, 老师。"])).toEqual({ "你好, 老师。": "meaning of 你好, 老师。" });
-});
-
-describe("editing a Meaning", () => {
-  it("replaces the meaning, and a later save never regenerates it", async () => {
-    await api.request("POST", "/api/sessions", chineseSession(["行"]));
-    await api.settle();
-    const res = await api.request("PUT", "/api/meanings", { subject: "chinese", word: "行", meaning: "OK; to walk" });
-    expect(res.status).toBe(200);
-    await api.request("POST", "/api/sessions", chineseSession(["行"]));
-    await api.settle();
-    expect(api.meaningCalls).toHaveLength(1);
-    expect(await meanings("chinese", ["行"])).toEqual({ 行: "OK; to walk" });
+  it("reuses stored meanings and asks only for the rest, with the whole list as context", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["长城"], { meanings: [{ word: "长城", meaning: "the Great Wall", edited: false }] }));
+    const res = await preview(["长城", " 大海 "]);
+    expect(res.body).toEqual({ 长城: "the Great Wall", 大海: "meaning of 大海" });
+    expect(api.meaningCalls).toEqual([{ items: ["长城", "大海"], missing: ["大海"], topic: null }]);
   });
 
-  it("can give a meaning to a word the AI never reached", async () => {
-    const res = await api.request("PUT", "/api/meanings", { subject: "chinese", word: " 大海 ", meaning: " the sea " });
-    expect(res.status).toBe(200);
-    expect(await meanings("chinese", ["大海"])).toEqual({ 大海: "the sea" });
+  it("generates only the words the client still needs, keeping the rest as context", async () => {
+    const res = await preview(["长城", "大海", "高山"], { missing: ["高山"] });
+    expect(res.body).toEqual({ 高山: "meaning of 高山" });
+    expect(api.meaningCalls).toEqual([{ items: ["长城", "大海", "高山"], missing: ["高山"], topic: null }]);
   });
 
-  it("clearing a meaning keeps it cleared rather than regenerating it", async () => {
-    await api.request("PUT", "/api/meanings", { subject: "chinese", word: "大海", meaning: "  " });
-    await api.request("POST", "/api/sessions", chineseSession(["大海"]));
-    await api.settle();
+  it("makes no call when every word already has a meaning", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["长城"], { meanings: [{ word: "长城", meaning: "the Great Wall", edited: false }] }));
+    expect((await preview(["长城"])).body).toEqual({ 长城: "the Great Wall" });
     expect(api.meaningCalls).toEqual([]);
+  });
+
+  it("never regenerates a meaning a parent cleared", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["大海"], { meanings: [{ word: "大海", meaning: "", edited: true }] }));
+    expect((await preview(["大海"])).body).toEqual({});
+    expect(api.meaningCalls).toEqual([]);
+  });
+
+  it("drops meanings the AI returns for items it was not asked about", async () => {
+    api.setGenerateMeanings(async () => ({ 长城: "Great Wall", 别的: "something else" }));
+    expect((await preview(["长城"])).body).toEqual({ 长城: "Great Wall" });
+  });
+
+  it("returns nothing for a Subject without Meanings", async () => {
+    const res = await preview(["apple"], { subject: "english" });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({});
+    expect(api.meaningCalls).toEqual([]);
+  });
+
+  it("reports a failed AI call so the user can try again", async () => {
+    api.setGenerateMeanings(async () => {
+      throw new Error("provider down");
+    });
+    expect((await preview(["长城"])).status).toBe(502);
+  });
+
+  it("rejects a request without a valid subject or words", async () => {
+    expect((await api.request("POST", "/api/meanings/preview", { subject: "maths", words: ["x"] })).status).toBe(400);
+    expect((await api.request("POST", "/api/meanings/preview", { subject: "chinese" })).status).toBe(400);
+  });
+});
+
+describe("saving Meanings with a list", () => {
+  it("stores the meanings sent with a new list and calls no AI", async () => {
+    const res = await api.request(
+      "POST",
+      "/api/sessions",
+      chineseSession(["长城", "行"], {
+        meanings: [
+          { word: "长城", meaning: "the Great Wall", edited: false },
+          { word: "行", meaning: "OK", edited: true },
+        ],
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(api.meaningCalls).toEqual([]);
+    expect(await meanings("chinese", ["长城", "行"])).toEqual({ 长城: "the Great Wall", 行: "OK" });
+  });
+
+  it("saves a list sent without meanings, leaving its words blank", async () => {
+    const res = await api.request("POST", "/api/sessions", chineseSession(["长城"]));
+    expect(res.status).toBe(200);
+    expect(api.meaningCalls).toEqual([]);
+    expect(await meanings("chinese", ["长城"])).toEqual({});
+  });
+
+  it("ignores meanings for words not in the list", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["长城"], { meanings: [{ word: "大海", meaning: "the sea", edited: true }] }));
     expect(await meanings("chinese", ["大海"])).toEqual({});
   });
 
-  it("rejects an edit without a valid subject or word", async () => {
-    expect((await api.request("PUT", "/api/meanings", { subject: "maths", word: "x", meaning: "y" })).status).toBe(400);
-    expect((await api.request("PUT", "/api/meanings", { subject: "chinese", word: " ", meaning: "y" })).status).toBe(400);
-  });
-});
-
-describe("filling a list's missing Meanings", () => {
-  it("retries only that list's words without a meaning", async () => {
-    api.setGenerateMeanings(async () => {
-      throw new Error("provider down");
-    });
-    const first = await api.request("POST", "/api/sessions", chineseSession(["长城", "大海"]));
-    await api.request("POST", "/api/sessions", chineseSession(["高山"]));
-    await api.settle();
-
-    const calls: string[][] = [];
-    api.setGenerateMeanings(async ({ missing }) => {
-      calls.push(missing);
-      return Object.fromEntries(missing.map((m) => [m, `meaning of ${m}`]));
-    });
-    const res = await api.request("POST", `/api/sessions/${first.body.id}/meanings/fill`);
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ filled: 2 });
-    expect(calls).toEqual([["长城", "大海"]]);
-    expect(await meanings("chinese", ["长城", "大海", "高山"])).toEqual({
-      长城: "meaning of 长城",
-      大海: "meaning of 大海",
-    });
+  it("an unedited meaning never replaces a stored one; an edit always does", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["行"], { meanings: [{ word: "行", meaning: "to walk", edited: false }] }));
+    await api.request("POST", "/api/sessions", chineseSession(["行"], { meanings: [{ word: "行", meaning: "a row", edited: false }] }));
+    expect(await meanings("chinese", ["行"])).toEqual({ 行: "to walk" });
+    await api.request("POST", "/api/sessions", chineseSession(["行"], { meanings: [{ word: "行", meaning: "OK", edited: true }] }));
+    expect(await meanings("chinese", ["行"])).toEqual({ 行: "OK" });
   });
 
-  it("reports a failed retry so the user can try again", async () => {
-    api.setGenerateMeanings(async () => {
-      throw new Error("provider down");
-    });
+  it("stores meanings sent when a list is edited", async () => {
     const created = await api.request("POST", "/api/sessions", chineseSession(["长城"]));
-    await api.settle();
-    expect((await api.request("POST", `/api/sessions/${created.body.id}/meanings/fill`)).status).toBe(502);
+    const res = await api.request("PUT", `/api/sessions/${created.body.id}`, {
+      words: ["长城", "大海"],
+      wordCount: 2,
+      meanings: [
+        { word: "长城", meaning: "the Great Wall", edited: true },
+        { word: "大海", meaning: "the sea", edited: false },
+      ],
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.meanings).toBeUndefined();
+    expect(await meanings("chinese", ["长城", "大海"])).toEqual({ 长城: "the Great Wall", 大海: "the sea" });
   });
 
-  it("404s for an unknown list", async () => {
-    expect((await api.request("POST", "/api/sessions/nope/meanings/fill")).status).toBe(404);
+  it("rejects malformed meanings", async () => {
+    const res = await api.request("POST", "/api/sessions", chineseSession(["长城"], { meanings: [{ word: "长城" }] }));
+    expect(res.status).toBe(400);
+  });
+
+  it("finds the meaning of a sentence that contains a comma", async () => {
+    await api.request("POST", "/api/sessions", chineseSession(["你好, 老师。"], { meanings: [{ word: "你好, 老师。", meaning: "Hello, teacher.", edited: false }] }));
+    expect(await meanings("chinese", ["你好, 老师。"])).toEqual({ "你好, 老师。": "Hello, teacher." });
   });
 });

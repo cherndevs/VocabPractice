@@ -9,8 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { LessonPicker } from "@/components/lesson-picker";
 import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
-import { MEANING_SUBJECTS, type SessionWithLesson } from "@shared/schema";
-import { meaningOf, useEditMeaning, useFillMeanings, useMeanings } from "@/hooks/use-meanings";
+import { MEANING_SUBJECTS, type MeaningEntry, type SessionWithLesson } from "@shared/schema";
+import { useMeaningDrafts, useMeanings } from "@/hooks/use-meanings";
+import { FillMeaningsButton, MeaningField } from "@/components/meaning-field";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -28,18 +29,13 @@ export default function EditSession() {
     queryKey: [`/api/sessions/${id}`],
     enabled: !!id,
   });
-  const meanings = useMeanings(session?.subject, words);
-  const editMeaning = useEditMeaning(session?.subject);
   const showMeanings = !!session && MEANING_SUBJECTS.includes(session.subject);
-  // Fill works on the saved list, so it's offered only for saved words still
-  // without a meaning (normally none: saving generates them).
-  const fillMeanings = useFillMeanings(id);
-  const missingMeanings = showMeanings ? session.words.filter((w) => w.trim() && !meaningOf(meanings, w)).length : 0;
-  const fill = () =>
-    fillMeanings.mutate(undefined, {
-      onSuccess: ({ filled }) => toast({ title: filled ? `Added ${filled} meaning${filled === 1 ? "" : "s"}` : "No meanings to add" }),
-      onError: () => toast({ title: "Couldn't fill meanings", description: "Try again later.", variant: "destructive" }),
-    });
+  // Meanings are drafted here and saved with the list, starting from the stored ones.
+  const drafts = useMeaningDrafts(session?.subject, lessonName);
+  const stored = useMeanings(session?.subject, session?.words ?? []);
+  // Keyed by content: useMeanings hands back a fresh object each render.
+  const storedKey = JSON.stringify(stored);
+  useEffect(() => drafts.seed(stored), [storedKey]);
 
   // Pre-populate form once session loads
   useEffect(() => {
@@ -52,7 +48,14 @@ export default function EditSession() {
   }, [session]);
 
   const updateSessionMutation = useMutation({
-    mutationFn: async (payload: { title: string; words: string[]; wordCount: number; lessonName: string | null; dueDate: string | null }) => {
+    mutationFn: async (payload: {
+      title: string;
+      words: string[];
+      wordCount: number;
+      lessonName: string | null;
+      dueDate: string | null;
+      meanings: MeaningEntry[];
+    }) => {
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -66,6 +69,7 @@ export default function EditSession() {
       queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
       queryClient.invalidateQueries({ queryKey: [`/api/sessions/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/meanings"] });
       setIsSaved(true);
       setTimeout(() => {
         navigate("/library");
@@ -125,7 +129,14 @@ export default function EditSession() {
       return;
     }
     const title = sessionTitle.trim() || `Spelling Session ${new Date().toLocaleDateString()}`;
-    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length, lessonName, dueDate });
+    updateSessionMutation.mutate({
+      title,
+      words: filteredWords,
+      wordCount: filteredWords.length,
+      lessonName,
+      dueDate,
+      meanings: showMeanings ? drafts.entries(filteredWords) : [],
+    });
   };
 
   if (isLoading) {
@@ -241,9 +252,8 @@ export default function EditSession() {
               </div>
               {showMeanings && word.trim() && (
                 <MeaningField
-                  key={word.trim()}
-                  meaning={meaningOf(meanings, word) ?? ""}
-                  onSave={(meaning) => editMeaning.mutate({ word: word.trim(), meaning })}
+                  value={drafts.meaningOf(word)}
+                  onChange={(meaning) => drafts.edit(word, meaning)}
                   testId={`edit-input-meaning-${index}`}
                 />
               )}
@@ -261,17 +271,7 @@ export default function EditSession() {
           Add Word
         </Button>
 
-        {missingMeanings > 0 && (
-          <Button
-            variant="outline"
-            onClick={fill}
-            disabled={fillMeanings.isPending}
-            className="w-full mb-4"
-            data-testid="edit-button-fill-meanings"
-          >
-            {fillMeanings.isPending ? "Filling meanings…" : `Fill ${missingMeanings} missing meaning${missingMeanings === 1 ? "" : "s"}`}
-          </Button>
-        )}
+        {showMeanings && <FillMeaningsButton drafts={drafts} words={words} />}
 
         <Button
           onClick={handleSave}
@@ -286,22 +286,3 @@ export default function EditSession() {
   );
 }
 
-// A word's Meaning, edited in place and saved when the field loses focus. An
-// edit sticks: it is never regenerated, and a blank one stays blank.
-function MeaningField({ meaning, onSave, testId }: { meaning: string; onSave: (meaning: string) => void; testId: string }) {
-  const [draft, setDraft] = useState(meaning);
-  useEffect(() => setDraft(meaning), [meaning]);
-  return (
-    <Input
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={() => {
-        if (draft.trim() !== meaning) onSave(draft);
-      }}
-      className="mt-1 ml-9 w-[calc(100%-2.25rem)] h-8 bg-transparent border-none text-sm text-muted-foreground"
-      placeholder="Meaning…"
-      aria-label="Meaning"
-      data-testid={testId}
-    />
-  );
-}
