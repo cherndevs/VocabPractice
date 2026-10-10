@@ -34,13 +34,13 @@ const yearOrder = (a: string, b: string) => a.localeCompare(b, undefined, { nume
  * order), each holding its Lessons in creation order, newest session first.
  * "Other" comes last. Empty groups are omitted.
  */
-export function groupLibrary<T extends SessionWithLesson>(sessions: T[]): Library<T> {
-  const pinned = sessions.filter((s) => s.pinnedAt).sort((a, b) => time(b.pinnedAt, 0) - time(a.pinnedAt, 0));
+export function groupLibrary<T extends SessionWithLesson>(sessions: T[], { pinnedFirst = true } = {}): Library<T> {
+  const pinned = pinnedFirst ? sessions.filter((s) => s.pinnedAt).sort((a, b) => time(b.pinnedAt, 0) - time(a.pinnedAt, 0)) : [];
 
   const byLesson = new Map<string, SessionGroup<T>>();
   const untagged: T[] = [];
   for (const session of sessions) {
-    if (session.pinnedAt) continue;
+    if (pinnedFirst && session.pinnedAt) continue;
     if (!session.lesson) {
       untagged.push(session);
       continue;
@@ -68,4 +68,37 @@ export function groupLibrary<T extends SessionWithLesson>(sessions: T[]): Librar
   if (other.length > 0) years.push({ year: null, lessons: other });
 
   return { pinned, years };
+}
+
+/** A Year filter chip: a Year, "other" (no Year), or "all". */
+export type YearFilter = { key: string; label: string; count: number };
+export const ALL_YEARS = "all";
+export const OTHER_YEAR = "other";
+
+const yearKey = (s: SessionWithLesson) => s.lesson?.year ?? OTHER_YEAR;
+
+/**
+ * The Library's Year chips: All, each Year in order, then Other, with session
+ * counts. Empty when no session has a Year, since there is nothing to choose.
+ */
+export function yearFilters(sessions: SessionWithLesson[]): YearFilter[] {
+  const counts = new Map<string, number>();
+  for (const s of sessions) counts.set(yearKey(s), (counts.get(yearKey(s)) ?? 0) + 1);
+  const years = Array.from(counts.keys()).filter((k) => k !== OTHER_YEAR).sort(yearOrder);
+  if (years.length === 0) return [];
+  const chips = [{ key: ALL_YEARS, label: "All", count: sessions.length }, ...years.map((y) => ({ key: y, label: y, count: counts.get(y)! }))];
+  if (counts.has(OTHER_YEAR)) chips.push({ key: OTHER_YEAR, label: "Other", count: counts.get(OTHER_YEAR)! });
+  return chips;
+}
+
+/**
+ * The Library for one chip. "all" is the full layout; a single Year (or
+ * Other) lists only its sessions, pinned ones staying in their Lesson.
+ */
+export function libraryFor<T extends SessionWithLesson>(sessions: T[], filter: string): Library<T> {
+  if (filter === ALL_YEARS) return groupLibrary(sessions);
+  return groupLibrary(
+    sessions.filter((s) => yearKey(s) === filter),
+    { pinnedFirst: false },
+  );
 }

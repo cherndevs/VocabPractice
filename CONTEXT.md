@@ -114,7 +114,7 @@ The structured catalog a session's tag resolves to — the app's model of a real
 _Avoid_: Unit, tag (a Lesson is the structured entity a tag now resolves to, not a loose label)
 
 **Year**:
-The school year a Lesson belongs to, written as the school writes it (e.g. "P1", "P2"). Optional, and chosen when a Lesson is created; changing it later moves the whole Lesson. A Session has a Year only through its Lesson. The Library is divided by Year, with Lessons that have none and untagged sessions under "Other".
+The school year a Lesson belongs to, written as the school writes it (e.g. "P1", "P2"). Optional, and chosen when a Lesson is created; changing it later moves the whole Lesson. A Session has a Year only through its Lesson. The Library is divided by Year, with Lessons that have none and untagged sessions under "Other", and a row of Year chips shows one Year at a time (remembered per device).
 _Avoid_: Level, grade (ambiguous with AHGE Grading), class
 
 **Writing list / Reading list**:

@@ -13,7 +13,8 @@ import { SUBJECT_META } from "@/lib/subjects";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { formatDueDate } from "@/lib/due-date";
 import type { SessionWithLesson } from "@shared/schema";
-import { groupLibrary, type SessionGroup } from "@/lib/group-sessions";
+import { useEffect, useState } from "react";
+import { ALL_YEARS, libraryFor, yearFilters, type SessionGroup } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
 type SessionWithTested = SessionWithLesson & { needsReviewCount: number; retrievability: number | null };
@@ -67,8 +68,31 @@ export default function Library() {
     pinSession.mutate(session);
   };
 
-  // Pinned first, then a section per Year holding its Lessons, then Other.
-  const library = groupLibrary(sessions);
+  // The chosen Year chip, remembered per device and Subject. A remembered Year
+  // that no longer has sessions falls back to All.
+  const yearKey = `libraryYear:${subject}`;
+  const [year, setYear] = useState(ALL_YEARS);
+  useEffect(() => {
+    try {
+      setYear(window.localStorage.getItem(yearKey) ?? ALL_YEARS);
+    } catch {
+      setYear(ALL_YEARS);
+    }
+  }, [yearKey]);
+  const chooseYear = (key: string) => {
+    setYear(key);
+    try {
+      window.localStorage.setItem(yearKey, key);
+    } catch {
+      // Not remembered; the choice still applies now.
+    }
+  };
+  const filters = yearFilters(sessions);
+  const activeYear = filters.some((f) => f.key === year) ? year : ALL_YEARS;
+
+  // All: pinned first, then a section per Year holding its Lessons, then Other.
+  // One Year: just its Lessons.
+  const library = libraryFor(sessions, activeYear);
 
   const renderSession = (session: SessionWithTested) => (
     <SwipeableCard
@@ -152,7 +176,28 @@ export default function Library() {
             </Link>
           </Button>
         </div>
-
+        {filters.length > 0 && (
+          <div role="tablist" aria-label="Year" className="-mx-4 flex gap-2 overflow-x-auto px-4 pt-2" data-testid="year-filters">
+            {filters.map((f) => {
+              const selected = f.key === activeYear;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => chooseYear(f.key)}
+                  className={`h-10 shrink-0 rounded-full border-[1.5px] px-3.5 text-sm font-semibold ${
+                    selected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
+                  }`}
+                  data-testid={`chip-year-filter-${f.key}`}
+                >
+                  {f.label} <span className="text-xs font-normal opacity-75">{f.count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -192,8 +237,9 @@ export default function Library() {
                   // Each Year's header sticks while its section scrolls by, and
                   // the next Year's header pushes it out at the section's end.
                   <section key={yearGroup.year ?? "other"} data-testid={`group-year-${yearGroup.year ?? "other"}`}>
-                    {/* With no Years at all, an "Other" heading would label nothing. */}
-                    {(yearGroup.year !== null || library.years.length > 1) && <h2
+                    {/* With no Years at all, an "Other" heading would label nothing; with one
+                        Year chosen, the chip already names it. */}
+                    {activeYear === ALL_YEARS && (yearGroup.year !== null || library.years.length > 1) && <h2
                       className="sticky top-0 z-10 -mx-4 bg-background/95 px-4 py-2 text-base font-bold text-foreground backdrop-blur"
                       data-testid={`heading-year-${yearGroup.year ?? "other"}`}
                     >
