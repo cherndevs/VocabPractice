@@ -20,7 +20,12 @@ export default function EditSession() {
 
   const [sessionTitle, setSessionTitle] = useState("");
   const [words, setWords] = useState<string[]>([""]);
-  const [lessonName, setLessonName] = useState<string | null>(null);
+  const [lessonName, setLessonNameOnly] = useState<string | null>(null);
+  const [lessonYear, setLessonYear] = useState<string | null>(null);
+  const setLesson = (name: string | null, year: string | null) => {
+    setLessonNameOnly(name);
+    setLessonYear(year);
+  };
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -42,7 +47,7 @@ export default function EditSession() {
     if (session) {
       setSessionTitle(session.title);
       setWords(session.words.length > 0 ? session.words : [""]);
-      setLessonName(session.lesson?.name ?? null);
+      setLesson(session.lesson?.name ?? null, session.lesson?.year ?? null);
       setDueDate(session.dueDate);
     }
   }, [session]);
@@ -53,9 +58,21 @@ export default function EditSession() {
       words: string[];
       wordCount: number;
       lessonName: string | null;
+      lessonYear: string | null;
       dueDate: string | null;
       meanings: MeaningEntry[];
     }) => {
+      // A new Year for the session's own Lesson moves the whole Lesson first.
+      const current = session?.lesson;
+      if (current && payload.lessonName === current.name && payload.lessonYear !== current.year) {
+        const moved = await fetch(`/api/lessons/${current.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ year: payload.lessonYear }),
+        });
+        // A clash means that Year already has this Lesson: the session joins it instead.
+        if (!moved.ok && moved.status !== 409) throw new Error("Failed to update lesson");
+      }
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -134,6 +151,7 @@ export default function EditSession() {
       words: filteredWords,
       wordCount: filteredWords.length,
       lessonName,
+      lessonYear,
       dueDate,
       meanings: showMeanings ? drafts.entries(filteredWords) : [],
     });
@@ -218,7 +236,13 @@ export default function EditSession() {
 
         {session && (
           <div className="mb-6">
-            <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} />
+            <LessonPicker
+              subject={session.subject}
+              value={lessonName}
+              year={lessonYear}
+              onChange={setLesson}
+              currentLesson={session.lesson}
+            />
           </div>
         )}
 

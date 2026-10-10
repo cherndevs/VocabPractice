@@ -64,6 +64,13 @@
       "when": 1791469517186,
       "tag": "0008_jazzy_wendell_rand",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791633626358,
+      "tag": "0009_lesson_year",
+      "breakpoints": true
     }
   ]
 }

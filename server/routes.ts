@@ -10,6 +10,8 @@ import {
   insertSessionSchema,
   insertSettingsSchema,
   lessonNameSchema,
+  lessonYearSchema,
+  type LessonSummary,
   meaningEntriesSchema,
   dueDateSchema,
   skillSchema,
@@ -87,9 +89,12 @@ export async function registerRoutes(
   );
 
   // The Lesson a session is tagged with, as the API reports it.
-  const withLesson = async <T extends Session>(session: T): Promise<T & { lesson: { id: string; name: string } | null }> => {
+  const withLesson = async <T extends Session>(session: T): Promise<T & { lesson: LessonSummary | null }> => {
     const lesson = session.lessonId ? await storage.getLesson(session.lessonId) : undefined;
-    return { ...session, lesson: lesson ? { id: lesson.id, name: lesson.name } : null };
+    return {
+      ...session,
+      lesson: lesson ? { id: lesson.id, name: lesson.name, year: lesson.year, createdAt: lesson.createdAt } : null,
+    };
   };
 
   // How well the session's words are retained (null until one is graded), for the card ring.
@@ -99,11 +104,12 @@ export async function registerRoutes(
     return { ...session, retrievability: sessionRetrievability(session.sessionType, words, states, now()) };
   };
 
-  // Resolves a lessonName to a lessonId: null (or blank) clears the tag, a
-  // name new to the Subject creates its Lesson, otherwise the existing one is reused.
-  const resolveLessonId = async (subject: Subject, lessonName: string | null) => {
+  // Resolves a lessonName (and its Year) to a lessonId: null (or blank) clears
+  // the tag, a name new to that Year creates its Lesson, otherwise the existing
+  // one is reused. A blank Year is no Year.
+  const resolveLessonId = async (subject: Subject, lessonName: string | null, lessonYear: string | null) => {
     const name = lessonName?.trim();
-    return name ? (await storage.findOrCreateLesson(subject, name)).id : null;
+    return name ? (await storage.findOrCreateLesson(subject, lessonYear?.trim() || null, name)).id : null;
   };
 
   // Sessions routes
@@ -206,6 +212,26 @@ export async function registerRoutes(
     }
   });
 
+  // Moves a Lesson, and so every session tagged with it, to another Year.
+  app.put("/api/lessons/:id", async (req, res) => {
+    const year = lessonYearSchema.safeParse(req.body?.year);
+    if (!year.success) {
+      return res.status(400).json({ message: "year must be a string or null" });
+    }
+    try {
+      const lesson = await storage.setLessonYear(req.params.id, year.data?.trim() || null);
+      if (lesson === "conflict") {
+        return res.status(409).json({ message: "That Year already has a Lesson with this name" });
+      }
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      res.json(lesson);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update lesson" });
+    }
+  });
+
   app.get("/api/sessions/:id", async (req, res) => {
     try {
       const session = await storage.getSession(req.params.id);
@@ -250,8 +276,9 @@ export async function registerRoutes(
     try {
       const sessionData = insertSessionSchema.parse(req.body);
       const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
+      const lessonYear = lessonYearSchema.nullish().parse(req.body.lessonYear) ?? null;
       const meanings = meaningEntriesSchema.optional().parse(req.body.meanings) ?? [];
-      const lessonId = await resolveLessonId(sessionData.subject, lessonName);
+      const lessonId = await resolveLessonId(sessionData.subject, lessonName, lessonYear);
       const session = await storage.createSession({ ...sessionData, lessonId });
       await saveMeanings(storage, session.subject, session.words, meanings);
       res.json(await withLesson(session));
@@ -263,9 +290,12 @@ export async function registerRoutes(
   app.put("/api/sessions/:id", async (req, res) => {
     try {
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
-      const { lessonName, meanings: rawMeanings, ...updates } = req.body as any;
+      const { lessonName, lessonYear, meanings: rawMeanings, ...updates } = req.body as any;
       if (lessonName !== undefined && !lessonNameSchema.safeParse(lessonName).success) {
         return res.status(400).json({ message: "lessonName must be a string or null" });
+      }
+      if (lessonYear !== undefined && !lessonYearSchema.safeParse(lessonYear).success) {
+        return res.status(400).json({ message: "lessonYear must be a string or null" });
       }
       const meanings = meaningEntriesSchema.optional().safeParse(rawMeanings);
       if (!meanings.success) {
@@ -301,7 +331,7 @@ export async function registerRoutes(
         if (!existing) {
           return res.status(404).json({ message: "Session not found" });
         }
-        updates.lessonId = await resolveLessonId(existing.subject, lessonName);
+        updates.lessonId = await resolveLessonId(existing.subject, lessonName, lessonYear ?? null);
       }
 
       const session = await storage.updateSession(req.params.id, updates);

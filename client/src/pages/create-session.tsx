@@ -76,7 +76,13 @@ export default function CreateSession() {
   const [sessionTitle, setSessionTitle] = useState("");
   // Optional Lesson tag, filled from the sheet when it names one and loaded
   // afresh for each candidate in a multi-unit batch.
-  const [lessonName, setLessonName] = useState<string | null>(null);
+  const [lessonName, setLessonNameOnly] = useState<string | null>(null);
+  const [lessonYear, setLessonYear] = useState<string | null>(null);
+  // A sheet names a Lesson but never its Year.
+  const setLessonName = (name: string | null, year: string | null = null) => {
+    setLessonNameOnly(name);
+    setLessonYear(year);
+  };
   const [dueDate, setDueDate] = useState<string | null>(null);
 
   // Multi-candidate selection state. `queue` holds the candidates the user
@@ -109,7 +115,7 @@ export default function CreateSession() {
   };
 
   const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: InsertSession & { lessonName: string | null; dueDate: string | null; meanings: MeaningEntry[] }) => {
+    mutationFn: async (sessionData: InsertSession & { lessonName: string | null; lessonYear: string | null; dueDate: string | null; meanings: MeaningEntry[] }) => {
       const response = await apiRequest("POST", "/api/sessions", sessionData);
       return response.json();
     },
@@ -287,6 +293,7 @@ export default function CreateSession() {
         subject,
         sessionType,
         lessonName,
+        lessonYear,
         dueDate,
         words: filteredWords,
         wordCount: filteredWords.length,
@@ -509,7 +516,7 @@ export default function CreateSession() {
               />
             </div>
 
-            {subject && <LessonPicker subject={subject} value={lessonName} onChange={setLessonName} />}
+            {subject && <LessonPicker subject={subject} value={lessonName} year={lessonYear} onChange={setLessonName} />}
 
             <DueDateField value={dueDate} onChange={setDueDate} />
 
