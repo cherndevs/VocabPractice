@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SessionWithLesson } from "@shared/schema";
-import { groupLibrary } from "./group-sessions";
+import { groupLibrary, libraryFor, yearFilters } from "./group-sessions";
 
 const lesson = (name: string, year: string | null, created = "2026-01-01") => ({
   id: `${year}/${name}`,
@@ -75,5 +75,40 @@ describe("groupLibrary", () => {
   it("omits empty groups", () => {
     expect(groupLibrary([])).toEqual({ pinned: [], years: [] });
     expect(layout([session("x", lesson("A", "P1"))]).years).toEqual([["P1", [["A", ["x"]]]]]);
+  });
+});
+
+describe("Year filters", () => {
+  const p1 = lesson("第一课", "P1");
+  const p2 = lesson("第一课", "P2");
+  const sessions = [
+    session("a", p1),
+    session("b", p2, { pinnedAt: new Date("2026-03-01") }),
+    session("c", p2),
+    session("loose", null),
+  ];
+
+  it("offers All, each Year, then Other, with counts", () => {
+    expect(yearFilters(sessions)).toEqual([
+      { key: "all", label: "All", count: 4 },
+      { key: "P1", label: "P1", count: 1 },
+      { key: "P2", label: "P2", count: 2 },
+      { key: "other", label: "Other", count: 1 },
+    ]);
+  });
+
+  it("offers nothing when no session has a Year", () => {
+    expect(yearFilters([session("x", lesson("A", null)), session("y", null)])).toEqual([]);
+  });
+
+  it("shows one Year with its pinned sessions kept in their Lesson", () => {
+    const { pinned, years } = libraryFor(sessions, "P2");
+    expect(pinned).toEqual([]);
+    expect(years.map((y) => [y.year, y.lessons.map((g) => g.sessions.map((s) => s.title))])).toEqual([["P2", [["b", "c"]]]]);
+  });
+
+  it("shows Other, and the full layout for All", () => {
+    expect(libraryFor(sessions, "other").years.map((y) => y.year)).toEqual([null]);
+    expect(libraryFor(sessions, "all")).toEqual(groupLibrary(sessions));
   });
 });
