@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, date, jsonb, boolean, doublePrecision, primaryKey, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, date, jsonb, boolean, doublePrecision, primaryKey, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -41,15 +41,20 @@ export const gradeSchema = z.enum(GRADES);
 // A Lesson is the school unit a session can be tagged with (CONTEXT.md). It is
 // created implicitly the first time a name is used; there is no management
 // screen. `topic` is reserved for a later description and has no UI yet.
+// `year` is the school Year it belongs to (ADR-0012): free text such as "P1",
+// optional, and part of what identifies the Lesson, since every Year has its
+// own "Lesson 1". A missing Year counts as one value for uniqueness.
 export const lessons = pgTable(
   "lessons",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     subject: text("subject").notNull().$type<Subject>(),
+    year: text("year"), // trimmed; null for none
     name: text("name").notNull(), // trimmed
     topic: text("topic"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("lessons_subject_name_unique").on(t.subject, t.name)],
+  (t) => [unique("lessons_subject_year_name_unique").on(t.subject, t.year, t.name).nullsNotDistinct()],
 );
 
 // A Due date is a calendar day (YYYY-MM-DD): no time, no time zone, so it
@@ -160,6 +165,8 @@ export const insertSessionSchema = createInsertSchema(sessions, {
 // Sent alongside a session on create and update: a name to tag with (new to
 // the Subject creates the Lesson), or null to clear the tag.
 export const lessonNameSchema = z.string().nullable();
+// The Year a new Lesson gets, sent with lessonName: a string, or null/blank for none.
+export const lessonYearSchema = z.string().nullable();
 
 export const insertSettingsSchema = createInsertSchema(settings, {
   activeSubject: subjectSchema.optional(),
@@ -194,7 +201,8 @@ export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type Lesson = typeof lessons.$inferSelect;
 /** A session as the API returns it: the Lesson it is tagged with, if any. */
-export type SessionWithLesson = Session & { lesson: Pick<Lesson, "id" | "name"> | null };
+export type LessonSummary = Pick<Lesson, "id" | "name" | "year" | "createdAt">;
+export type SessionWithLesson = Session & { lesson: LessonSummary | null };
 export type InsertSettings = z.infer<typeof insertSettingsSchema>;
 export type Settings = typeof settings.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

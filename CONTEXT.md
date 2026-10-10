@@ -110,8 +110,12 @@ What the user is learning in a Workspace — the dimension workspaces are define
 _Avoid_: Language (as the dimension name)
 
 **Lesson**:
-The structured catalog a session's tag resolves to — the app's model of a real school unit/week's worth of syllabus content (e.g. "Unit 3: Going to the Market"). Created implicitly the first time a session is tagged with a new name, same authoring flow as tagging today, rather than through a separate management screen. Carries a writing (spelling) list and a reading list as independently-captured content — not the same set of words, since they typically come from different worksheets — plus a parent-written topic/theme description. A Session belongs to at most one Lesson — tagging is optional; a Refresher, which draws across Lessons, belongs to none.
+The structured catalog a session's tag resolves to — the app's model of a real school unit/week's worth of syllabus content (e.g. "Unit 3: Going to the Market"). Created implicitly the first time a session is tagged with a new name, same authoring flow as tagging today, rather than through a separate management screen. Carries a writing (spelling) list and a reading list as independently-captured content — not the same set of words, since they typically come from different worksheets — plus a parent-written topic/theme description. A Session belongs to at most one Lesson — tagging is optional; a Refresher, which draws across Lessons, belongs to none. A Lesson may belong to a Year; within a Subject it is identified by its name together with its Year, since every Year has its own "Lesson 1".
 _Avoid_: Unit, tag (a Lesson is the structured entity a tag now resolves to, not a loose label)
+
+**Year**:
+The school year a Lesson belongs to, written as the school writes it (e.g. "P1", "P2"). Optional, and chosen when a Lesson is created; changing it later moves the whole Lesson. A Session has a Year only through its Lesson. The Library is divided by Year, with Lessons that have none and untagged sessions under "Other".
+_Avoid_: Level, grade (ambiguous with AHGE Grading), class
 
 **Writing list / Reading list**:
 A Lesson's two independently-captured word lists. The writing list is what a Spelling session draws from; the reading list is what a Reading session draws from. A word may appear in one, the other, or both — capturing it for one list does not add it to the other. Each is reviewed and confirmed separately at session-creation time; both lists can carry a meaning per word (a spelling word benefits from a meaning too, not just a reading one), captured the same way regardless of which list it's for.

@@ -13,7 +13,7 @@ import { SUBJECT_META } from "@/lib/subjects";
 import WorkspaceSwitcher from "@/components/workspace-switcher";
 import { formatDueDate } from "@/lib/due-date";
 import type { SessionWithLesson } from "@shared/schema";
-import { groupSessionsByLesson } from "@/lib/group-sessions";
+import { groupLibrary, type SessionGroup } from "@/lib/group-sessions";
 
 // The list endpoint adds how many of a session's words have ever been graded.
 type SessionWithTested = SessionWithLesson & { needsReviewCount: number; retrievability: number | null };
@@ -67,8 +67,8 @@ export default function Library() {
     pinSession.mutate(session);
   };
 
-  // Lesson headings first, then untagged sessions; pinned-first within each group.
-  const groups = groupSessionsByLesson(sessions);
+  // Pinned first, then a section per Year holding its Lessons, then Other.
+  const library = groupLibrary(sessions);
 
   const renderSession = (session: SessionWithTested) => (
     <SwipeableCard
@@ -111,6 +111,24 @@ export default function Library() {
         </CardContent>
       </Link>
     </SwipeableCard>
+  );
+
+  const renderLessonGroup = (group: SessionGroup<SessionWithTested>) => (
+    <section
+      key={group.lesson?.id ?? "untagged"}
+      className="space-y-3"
+      data-testid={group.lesson ? `group-lesson-${group.lesson.id}` : "group-untagged"}
+    >
+      {group.lesson && (
+        <h3
+          className="pt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
+          data-testid={`heading-lesson-${group.lesson.id}`}
+        >
+          {group.lesson.name}
+        </h3>
+      )}
+      {group.sessions.map(renderSession)}
+    </section>
   );
 
   return (
@@ -163,23 +181,28 @@ export default function Library() {
                 </CardContent>
               </Card>
             ) : (
-              groups.map((group) => (
-                <section
-                  key={group.lesson?.id ?? "untagged"}
-                  className="space-y-3"
-                  data-testid={group.lesson ? `group-lesson-${group.lesson.id}` : "group-untagged"}
-                >
-                  {group.lesson && (
-                    <h2
-                      className="pt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground"
-                      data-testid={`heading-lesson-${group.lesson.id}`}
+              <>
+                {library.pinned.length > 0 && (
+                  <section className="space-y-3" data-testid="group-pinned">
+                    <h2 className="pt-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Pinned</h2>
+                    {library.pinned.map(renderSession)}
+                  </section>
+                )}
+                {library.years.map((yearGroup) => (
+                  // Each Year's header sticks while its section scrolls by, and
+                  // the next Year's header pushes it out at the section's end.
+                  <section key={yearGroup.year ?? "other"} data-testid={`group-year-${yearGroup.year ?? "other"}`}>
+                    {/* With no Years at all, an "Other" heading would label nothing. */}
+                    {(yearGroup.year !== null || library.years.length > 1) && <h2
+                      className="sticky top-0 z-10 -mx-4 bg-background/95 px-4 py-2 text-base font-bold text-foreground backdrop-blur"
+                      data-testid={`heading-year-${yearGroup.year ?? "other"}`}
                     >
-                      {group.lesson.name}
-                    </h2>
-                  )}
-                  {group.sessions.map(renderSession)}
-                </section>
-              ))
+                      {yearGroup.year ?? "Other"}
+                    </h2>}
+                    <div className="space-y-3">{yearGroup.lessons.map(renderLessonGroup)}</div>
+                  </section>
+                ))}
+              </>
             )}
           </div>
         )}

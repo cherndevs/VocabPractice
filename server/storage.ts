@@ -2,7 +2,7 @@ import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type 
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -16,11 +16,14 @@ export interface IStorage {
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
   deleteSession(id: string): Promise<boolean>;
 
-  // Lessons. A name is trimmed by the caller; (subject, name) is unique.
+  // Lessons. Names and Years are trimmed by the caller (a blank Year is null);
+  // (subject, year, name) is unique, with a missing Year counting as one value.
   getLessons(subject: Subject): Promise<Lesson[]>;
   getLesson(id: string): Promise<Lesson | undefined>;
-  /** The Subject's Lesson with this name, created if it does not exist yet. */
-  findOrCreateLesson(subject: Subject, name: string): Promise<Lesson>;
+  /** The Subject's Lesson with this Year and name, created if it does not exist yet. */
+  findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson>;
+  /** Moves a Lesson to another Year. Undefined if the Lesson is missing; "conflict" if that Year already has one by this name. */
+  setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict">;
 
   // Grades and review state. The scheduling rules live in server/grades.ts;
   // storage only keeps what it is told.
@@ -171,12 +174,24 @@ export class MemStorage implements IStorage {
     return this.lessons.get(id);
   }
 
-  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
-    const existing = Array.from(this.lessons.values()).find((l) => l.subject === subject && l.name === name);
+  async findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson> {
+    const existing = Array.from(this.lessons.values()).find((l) => l.subject === subject && l.year === year && l.name === name);
     if (existing) return existing;
-    const lesson: Lesson = { id: randomUUID(), subject, name, topic: null };
+    const lesson: Lesson = { id: randomUUID(), subject, year, name, topic: null, createdAt: new Date() };
     this.lessons.set(lesson.id, lesson);
     return lesson;
+  }
+
+  async setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict"> {
+    const lesson = this.lessons.get(id);
+    if (!lesson) return undefined;
+    const clash = Array.from(this.lessons.values()).some(
+      (l) => l.id !== id && l.subject === lesson.subject && l.year === year && l.name === lesson.name,
+    );
+    if (clash) return "conflict";
+    const updated = { ...lesson, year };
+    this.lessons.set(id, updated);
+    return updated;
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {
@@ -337,15 +352,25 @@ class PgStorage implements IStorage {
     return result[0];
   }
 
-  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
-    // The unique index makes concurrent creators converge on one row.
-    await this.db.insert(lessons).values({ subject, name }).onConflictDoNothing();
+  async findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson> {
+    // The unique constraint makes concurrent creators converge on one row.
+    await this.db.insert(lessons).values({ subject, year, name }).onConflictDoNothing();
     const result = await this.db
       .select()
       .from(lessons)
-      .where(and(eq(lessons.subject, subject), eq(lessons.name, name)))
+      .where(and(eq(lessons.subject, subject), year === null ? isNull(lessons.year) : eq(lessons.year, year), eq(lessons.name, name)))
       .limit(1);
     return result[0]!;
+  }
+
+  async setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict"> {
+    try {
+      const result = await this.db.update(lessons).set({ year }).where(eq(lessons.id, id)).returning();
+      return result[0];
+    } catch (error) {
+      if ((error as { code?: string }).code === "23505") return "conflict"; // unique_violation
+      throw error;
+    }
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {
