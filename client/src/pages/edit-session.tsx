@@ -242,6 +242,7 @@ export default function EditSession() {
               year={lessonYear}
               onChange={setLesson}
               currentLesson={session.lesson}
+              title={sessionTitle}
             />
           </div>
         )}

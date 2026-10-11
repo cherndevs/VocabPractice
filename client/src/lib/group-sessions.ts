@@ -1,4 +1,5 @@
 import type { LessonSummary, SessionWithLesson } from "@shared/schema";
+import { compareLessonNames } from "./lesson-order";
 
 export interface SessionGroup<T> {
   /** The Lesson heading, or null for the sessions with no Lesson. */
@@ -23,8 +24,9 @@ const time = (value: unknown, fallback: number) => (value ? new Date(value as st
 const newestFirst = (a: SessionWithLesson, b: SessionWithLesson) => time(b.createdAt, 0) - time(a.createdAt, 0);
 
 // Creation order matches a textbook's order when its Lessons are entered in turn.
+// Lessons created together (e.g. by a migration) fall back to lesson number.
 const lessonOrder = (a: LessonSummary, b: LessonSummary) =>
-  time(a.createdAt, 0) - time(b.createdAt, 0) || a.name.localeCompare(b.name);
+  time(a.createdAt, 0) - time(b.createdAt, 0) || compareLessonNames(a.name, b.name);
 
 // "P2" before "P10".
 const yearOrder = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true });

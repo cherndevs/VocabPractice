@@ -516,7 +516,7 @@ export default function CreateSession() {
               />
             </div>
 
-            {subject && <LessonPicker subject={subject} value={lessonName} year={lessonYear} onChange={setLessonName} />}
+            {subject && <LessonPicker subject={subject} value={lessonName} year={lessonYear} onChange={setLessonName} title={sessionTitle} />}
 
             <DueDateField value={dueDate} onChange={setDueDate} />
 

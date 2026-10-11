@@ -61,6 +61,14 @@ describe("groupLibrary", () => {
     ).toEqual([["P1", [["第一课", ["1-new", "1-old"]], ["第二课", ["2a"]]]]]);
   });
 
+  it("orders Lessons created together by lesson number, not text", () => {
+    const twenty = lesson("第二十课", "P1");
+    const eleven = lesson("第十一课", "P1");
+    expect(layout([session("20", twenty), session("11", eleven)]).years).toEqual([
+      ["P1", [["第十一课", ["11"]], ["第二十课", ["20"]]]],
+    ]);
+  });
+
   it("lists pinned sessions first, latest pinned first, and only there", () => {
     const p1 = lesson("第一课", "P1");
     expect(
