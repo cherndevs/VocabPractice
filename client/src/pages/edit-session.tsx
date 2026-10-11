@@ -194,7 +194,7 @@ export default function EditSession() {
 
         {session && (
           <div className="mb-6">
-            <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} />
+            <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} title={sessionTitle} />
           </div>
         )}
 

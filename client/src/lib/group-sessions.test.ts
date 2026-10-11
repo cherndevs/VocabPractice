@@ -30,6 +30,11 @@ describe("groupSessionsByLesson", () => {
     ]);
   });
 
+  it("orders Lessons by lesson number, not text", () => {
+    const groups = groupSessionsByLesson([session("twenty", "第二十课·a"), session("eleven", "第十一课·b")]);
+    expect(titles(groups).map(([name]) => name)).toEqual(["第十一课·b", "第二十课·a"]);
+  });
+
   it("keeps pinned first, then newest, within each group", () => {
     const groups = groupSessionsByLesson([
       session("old", "A", { createdAt: new Date("2026-01-01") }),

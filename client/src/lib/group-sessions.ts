@@ -1,4 +1,5 @@
 import type { SessionWithLesson } from "@shared/schema";
+import { compareLessonNames } from "./lesson-order";
 
 export interface SessionGroup<T> {
   /** The Lesson heading, or null for the sessions with no Lesson. */
@@ -15,7 +16,7 @@ function byPinnedThenNewest(a: SessionWithLesson, b: SessionWithLesson): number 
   return time(b.createdAt, 0) - time(a.createdAt, 0);
 }
 
-/** Lesson groups by name, then the untagged sessions last. Empty groups are omitted. */
+/** Lesson groups in lesson-number order, then the untagged sessions last. Empty groups are omitted. */
 export function groupSessionsByLesson<T extends SessionWithLesson>(sessions: T[]): SessionGroup<T>[] {
   const byLesson = new Map<string, SessionGroup<T>>();
   const untagged: T[] = [];
@@ -28,7 +29,7 @@ export function groupSessionsByLesson<T extends SessionWithLesson>(sessions: T[]
     group.sessions.push(session);
     byLesson.set(session.lesson.id, group);
   }
-  const groups = Array.from(byLesson.values()).sort((a, b) => a.lesson!.name.localeCompare(b.lesson!.name));
+  const groups = Array.from(byLesson.values()).sort((a, b) => compareLessonNames(a.lesson!.name, b.lesson!.name));
   for (const group of groups) group.sessions.sort(byPinnedThenNewest);
   if (untagged.length > 0) groups.push({ lesson: null, sessions: untagged.sort(byPinnedThenNewest) });
   return groups;
