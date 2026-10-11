@@ -10,6 +10,7 @@ import { useSpeech } from "@/hooks/use-speech";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { usePinSession } from "@/hooks/use-pin-session";
+import { meaningOf, useMeanings } from "@/hooks/use-meanings";
 import { getPinyinAnnotation } from "@/lib/pinyin";
 import { MarkingWord } from "@/components/marking-word";
 import { LearnHandover, LearnRun, LearnStart } from "@/components/learn-stage";
@@ -81,6 +82,7 @@ export default function PracticeSession() {
   const { data: session, isLoading: sessionLoading } = useQuery<Session>({
     queryKey: ["/api/sessions", id],
   });
+  const meanings = useMeanings(session?.subject, session?.words ?? []);
 
   useEffect(() => {
     let cancelled = false;
@@ -147,7 +149,7 @@ export default function PracticeSession() {
       );
     }
     if (stage === "learn") {
-      return <LearnRun words={learning} onClose={exit} onFinished={() => setStage("handover")} />;
+      return <LearnRun words={learning} meanings={meanings} onClose={exit} onFinished={() => setStage("handover")} />;
     }
     return (
       <LearnHandover
@@ -222,6 +224,9 @@ export function PracticeDrill({
   const [currentRepetition, setCurrentRepetition] = useState(1);
   // Reading sessions: the pure Read Mode flow owns the queue and per-word state.
   const [storedReadFlow, setReadFlowState] = useState<ReadFlow | null>(null);
+  // The word just graded in Read Mode, whose Meaning is now safe to show.
+  const [lastGraded, setLastGraded] = useState<string | null>(null);
+  const meanings = useMeanings(session.subject, words);
   // Read Aloud: the recogniser adapter, and the first-use notice sheet.
   const recogniserRef = useRef<ReturnType<typeof createRecogniser> | null>(null);
   if (recogniserRef.current === null) recogniserRef.current = createRecogniser();
@@ -314,6 +319,8 @@ export function PracticeDrill({
     : null;
   const showing = readFlow && !isFinished(readFlow) ? currentShowing(readFlow) : null;
   const activeWord = showing ? showing.word : words[currentWordIndex];
+  const currentMeaning = meaningOf(meanings, activeWord);
+  const lastMeaning = meaningOf(meanings, lastGraded ?? undefined);
   const currentWordPinyin = activeWord ? getPinyinAnnotation(activeWord) : null;
   const offeredViews = viewsForSessionType(session.sessionType);
   const baseMode =
@@ -598,6 +605,7 @@ export function PracticeDrill({
     if (!session || !readFlow) return;
     const { flow, emitted } = gradeWord(readFlow, grade);
     if (!emitted) return;
+    setLastGraded(emitted.word);
     gradeOutbox.add({
       subject: session.subject,
       word: emitted.word.trim(),
@@ -617,6 +625,7 @@ export function PracticeDrill({
     if (!session) return;
     setReadFlowState(startReadFlow(words, { readAloud: recogniser.supported && !readFlow?.readAloudOff }));
     setPickedMode("read");
+    setLastGraded(null);
   };
 
   const switchMode = (newMode: SessionViewMode) => {
@@ -809,6 +818,12 @@ export function PracticeDrill({
               </div>
             )}
 
+            {mode === "peek" && currentMeaning && (
+              <div className="max-w-[280px] text-center text-[15px] text-foreground" data-testid="text-current-word-meaning">
+                {currentMeaning}
+              </div>
+            )}
+
             {mode === "peek" && (
               <button
                 type="button"
@@ -883,6 +898,13 @@ export function PracticeDrill({
           <div className="mx-4 mt-2 min-h-4 text-center text-xs text-muted-foreground" data-testid="text-grade-hint">
             {gateHint}
           </div>
+
+          {/* The last graded word's Meaning: only once it has been read, never before (CONTEXT.md: Meaning). */}
+          {lastGraded && lastMeaning && (
+            <div className="mx-4 mt-3 rounded-lg bg-muted px-3 py-2 text-center text-[13px] text-muted-foreground" data-testid="text-last-meaning">
+              <span className="font-semibold text-foreground">{lastGraded}</span> means {lastMeaning}
+            </div>
+          )}
 
           {/* Up next: one dot per word in the drill, filled once it stops coming back */}
           <div className="mt-[18px] flex items-center justify-center gap-1.5 px-6" data-testid="up-next">

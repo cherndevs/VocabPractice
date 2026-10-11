@@ -1,56 +1,122 @@
 import { describe, expect, it } from "vitest";
 import type { SessionWithLesson } from "@shared/schema";
-import { groupSessionsByLesson } from "./group-sessions";
+import { groupLibrary, libraryFor, yearFilters } from "./group-sessions";
 
-const session = (title: string, lesson: string | null, extra: Partial<SessionWithLesson> = {}) =>
+const lesson = (name: string, year: string | null, created = "2026-01-01") => ({
+  id: `${year}/${name}`,
+  name,
+  year,
+  createdAt: new Date(created),
+});
+
+const session = (title: string, l: ReturnType<typeof lesson> | null, extra: Partial<SessionWithLesson> = {}) =>
   ({
     id: title,
     title,
-    lesson: lesson ? { id: lesson, name: lesson } : null,
+    lesson: l,
     pinnedAt: null,
     createdAt: new Date("2026-01-01"),
     ...extra,
   }) as SessionWithLesson;
 
-const titles = (groups: ReturnType<typeof groupSessionsByLesson>) =>
-  groups.map((g) => [g.lesson?.name ?? null, g.sessions.map((s) => s.title)]);
+const layout = (sessions: SessionWithLesson[]) => {
+  const { pinned, years } = groupLibrary(sessions);
+  return {
+    pinned: pinned.map((s) => s.title),
+    years: years.map((y) => [y.year, y.lessons.map((g) => [g.lesson?.name ?? null, g.sessions.map((s) => s.title)])]),
+  };
+};
 
-describe("groupSessionsByLesson", () => {
-  it("lists Lessons by name, then untagged sessions", () => {
-    const groups = groupSessionsByLesson([
-      session("loose", null),
-      session("b1", "Unit B"),
-      session("a1", "Unit A"),
-      session("b2", "Unit B"),
-    ]);
-    expect(titles(groups)).toEqual([
-      ["Unit A", ["a1"]],
-      ["Unit B", expect.arrayContaining(["b1", "b2"])],
-      [null, ["loose"]],
-    ]);
-  });
-
-  it("orders Lessons by lesson number, not text", () => {
-    const groups = groupSessionsByLesson([session("twenty", "第二十课·a"), session("eleven", "第十一课·b")]);
-    expect(titles(groups).map(([name]) => name)).toEqual(["第十一课·b", "第二十课·a"]);
-  });
-
-  it("keeps pinned first, then newest, within each group", () => {
-    const groups = groupSessionsByLesson([
-      session("old", "A", { createdAt: new Date("2026-01-01") }),
-      session("new", "A", { createdAt: new Date("2026-02-01") }),
-      session("pinned", "A", { pinnedAt: new Date("2026-03-01") }),
-      session("loose-old", null, { createdAt: new Date("2026-01-01") }),
-      session("loose-pinned", null, { pinnedAt: new Date("2026-01-02") }),
-    ]);
-    expect(titles(groups)).toEqual([
-      ["A", ["pinned", "new", "old"]],
-      [null, ["loose-pinned", "loose-old"]],
+describe("groupLibrary", () => {
+  it("groups Lessons under their Year in Year order, with Other last", () => {
+    const p1 = lesson("第一课", "P1");
+    const p2 = lesson("第一课", "P2");
+    const p10 = lesson("Unit 1", "P10");
+    const noYear = lesson("Loose lesson", null);
+    expect(
+      layout([
+        session("untagged", null),
+        session("p10", p10),
+        session("p2", p2),
+        session("no-year", noYear),
+        session("p1", p1),
+      ]).years,
+    ).toEqual([
+      ["P1", [["第一课", ["p1"]]]],
+      ["P2", [["第一课", ["p2"]]]],
+      ["P10", [["Unit 1", ["p10"]]]],
+      [null, [["Loose lesson", ["no-year"]], [null, ["untagged"]]]],
     ]);
   });
 
-  it("has no untagged group when every session is tagged, and no groups when empty", () => {
-    expect(titles(groupSessionsByLesson([session("x", "A")]))).toEqual([["A", ["x"]]]);
-    expect(groupSessionsByLesson([])).toEqual([]);
+  it("orders Lessons within a Year by creation, and sessions newest first", () => {
+    const second = lesson("第二课", "P1", "2026-01-02");
+    const first = lesson("第一课", "P1", "2026-01-01");
+    expect(
+      layout([
+        session("2a", second),
+        session("1-old", first, { createdAt: new Date("2026-01-01") }),
+        session("1-new", first, { createdAt: new Date("2026-02-01") }),
+      ]).years,
+    ).toEqual([["P1", [["第一课", ["1-new", "1-old"]], ["第二课", ["2a"]]]]]);
+  });
+
+  it("orders Lessons created together by lesson number, not text", () => {
+    const twenty = lesson("第二十课", "P1");
+    const eleven = lesson("第十一课", "P1");
+    expect(layout([session("20", twenty), session("11", eleven)]).years).toEqual([
+      ["P1", [["第十一课", ["11"]], ["第二十课", ["20"]]]],
+    ]);
+  });
+
+  it("lists pinned sessions first, latest pinned first, and only there", () => {
+    const p1 = lesson("第一课", "P1");
+    expect(
+      layout([
+        session("a", p1, { pinnedAt: new Date("2026-03-01") }),
+        session("b", null, { pinnedAt: new Date("2026-03-02") }),
+        session("c", p1),
+      ]),
+    ).toEqual({ pinned: ["b", "a"], years: [["P1", [["第一课", ["c"]]]]] });
+  });
+
+  it("omits empty groups", () => {
+    expect(groupLibrary([])).toEqual({ pinned: [], years: [] });
+    expect(layout([session("x", lesson("A", "P1"))]).years).toEqual([["P1", [["A", ["x"]]]]]);
+  });
+});
+
+describe("Year filters", () => {
+  const p1 = lesson("第一课", "P1");
+  const p2 = lesson("第一课", "P2");
+  const sessions = [
+    session("a", p1),
+    session("b", p2, { pinnedAt: new Date("2026-03-01") }),
+    session("c", p2),
+    session("loose", null),
+  ];
+
+  it("offers All, each Year, then Other, with counts", () => {
+    expect(yearFilters(sessions)).toEqual([
+      { key: "all", label: "All", count: 4 },
+      { key: "P1", label: "P1", count: 1 },
+      { key: "P2", label: "P2", count: 2 },
+      { key: "other", label: "Other", count: 1 },
+    ]);
+  });
+
+  it("offers nothing when no session has a Year", () => {
+    expect(yearFilters([session("x", lesson("A", null)), session("y", null)])).toEqual([]);
+  });
+
+  it("shows one Year with its pinned sessions kept in their Lesson", () => {
+    const { pinned, years } = libraryFor(sessions, "P2");
+    expect(pinned).toEqual([]);
+    expect(years.map((y) => [y.year, y.lessons.map((g) => g.sessions.map((s) => s.title))])).toEqual([["P2", [["b", "c"]]]]);
+  });
+
+  it("shows Other, and the full layout for All", () => {
+    expect(libraryFor(sessions, "other").years.map((y) => y.year)).toEqual([null]);
+    expect(libraryFor(sessions, "all")).toEqual(groupLibrary(sessions));
   });
 });

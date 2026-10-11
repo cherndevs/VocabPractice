@@ -57,6 +57,20 @@
       "when": 1791041831265,
       "tag": "0007_spooky_ikaris",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791469517186,
+      "tag": "0008_jazzy_wendell_rand",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791633626358,
+      "tag": "0009_lesson_year",
+      "breakpoints": true
     }
   ]
 }

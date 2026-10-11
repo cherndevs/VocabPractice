@@ -1,5 +1,6 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
+import { z } from "zod";
 import type { IStorage } from "./storage";
 import {
   DEFAULT_REFRESHER_SIZE,
@@ -9,6 +10,9 @@ import {
   insertSessionSchema,
   insertSettingsSchema,
   lessonNameSchema,
+  lessonYearSchema,
+  type LessonSummary,
+  meaningEntriesSchema,
   dueDateSchema,
   skillSchema,
   subjectSchema,
@@ -25,6 +29,7 @@ import {
   SUPPORTED_MEDIA_TYPES,
   type SupportedMediaType,
 } from "./spelling-extraction";
+import { generateMeaningsWithOpenRouter, normalizeWords, previewMeanings, saveMeanings, type GenerateMeanings } from "./meanings";
 
 // Storage is injected rather than imported so tests can mount these routes on
 // in-memory storage (CHE-29: the HTTP API is the testing seam).
@@ -37,12 +42,14 @@ function withActiveSubject<T extends { activeSubject: string | null }>(settings:
 export interface RouteOptions {
   /** The server's clock; tests inject their own to move past due dates. */
   now?: () => Date;
+  /** The AI call behind Meanings; tests inject a fake. */
+  generateMeanings?: GenerateMeanings;
 }
 
 export async function registerRoutes(
   app: Express,
   storage: IStorage,
-  { now = () => new Date() }: RouteOptions = {},
+  { now = () => new Date(), generateMeanings = generateMeaningsWithOpenRouter }: RouteOptions = {},
 ): Promise<Server> {
   // Spelling list extraction — relays a worksheet photo to Claude and returns
   // the sessions it reads off the page. Takes the image as raw bytes rather
@@ -82,9 +89,12 @@ export async function registerRoutes(
   );
 
   // The Lesson a session is tagged with, as the API reports it.
-  const withLesson = async <T extends Session>(session: T): Promise<T & { lesson: { id: string; name: string } | null }> => {
+  const withLesson = async <T extends Session>(session: T): Promise<T & { lesson: LessonSummary | null }> => {
     const lesson = session.lessonId ? await storage.getLesson(session.lessonId) : undefined;
-    return { ...session, lesson: lesson ? { id: lesson.id, name: lesson.name } : null };
+    return {
+      ...session,
+      lesson: lesson ? { id: lesson.id, name: lesson.name, year: lesson.year, createdAt: lesson.createdAt } : null,
+    };
   };
 
   // How well the session's words are retained (null until one is graded), for the card ring.
@@ -94,11 +104,12 @@ export async function registerRoutes(
     return { ...session, retrievability: sessionRetrievability(session.sessionType, words, states, now()) };
   };
 
-  // Resolves a lessonName to a lessonId: null (or blank) clears the tag, a
-  // name new to the Subject creates its Lesson, otherwise the existing one is reused.
-  const resolveLessonId = async (subject: Subject, lessonName: string | null) => {
+  // Resolves a lessonName (and its Year) to a lessonId: null (or blank) clears
+  // the tag, a name new to that Year creates its Lesson, otherwise the existing
+  // one is reused. A blank Year is no Year.
+  const resolveLessonId = async (subject: Subject, lessonName: string | null, lessonYear: string | null) => {
     const name = lessonName?.trim();
-    return name ? (await storage.findOrCreateLesson(subject, name)).id : null;
+    return name ? (await storage.findOrCreateLesson(subject, lessonYear?.trim() || null, name)).id : null;
   };
 
   // Sessions routes
@@ -201,6 +212,26 @@ export async function registerRoutes(
     }
   });
 
+  // Moves a Lesson, and so every session tagged with it, to another Year.
+  app.put("/api/lessons/:id", async (req, res) => {
+    const year = lessonYearSchema.safeParse(req.body?.year);
+    if (!year.success) {
+      return res.status(400).json({ message: "year must be a string or null" });
+    }
+    try {
+      const lesson = await storage.setLessonYear(req.params.id, year.data?.trim() || null);
+      if (lesson === "conflict") {
+        return res.status(409).json({ message: "That Year already has a Lesson with this name" });
+      }
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      res.json(lesson);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update lesson" });
+    }
+  });
+
   app.get("/api/sessions/:id", async (req, res) => {
     try {
       const session = await storage.getSession(req.params.id);
@@ -245,8 +276,11 @@ export async function registerRoutes(
     try {
       const sessionData = insertSessionSchema.parse(req.body);
       const lessonName = lessonNameSchema.nullish().parse(req.body.lessonName) ?? null;
-      const lessonId = await resolveLessonId(sessionData.subject, lessonName);
+      const lessonYear = lessonYearSchema.nullish().parse(req.body.lessonYear) ?? null;
+      const meanings = meaningEntriesSchema.optional().parse(req.body.meanings) ?? [];
+      const lessonId = await resolveLessonId(sessionData.subject, lessonName, lessonYear);
       const session = await storage.createSession({ ...sessionData, lessonId });
+      await saveMeanings(storage, session.subject, session.words, meanings);
       res.json(await withLesson(session));
     } catch (error) {
       res.status(400).json({ message: "Invalid session data" });
@@ -256,9 +290,16 @@ export async function registerRoutes(
   app.put("/api/sessions/:id", async (req, res) => {
     try {
       // Normalize pinnedAt if provided (ensure Date or null for DB driver)
-      const { lessonName, ...updates } = req.body as any;
+      const { lessonName, lessonYear, meanings: rawMeanings, ...updates } = req.body as any;
       if (lessonName !== undefined && !lessonNameSchema.safeParse(lessonName).success) {
         return res.status(400).json({ message: "lessonName must be a string or null" });
+      }
+      if (lessonYear !== undefined && !lessonYearSchema.safeParse(lessonYear).success) {
+        return res.status(400).json({ message: "lessonYear must be a string or null" });
+      }
+      const meanings = meaningEntriesSchema.optional().safeParse(rawMeanings);
+      if (!meanings.success) {
+        return res.status(400).json({ message: "meanings must be a list of {word, meaning, edited}" });
       }
       if (updates.dueDate !== undefined && !dueDateSchema.safeParse(updates.dueDate).success) {
         return res.status(400).json({ message: "dueDate must be a YYYY-MM-DD date or null" });
@@ -290,13 +331,14 @@ export async function registerRoutes(
         if (!existing) {
           return res.status(404).json({ message: "Session not found" });
         }
-        updates.lessonId = await resolveLessonId(existing.subject, lessonName);
+        updates.lessonId = await resolveLessonId(existing.subject, lessonName, lessonYear ?? null);
       }
 
       const session = await storage.updateSession(req.params.id, updates);
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
       }
+      await saveMeanings(storage, session.subject, session.words, meanings.data ?? []);
       res.json(await withLesson(session));
     } catch (error) {
       console.error("Failed to update session", error);
@@ -354,6 +396,45 @@ export async function registerRoutes(
       );
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch review states" });
+    }
+  });
+
+  // Meanings (ADR-0011). GET returns {word: meaning} for the given words that
+  // have one. Words come as repeated ?word= params, not comma-separated: a
+  // sentence can contain a comma.
+  app.get("/api/meanings", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.query.subject);
+    const raw = req.query.word;
+    const words = typeof raw === "string" ? [raw] : Array.isArray(raw) ? raw.filter((w): w is string => typeof w === "string") : null;
+    if (!subject.success || !words) {
+      return res.status(400).json({ message: "subject and word are required" });
+    }
+    try {
+      const rows = await storage.getWords(subject.data, normalizeWords(words));
+      res.json(Object.fromEntries(rows.filter((r) => r.meaning).map((r) => [r.word, r.meaning])));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch meanings" });
+    }
+  });
+
+  // The Meanings for a list under review, before it is saved: stored ones
+  // plus one AI call for the rest. Nothing is stored until the list is saved.
+  app.post("/api/meanings/preview", async (req, res) => {
+    const subject = subjectSchema.safeParse(req.body?.subject);
+    const words = z.array(z.string()).safeParse(req.body?.words);
+    const missing = z.array(z.string()).optional().safeParse(req.body?.missing);
+    const lessonName = lessonNameSchema.nullish().safeParse(req.body?.lessonName);
+    if (!subject.success || !words.success || !missing.success || !lessonName.success) {
+      return res.status(400).json({ message: "subject and words are required" });
+    }
+    try {
+      // The topic of an existing Lesson, if the list is tagged with one; never creates it.
+      const name = lessonName.data?.trim();
+      const topic = name ? ((await storage.getLessons(subject.data)).find((l) => l.name === name)?.topic ?? null) : null;
+      res.json(await previewMeanings(storage, generateMeanings, subject.data, words.data, topic, missing.data));
+    } catch (error) {
+      console.error("[meanings] Preview failed", error);
+      res.status(502).json({ message: "Couldn't get meanings. Try again later." });
     }
   });
 

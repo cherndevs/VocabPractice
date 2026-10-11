@@ -1,8 +1,8 @@
-import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, type Grade, users, sessions, lessons, settings, reviewStates, gradeLog } from "@shared/schema";
+import { DEFAULT_REFRESHER_SIZE, type User, type InsertUser, type Session, type InsertSession, type Lesson, type Settings, type InsertSettings, type Subject, type Skill, type ReviewState, type GradeInput, type Grade, type WordRow, users, sessions, lessons, settings, reviewStates, gradeLog, words } from "@shared/schema";
 import { randomUUID } from "crypto";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -16,11 +16,14 @@ export interface IStorage {
   updateSession(id: string, updates: Partial<Session>): Promise<Session | undefined>;
   deleteSession(id: string): Promise<boolean>;
 
-  // Lessons. A name is trimmed by the caller; (subject, name) is unique.
+  // Lessons. Names and Years are trimmed by the caller (a blank Year is null);
+  // (subject, year, name) is unique, with a missing Year counting as one value.
   getLessons(subject: Subject): Promise<Lesson[]>;
   getLesson(id: string): Promise<Lesson | undefined>;
-  /** The Subject's Lesson with this name, created if it does not exist yet. */
-  findOrCreateLesson(subject: Subject, name: string): Promise<Lesson>;
+  /** The Subject's Lesson with this Year and name, created if it does not exist yet. */
+  findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson>;
+  /** Moves a Lesson to another Year. Undefined if the Lesson is missing; "conflict" if that Year already has one by this name. */
+  setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict">;
 
   // Grades and review state. The scheduling rules live in server/grades.ts;
   // storage only keeps what it is told.
@@ -33,6 +36,14 @@ export interface IStorage {
   getLatestGrades(subject: Subject, skill: Skill, words: string[]): Promise<Map<string, Grade>>;
   /** Whether any grade has been logged as part of this session. */
   hasSessionGrades(sessionId: string): Promise<boolean>;
+
+  // Words and their Meanings (ADR-0011). Words are trimmed by the caller.
+  /** The rows that exist for these words. */
+  getWords(subject: Subject, words: string[]): Promise<WordRow[]>;
+  /** Adds generated meanings for words with no row yet; never touches an existing row. */
+  addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void>;
+  /** A parent's edit: creates or replaces the row and marks it edited. */
+  setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow>;
 
   // Settings
   getSettings(): Promise<Settings | undefined>;
@@ -56,6 +67,7 @@ export class MemStorage implements IStorage {
   private settings: Settings | undefined;
   private grades = new Map<string, GradeInput>();
   private reviewStates = new Map<string, ReviewState>();
+  private wordRows = new Map<string, WordRow>();
 
   constructor() {
     this.users = new Map();
@@ -162,12 +174,24 @@ export class MemStorage implements IStorage {
     return this.lessons.get(id);
   }
 
-  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
-    const existing = Array.from(this.lessons.values()).find((l) => l.subject === subject && l.name === name);
+  async findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson> {
+    const existing = Array.from(this.lessons.values()).find((l) => l.subject === subject && l.year === year && l.name === name);
     if (existing) return existing;
-    const lesson: Lesson = { id: randomUUID(), subject, name, topic: null };
+    const lesson: Lesson = { id: randomUUID(), subject, year, name, topic: null, createdAt: new Date() };
     this.lessons.set(lesson.id, lesson);
     return lesson;
+  }
+
+  async setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict"> {
+    const lesson = this.lessons.get(id);
+    if (!lesson) return undefined;
+    const clash = Array.from(this.lessons.values()).some(
+      (l) => l.id !== id && l.subject === lesson.subject && l.year === year && l.name === lesson.name,
+    );
+    if (clash) return "conflict";
+    const updated = { ...lesson, year };
+    this.lessons.set(id, updated);
+    return updated;
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {
@@ -206,6 +230,27 @@ export class MemStorage implements IStorage {
 
   async saveReviewState(state: ReviewState): Promise<void> {
     this.reviewStates.set(this.reviewKey(state.subject, state.word, state.skill), state);
+  }
+
+  private wordKey(subject: Subject, word: string) {
+    return JSON.stringify([subject, word]);
+  }
+
+  async getWords(subject: Subject, words: string[]): Promise<WordRow[]> {
+    return Array.from(new Set(words)).flatMap((word) => this.wordRows.get(this.wordKey(subject, word)) ?? []);
+  }
+
+  async addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void> {
+    for (const [word, meaning] of Object.entries(meanings)) {
+      const key = this.wordKey(subject, word);
+      if (!this.wordRows.has(key)) this.wordRows.set(key, { subject, word, meaning, edited: false });
+    }
+  }
+
+  async setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow> {
+    const row: WordRow = { subject, word, meaning, edited: true };
+    this.wordRows.set(this.wordKey(subject, word), row);
+    return row;
   }
 
   async getSettings(): Promise<Settings | undefined> {
@@ -307,15 +352,25 @@ class PgStorage implements IStorage {
     return result[0];
   }
 
-  async findOrCreateLesson(subject: Subject, name: string): Promise<Lesson> {
-    // The unique index makes concurrent creators converge on one row.
-    await this.db.insert(lessons).values({ subject, name }).onConflictDoNothing();
+  async findOrCreateLesson(subject: Subject, year: string | null, name: string): Promise<Lesson> {
+    // The unique constraint makes concurrent creators converge on one row.
+    await this.db.insert(lessons).values({ subject, year, name }).onConflictDoNothing();
     const result = await this.db
       .select()
       .from(lessons)
-      .where(and(eq(lessons.subject, subject), eq(lessons.name, name)))
+      .where(and(eq(lessons.subject, subject), year === null ? isNull(lessons.year) : eq(lessons.year, year), eq(lessons.name, name)))
       .limit(1);
     return result[0]!;
+  }
+
+  async setLessonYear(id: string, year: string | null): Promise<Lesson | undefined | "conflict"> {
+    try {
+      const result = await this.db.update(lessons).set({ year }).where(eq(lessons.id, id)).returning();
+      return result[0];
+    } catch (error) {
+      if ((error as { code?: string }).code === "23505") return "conflict"; // unique_violation
+      throw error;
+    }
   }
 
   async logGrade(grade: GradeInput): Promise<boolean> {
@@ -363,6 +418,27 @@ class PgStorage implements IStorage {
   async hasSessionGrades(sessionId: string): Promise<boolean> {
     const rows = await this.db.select({ id: gradeLog.id }).from(gradeLog).where(eq(gradeLog.sessionId, sessionId)).limit(1);
     return rows.length > 0;
+  }
+
+  async getWords(subject: Subject, wanted: string[]): Promise<WordRow[]> {
+    if (wanted.length === 0) return [];
+    return this.db.select().from(words).where(and(eq(words.subject, subject), inArray(words.word, wanted)));
+  }
+
+  async addGeneratedMeanings(subject: Subject, meanings: Record<string, string>): Promise<void> {
+    const rows = Object.entries(meanings).map(([word, meaning]) => ({ subject, word, meaning, edited: false }));
+    if (rows.length === 0) return;
+    await this.db.insert(words).values(rows).onConflictDoNothing();
+  }
+
+  async setEditedMeaning(subject: Subject, word: string, meaning: string | null): Promise<WordRow> {
+    const row = { subject, word, meaning, edited: true };
+    const result = await this.db
+      .insert(words)
+      .values(row)
+      .onConflictDoUpdate({ target: [words.subject, words.word], set: { meaning, edited: true } })
+      .returning();
+    return result[0]!;
   }
 
   async getSettings(): Promise<Settings | undefined> {

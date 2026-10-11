@@ -9,7 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { LessonPicker } from "@/components/lesson-picker";
 import { DueDateField } from "@/components/due-date-field";
 import { queryClient } from "@/lib/queryClient";
-import type { SessionWithLesson } from "@shared/schema";
+import { MEANING_SUBJECTS, type MeaningEntry, type SessionWithLesson } from "@shared/schema";
+import { useMeaningDrafts, useMeanings } from "@/hooks/use-meanings";
+import { FillMeaningsButton, MeaningField } from "@/components/meaning-field";
 
 export default function EditSession() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +20,12 @@ export default function EditSession() {
 
   const [sessionTitle, setSessionTitle] = useState("");
   const [words, setWords] = useState<string[]>([""]);
-  const [lessonName, setLessonName] = useState<string | null>(null);
+  const [lessonName, setLessonNameOnly] = useState<string | null>(null);
+  const [lessonYear, setLessonYear] = useState<string | null>(null);
+  const setLesson = (name: string | null, year: string | null) => {
+    setLessonNameOnly(name);
+    setLessonYear(year);
+  };
   const [dueDate, setDueDate] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
@@ -27,19 +34,45 @@ export default function EditSession() {
     queryKey: [`/api/sessions/${id}`],
     enabled: !!id,
   });
+  const showMeanings = !!session && MEANING_SUBJECTS.includes(session.subject);
+  // Meanings are drafted here and saved with the list, starting from the stored ones.
+  const drafts = useMeaningDrafts(session?.subject, lessonName);
+  const stored = useMeanings(session?.subject, session?.words ?? []);
+  // Keyed by content: useMeanings hands back a fresh object each render.
+  const storedKey = JSON.stringify(stored);
+  useEffect(() => drafts.seed(stored), [storedKey]);
 
   // Pre-populate form once session loads
   useEffect(() => {
     if (session) {
       setSessionTitle(session.title);
       setWords(session.words.length > 0 ? session.words : [""]);
-      setLessonName(session.lesson?.name ?? null);
+      setLesson(session.lesson?.name ?? null, session.lesson?.year ?? null);
       setDueDate(session.dueDate);
     }
   }, [session]);
 
   const updateSessionMutation = useMutation({
-    mutationFn: async (payload: { title: string; words: string[]; wordCount: number; lessonName: string | null; dueDate: string | null }) => {
+    mutationFn: async (payload: {
+      title: string;
+      words: string[];
+      wordCount: number;
+      lessonName: string | null;
+      lessonYear: string | null;
+      dueDate: string | null;
+      meanings: MeaningEntry[];
+    }) => {
+      // A new Year for the session's own Lesson moves the whole Lesson first.
+      const current = session?.lesson;
+      if (current && payload.lessonName === current.name && payload.lessonYear !== current.year) {
+        const moved = await fetch(`/api/lessons/${current.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ year: payload.lessonYear }),
+        });
+        // A clash means that Year already has this Lesson: the session joins it instead.
+        if (!moved.ok && moved.status !== 409) throw new Error("Failed to update lesson");
+      }
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +86,7 @@ export default function EditSession() {
       queryClient.invalidateQueries({ queryKey: ["/api/practice"] });
       queryClient.invalidateQueries({ queryKey: ["/api/lessons"] });
       queryClient.invalidateQueries({ queryKey: [`/api/sessions/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/meanings"] });
       setIsSaved(true);
       setTimeout(() => {
         navigate("/library");
@@ -112,7 +146,15 @@ export default function EditSession() {
       return;
     }
     const title = sessionTitle.trim() || `Spelling Session ${new Date().toLocaleDateString()}`;
-    updateSessionMutation.mutate({ title, words: filteredWords, wordCount: filteredWords.length, lessonName, dueDate });
+    updateSessionMutation.mutate({
+      title,
+      words: filteredWords,
+      wordCount: filteredWords.length,
+      lessonName,
+      lessonYear,
+      dueDate,
+      meanings: showMeanings ? drafts.entries(filteredWords) : [],
+    });
   };
 
   if (isLoading) {
@@ -194,7 +236,14 @@ export default function EditSession() {
 
         {session && (
           <div className="mb-6">
-            <LessonPicker subject={session.subject} value={lessonName} onChange={setLessonName} title={sessionTitle} />
+            <LessonPicker
+              subject={session.subject}
+              value={lessonName}
+              year={lessonYear}
+              onChange={setLesson}
+              currentLesson={session.lesson}
+              title={sessionTitle}
+            />
           </div>
         )}
 
@@ -205,28 +254,34 @@ export default function EditSession() {
         {/* Word List */}
         <div className="space-y-3 mb-6">
           {words.map((word, index) => (
-            <div
-              key={index}
-              className="flex items-center space-x-3 p-3 bg-card rounded-lg border border-border"
-            >
-              <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
-              <Input
-                value={word}
-                onChange={(e) => handleWordChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className="flex-1 bg-transparent border-none outline-none"
-                placeholder="Enter word…"
-                data-testid={`edit-input-word-${index}`}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRemoveWord(index)}
-                className="p-1 text-destructive hover:bg-destructive/10"
-                data-testid={`edit-button-remove-word-${index}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+            <div key={index} className="p-3 bg-card rounded-lg border border-border">
+              <div className="flex items-center space-x-3">
+                <span className="w-6 text-sm text-muted-foreground">{index + 1}.</span>
+                <Input
+                  value={word}
+                  onChange={(e) => handleWordChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  className="flex-1 bg-transparent border-none outline-none"
+                  placeholder="Enter word…"
+                  data-testid={`edit-input-word-${index}`}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveWord(index)}
+                  className="p-1 text-destructive hover:bg-destructive/10"
+                  data-testid={`edit-button-remove-word-${index}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+              {showMeanings && word.trim() && (
+                <MeaningField
+                  value={drafts.meaningOf(word)}
+                  onChange={(meaning) => drafts.edit(word, meaning)}
+                  testId={`edit-input-meaning-${index}`}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -241,6 +296,8 @@ export default function EditSession() {
           Add Word
         </Button>
 
+        {showMeanings && <FillMeaningsButton drafts={drafts} words={words} />}
+
         <Button
           onClick={handleSave}
           className="w-full"
@@ -253,3 +310,4 @@ export default function EditSession() {
     </div>
   );
 }
+
