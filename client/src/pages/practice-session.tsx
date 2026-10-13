@@ -60,21 +60,22 @@ export interface DrillSource {
   subject: Session["subject"];
   sessionType: Session["sessionType"];
   pinnedAt: Session["pinnedAt"];
-  /** Where the header's close button leads. */
-  exitTo: string;
 }
 
 // Loads the session and its drill (the words to practise now), and keys the
 // drill by scope so switching restarts it. The words are held as loaded: grades
 // refresh review states mid-drill, and the list must not shift under the child.
 // Spelling sessions open with the Learn stage (start choice, learn, hand-over)
-// before the drill; nothing in it is recorded.
+// before the drill; nothing in it is recorded. Closing Learn or dictation returns
+// to the start choice, refetching so the counts reflect grades just given.
 export default function PracticeSession() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   // "test" asks the server: every word until the session is first tested, then due.
   const [scope, setScope] = useState<DrillScope | "test">("test");
   const [stage, setStage] = useState<"choose" | "learn" | "handover" | "test">("choose");
+  // Bumped on returning to the start choice, to refetch the drill and Learn words.
+  const [visit, setVisit] = useState(0);
   const [learnWords, setLearnWords] = useState<string[] | null>(null);
   const [learning, setLearning] = useState<string[]>([]);
   const [drill, setDrill] = useState<{ scope: DrillScope; words: string[] } | null>(null);
@@ -99,7 +100,7 @@ export default function PracticeSession() {
     return () => {
       cancelled = true;
     };
-  }, [id, scope]);
+  }, [id, scope, visit]);
 
   const isSpelling = session?.sessionType === "spelling";
   useEffect(() => {
@@ -117,7 +118,16 @@ export default function PracticeSession() {
     return () => {
       cancelled = true;
     };
-  }, [id, isSpelling]);
+  }, [id, isSpelling, visit]);
+
+  const exit = () => navigate("/library");
+  const backToChoose = () => {
+    setLearnWords(null);
+    setScope("test");
+    setStage("choose");
+    // Send queued grades first, so words just graded Oops count as missed.
+    void gradeOutbox.flush().finally(() => setVisit((v) => v + 1));
+  };
 
   const choosing = isSpelling && stage !== "test";
   if (sessionLoading || (!drillFailed && session && (choosing ? !learnWords : !drill))) {
@@ -132,7 +142,6 @@ export default function PracticeSession() {
 
   if (session && choosing && learnWords && !drillFailed) {
     const allWords = Array.from(new Set(session.words.map((w) => w.trim()).filter(Boolean)));
-    const exit = () => navigate("/library");
     if (stage === "choose") {
       return (
         <LearnStart
@@ -149,7 +158,7 @@ export default function PracticeSession() {
       );
     }
     if (stage === "learn") {
-      return <LearnRun words={learning} meanings={meanings} onClose={exit} onFinished={() => setStage("handover")} />;
+      return <LearnRun words={learning} meanings={meanings} onClose={backToChoose} onFinished={() => setStage("handover")} />;
     }
     return (
       <LearnHandover
@@ -194,8 +203,10 @@ export default function PracticeSession() {
 
   return (
     <PracticeDrill
-      key={drill.scope}
-      session={{ ...session, exitTo: "/library" }}
+      key={`${drill.scope}-${visit}`}
+      session={session}
+      // Back to the start choice if this test followed it (Learn's words loaded).
+      onClose={isSpelling && learnWords ? backToChoose : exit}
       words={drill.words}
       scope={drill.scope}
       onScopeChange={setScope}
@@ -208,8 +219,11 @@ export function PracticeDrill({
   words,
   scope,
   onScopeChange,
+  onClose,
 }: {
   session: DrillSource;
+  /** The header's close button. */
+  onClose: () => void;
   words: string[];
   /** Absent for a refresher, which has no Revise all. */
   scope?: DrillScope;
@@ -730,7 +744,7 @@ export function PracticeDrill({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(session.exitTo)}
+          onClick={onClose}
           aria-label="End session"
           className="text-muted-foreground"
           data-testid="button-go-back"

@@ -82,9 +82,9 @@ export default function Refresher() {
         subject,
         sessionType: skill.data,
         pinnedAt: null,
-        exitTo: "/",
       }}
       words={words}
+      onClose={() => navigate("/")}
     />
   );
 }
