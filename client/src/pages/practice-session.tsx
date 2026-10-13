@@ -120,7 +120,10 @@ export default function PracticeSession() {
     };
   }, [id, isSpelling, visit]);
 
-  const exit = () => navigate("/library");
+  // Leaving returns to the screen the session was opened from: the Practice
+  // screen marks its links; anything else (the Library, a cold open) gets the Library.
+  const exitTo = (window.history.state as { from?: string } | null)?.from === "/" ? "/" : "/library";
+  const exit = () => navigate(exitTo);
   const backToChoose = () => {
     setLearnWords(null);
     setScope("test");
@@ -175,7 +178,7 @@ export default function PracticeSession() {
       <div className="px-4 pt-4">
         <div className={STAGE}>
           <p className="text-[15px] text-muted-foreground">{session ? "Couldn't load the words" : "Session not found"}</p>
-          <Button onClick={() => navigate("/library")} className={`${WIDE_BUTTON} max-w-[200px]`}>
+          <Button onClick={exit} className={`${WIDE_BUTTON} max-w-[200px]`}>
             Back to sessions
           </Button>
         </div>
@@ -195,7 +198,7 @@ export default function PracticeSession() {
         </div>
         <div className="mt-4 flex flex-col gap-2 px-4">
           <Button className={WIDE_BUTTON} onClick={() => setScope("all")} data-testid="button-revise-all">Revise all</Button>
-          <Button variant="outline" className={WIDE_BUTTON} onClick={() => navigate("/library")}>Back to sessions</Button>
+          <Button variant="outline" className={WIDE_BUTTON} onClick={exit}>Back to sessions</Button>
         </div>
       </div>
     );
