@@ -26,7 +26,7 @@ function SessionCard({ session, onTogglePin }: { session: PracticeSession; onTog
   const meta = `${formatDueDate(session.dueDate)} · ${session.wordCount} ${session.wordCount === 1 ? "word" : "words"}`;
   return (
     <Card className="word-card hover:shadow-md transition-shadow" data-testid={`card-session-${session.id}`}>
-      <Link href={`/practice/${session.id}`}>
+      <Link href={`/practice/${session.id}`} state={{ from: "/" }}>
         <CardContent className="flex items-center gap-3 px-3.5 py-3 cursor-pointer">
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
