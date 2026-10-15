@@ -142,8 +142,12 @@ export async function registerRoutes(
 
   // Every word in the Subject's sessions of this skill that needs review,
   // each listed once, most overdue first then never-graded (CONTEXT.md: Refresher).
-  const dueWords = async (subject: Subject, skill: Skill) => {
-    const words = (await storage.getSessions(subject)).filter((s) => s.sessionType === skill).flatMap((s) => s.words);
+  // Only sessions due on or before today count: a list set for later, or with
+  // no due date yet, isn't drilled before it's been learned.
+  const refresherWords = async (subject: Subject, skill: Skill, today: string) => {
+    const words = (await storage.getSessions(subject))
+      .filter((s) => s.sessionType === skill && !!s.dueDate && s.dueDate <= today)
+      .flatMap((s) => s.words);
     const states = await storage.getReviewStates(subject, skill, words.map((w) => w.trim()));
     return drillWords(words, states, "due", now());
   };
@@ -173,7 +177,7 @@ export async function registerRoutes(
         .sort((a, b) => time(b.pinnedAt) - time(a.pinnedAt));
       res.json({
         refreshers: Object.fromEntries(
-          await Promise.all(SKILLS.map(async (skill) => [skill, (await dueWords(subject.data, skill)).length] as const)),
+          await Promise.all(SKILLS.map(async (skill) => [skill, (await refresherWords(subject.data, skill, today.data!)).length] as const)),
         ),
         thisWeek: thisWeek ? await withRetrievability(await withLesson(thisWeek)) : null,
         pinned: await Promise.all(pinned.map(async (s) => withRetrievability(await withLesson(s)))),
@@ -188,11 +192,12 @@ export async function registerRoutes(
   app.get("/api/refresher", async (req, res) => {
     const subject = subjectSchema.safeParse(req.query.subject);
     const skill = skillSchema.safeParse(req.query.skill);
-    if (!subject.success || !skill.success) {
-      return res.status(400).json({ message: "subject and skill are required" });
+    const today = dueDateSchema.safeParse(req.query.today);
+    if (!subject.success || !skill.success || !today.success || !today.data) {
+      return res.status(400).json({ message: "subject, skill and today (YYYY-MM-DD) are required" });
     }
     try {
-      const due = await dueWords(subject.data, skill.data);
+      const due = await refresherWords(subject.data, skill.data, today.data);
       const size = (await storage.getSettings())?.refresherSize ?? DEFAULT_REFRESHER_SIZE;
       res.json({ words: due.slice(0, size), count: due.length });
     } catch (error) {
