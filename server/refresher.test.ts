@@ -26,6 +26,7 @@ const make = async (words: string[], overrides: Record<string, unknown> = {}) =>
     wordCount: words.length,
     subject: "english",
     sessionType: "spelling",
+    dueDate: "2026-01-01",
     ...overrides,
   });
   expect(res.status).toBe(200);
@@ -108,14 +109,14 @@ describe("GET /api/refresher", () => {
 });
 
 describe("Refresher due dates", () => {
-  it("draws only from sessions that are undated or due on or before today", async () => {
+  it("draws only from sessions due on or before today", async () => {
     await make(["past"], { dueDate: "2026-01-04" });
     await make(["today"], { dueDate: "2026-01-05" });
-    await make(["undated"]);
+    await make(["undated"], { dueDate: null });
     await make(["future"], { dueDate: "2026-01-06" });
     const { body } = await refresher();
-    expect(body.words.sort()).toEqual(["past", "today", "undated"]);
-    expect(body.count).toBe(3);
+    expect(body.words.sort()).toEqual(["past", "today"]);
+    expect(body.count).toBe(2);
   });
 
   it("takes a word held by a past and a future session", async () => {
@@ -150,6 +151,7 @@ describe("Refresher due dates", () => {
   it("applies to the Practice screen's counts", async () => {
     await make(["now"]);
     await make(["soon"], { dueDate: "2026-01-06" });
+    await make(["someday"], { dueDate: null });
     expect((await practice()).body.refreshers).toEqual({ spelling: 1, reading: 0 });
   });
 });

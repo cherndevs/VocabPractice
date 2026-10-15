@@ -142,11 +142,11 @@ export async function registerRoutes(
 
   // Every word in the Subject's sessions of this skill that needs review,
   // each listed once, most overdue first then never-graded (CONTEXT.md: Refresher).
-  // Only sessions that are undated or due on or before today count, so a list
-  // set for later isn't drilled before it's been learned.
+  // Only sessions due on or before today count: a list set for later, or with
+  // no due date yet, isn't drilled before it's been learned.
   const refresherWords = async (subject: Subject, skill: Skill, today: string) => {
     const words = (await storage.getSessions(subject))
-      .filter((s) => s.sessionType === skill && (!s.dueDate || s.dueDate <= today))
+      .filter((s) => s.sessionType === skill && !!s.dueDate && s.dueDate <= today)
       .flatMap((s) => s.words);
     const states = await storage.getReviewStates(subject, skill, words.map((w) => w.trim()));
     return drillWords(words, states, "due", now());

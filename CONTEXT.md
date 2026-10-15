@@ -59,11 +59,11 @@ A word whose review state says it is ready for practice again in that skill. Wha
 _Avoid_: Due (reserved for a Session's due date), overdue
 
 **Refresher**:
-A session made of the words that need review in one skill, across Lessons, rather than one Lesson's list. There is one per skill — a spelling refresher and a reading refresher — each offered on the Practice screen only when it has words. It draws only from Sessions with no due date or one on or before today, so a list set for later isn't drilled before it's been learned; a word on any such Session counts. It holds at most the refresher size set in Settings (20 by default). Never mixed, so a reading refresher can be done without a parent free to mark.
+A session made of the words that need review in one skill, across Lessons, rather than one Lesson's list. There is one per skill — a spelling refresher and a reading refresher — each offered on the Practice screen only when it has words. It draws only from Sessions due on or before today, so a list set for later isn't drilled before it's been learned; a Session with no due date counts as not started and is left out. A word on any due Session counts. It holds at most the refresher size set in Settings (20 by default). Never mixed, so a reading refresher can be done without a parent free to mark.
 _Avoid_: Quick Refresher as a single mixed session, review session
 
 **Due date**:
-The calendar date a Session is for — typically the day of the school test or homework it prepares for. Optional: set when the session is created, and changeable whenever it is edited, since tests move. The Practice screen's "This week" shows the session with the nearest future due date; a session without one never appears there. Unrelated to whether its words need review — moving a due date never changes review state.
+The calendar date a Session is for — typically the day of the school test or homework it prepares for. Optional: set when the session is created, and changeable whenever it is edited, since tests move. The Practice screen's "This week" shows the session with the nearest future due date; a session without one never appears there, nor in a Refresher, until it is dated. Unrelated to whether its words need review — moving a due date never changes review state.
 _Avoid_: Deadline, test date (the session may not be for a test)
 
 **Pinned**:
