@@ -33,6 +33,11 @@ export function DueDateField({ value, onChange }: DueDateFieldProps) {
       <p className="mt-1.5 text-xs leading-snug text-muted-foreground">
         The day of the test or homework. The session with the nearest due date shows under This week on Practice.
       </p>
+      {!value && (
+        <p className="mt-1 text-xs leading-snug text-muted-foreground" data-testid="text-due-date-refresher-hint">
+          Without a due date, this list won't appear in the spelling or reading Refreshers until it has one.
+        </p>
+      )}
     </div>
   );
 }
