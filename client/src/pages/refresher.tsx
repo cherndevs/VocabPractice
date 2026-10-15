@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useActiveSubject } from "@/hooks/use-active-subject";
 import { REFRESHERS } from "@/pages/practice";
 import { PracticeDrill } from "@/pages/practice-session";
+import { localToday } from "@/lib/due-date";
 import { skillSchema } from "@shared/schema";
 
 // A refresher drills the words needing review in one skill across the active
@@ -25,7 +26,7 @@ export default function Refresher() {
     let cancelled = false;
     setWords(null);
     setFailed(false);
-    fetch(`/api/refresher?subject=${subject}&skill=${skill.data}`)
+    fetch(`/api/refresher?subject=${subject}&skill=${skill.data}&today=${localToday()}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
       .then((body: { words: string[] }) => {
         if (!cancelled) setWords(body.words);

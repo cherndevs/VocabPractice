@@ -31,15 +31,18 @@ const make = async (words: string[], overrides: Record<string, unknown> = {}) =>
   expect(res.status).toBe(200);
   return res.body;
 };
-const refresher = (skill = "spelling", subject = "english") =>
-  api.request("GET", `/api/refresher?subject=${subject}&skill=${skill}`);
+const refresher = (skill = "spelling", subject = "english", today = "2026-01-05") =>
+  api.request("GET", `/api/refresher?subject=${subject}&skill=${skill}&today=${today}`);
 const practice = () => api.request("GET", "/api/practice?subject=english&today=2026-01-05");
 
 describe("GET /api/refresher", () => {
-  it("requires a valid subject and skill", async () => {
-    expect((await api.request("GET", "/api/refresher?skill=spelling")).status).toBe(400);
-    expect((await api.request("GET", "/api/refresher?subject=english")).status).toBe(400);
-    expect((await api.request("GET", "/api/refresher?subject=english&skill=bogus")).status).toBe(400);
+  it("requires a valid subject, skill and today", async () => {
+    const todayParam = "&today=2026-01-05";
+    expect((await api.request("GET", `/api/refresher?skill=spelling${todayParam}`)).status).toBe(400);
+    expect((await api.request("GET", `/api/refresher?subject=english${todayParam}`)).status).toBe(400);
+    expect((await api.request("GET", `/api/refresher?subject=english&skill=bogus${todayParam}`)).status).toBe(400);
+    expect((await api.request("GET", "/api/refresher?subject=english&skill=spelling")).status).toBe(400);
+    expect((await api.request("GET", "/api/refresher?subject=english&skill=spelling&today=soon")).status).toBe(400);
   });
 
   it("is empty with no sessions", async () => {
@@ -101,6 +104,53 @@ describe("GET /api/refresher", () => {
     const { body } = await refresher();
     expect(body.words).toHaveLength(20);
     expect(body.count).toBe(25);
+  });
+});
+
+describe("Refresher due dates", () => {
+  it("draws only from sessions that are undated or due on or before today", async () => {
+    await make(["past"], { dueDate: "2026-01-04" });
+    await make(["today"], { dueDate: "2026-01-05" });
+    await make(["undated"]);
+    await make(["future"], { dueDate: "2026-01-06" });
+    const { body } = await refresher();
+    expect(body.words.sort()).toEqual(["past", "today", "undated"]);
+    expect(body.count).toBe(3);
+  });
+
+  it("takes a word held by a past and a future session", async () => {
+    await make(["shared"], { dueDate: "2026-01-01" });
+    await make(["shared", "later"], { dueDate: "2026-02-01" });
+    expect((await refresher()).body.words).toEqual(["shared"]);
+  });
+
+  it("leaves out a graded word whose only session is still to come", async () => {
+    await make(["early"], { dueDate: "2026-02-01" });
+    await grade("early", "again", T0);
+    api.setNow(days(1));
+    expect((await refresher("spelling", "english", "2026-01-06")).body.count).toBe(0);
+    expect((await refresher("spelling", "english", "2026-02-01")).body.words).toEqual(["early"]);
+  });
+
+  it("leaves out a word no longer on any session", async () => {
+    const s = await make(["gone", "kept"]);
+    await grade("gone", "again", T0);
+    await api.request("PUT", `/api/sessions/${s.id}`, { words: ["kept"], wordCount: 1 });
+    api.setNow(days(1));
+    expect((await refresher()).body.words).toEqual(["kept"]);
+  });
+
+  it("leaves out future sessions before applying the cap", async () => {
+    await make(["f1", "f2", "f3"], { dueDate: "2026-02-01" });
+    await make(["n1", "n2"]);
+    await api.request("PUT", "/api/settings", { refresherSize: 2 });
+    expect((await refresher()).body).toEqual({ words: ["n1", "n2"], count: 2 });
+  });
+
+  it("applies to the Practice screen's counts", async () => {
+    await make(["now"]);
+    await make(["soon"], { dueDate: "2026-01-06" });
+    expect((await practice()).body.refreshers).toEqual({ spelling: 1, reading: 0 });
   });
 });
 
